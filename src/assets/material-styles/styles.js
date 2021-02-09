@@ -281,3 +281,22 @@ export const receivePOTextFieldUseStyles = makeStyles((theme) => ({
         fontSize: '1rem'
     },
 }));
+
+
+export const sendMailDialogUseStyles = makeStyles((theme) => ({
+    dialog: {
+        padding: theme.spacing(3)
+    },
+    cancelBtn: {
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: '#dc3545'
+        }
+    },
+    sendMailBtn: {
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: theme.palette.primary.main
+        }
+    }
+}));

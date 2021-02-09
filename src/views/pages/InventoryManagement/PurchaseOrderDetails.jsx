@@ -11,7 +11,8 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import { TrainOutlined } from '@material-ui/icons';
+import SendMailDialog from '../../../components/SendMailDialog'
+import EditIcon from '@material-ui/icons/Edit';
 
 
 const columns = [
@@ -90,13 +91,11 @@ const PurchaseOrderDetails = () =>
                                 </Grid>
                                 <Grid item>
                                     <Button variant="subtitle1" color="default">
-                                        Edit
+                                        <EditIcon />
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="subtitle1" color="default">
-                                        Send
-                                    </Button>
+                                    <SendMailDialog />
                                 </Grid>
                                 {/* Desktop */}
                                 <Grid item>
@@ -123,7 +122,7 @@ const PurchaseOrderDetails = () =>
                                         >
                                         <MenuItem > Save as PDF </MenuItem>
                                         <MenuItem > Save as CSV </MenuItem>
-                                        <MenuItem > Cancel remaining items </MenuItem>
+                                        <MenuItem > Cancel orders </MenuItem>
                                     </Menu>
                                 </Grid>
                             </Grid>
@@ -167,7 +166,7 @@ const PurchaseOrderDetails = () =>
                                     Save as CSV
                                 </MenuItem>
                                 <MenuItem >
-                                    Cancel remaining items
+                                    Cancel orders
                                 </MenuItem>
                             </Menu>
                         </Grid>
