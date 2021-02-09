@@ -217,4 +217,34 @@ export const dataGridUseStyles = makeStyles((theme) => ({
     btn: {
         margin: theme.spacing(1, 1, 1, 0),
     }
+}));
+
+
+  
+export const purchaseOrderDetailsUseStyles = makeStyles((theme) => ({
+    addBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: '#4caf50',
+        color: '#FFF',
+        fontWeight: '600'
+    },
+    btn: {
+        margin: theme.spacing(1, 1, 1, 0),
+    },
+    purchaseOrderDetails: {
+        padding: theme.spacing(2)
+    },
+    options: {
+        [theme.breakpoints.down('sm')]: {
+            display: 'none'
+        },
+    },
+    optionsOnMobile: {
+        [theme.breakpoints.up('md')]: {
+            display: 'none'
+        },
+        [theme.breakpoints.down('sm')]: {
+            display: 'block'
+        },
+    }
   }));
