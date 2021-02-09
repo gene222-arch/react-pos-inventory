@@ -7,8 +7,8 @@ import { dataGridUseStyles } from '../../../assets/material-styles/styles'
 
 
 const columns = [
-    { field: 'name', headerName: 'Name', width: 200 },
-    { field: 'email', headerName: 'Email', width: 200 },
+    { field: 'name', headerName: 'Name', width: 270 },
+    { field: 'email', headerName: 'Email', width: 250 },
     { field: 'role', headerName: 'Role', width: 200 },
 
 ];

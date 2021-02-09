@@ -7,9 +7,9 @@ import { dataGridUseStyles } from '../../../assets/material-styles/styles'
 
 
 const columns = [
-    { field: 'role', headerName: 'Role', width: 200 },
+    { field: 'role', headerName: 'Role', width: 250 },
     { field: 'access', headerName: 'Access', width: 250 },
-    { field: 'employees', headerName: 'Employees', width: 200 },
+    { field: 'employees', headerName: 'Employees', width: 250 },
 
 ];
 

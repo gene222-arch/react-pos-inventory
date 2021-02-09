@@ -7,11 +7,11 @@ import { dataGridUseStyles } from '../../../assets/material-styles/styles'
 
 
 const columns = [
-    { field: 'customer', headerName: 'Customer', width: 130 },
-    { field: 'first_visit', headerName: 'First visit', width: 130 },
-    { field: 'last_visit', headerName: 'Last visit', width: 130 },
-    { field: 'total_visits', headerName: 'Total visits', width: 130 },
-    { field: 'total_spent', headerName: 'Total spent', width: 130 },
+    { field: 'customer', headerName: 'Customer', width: 335 },
+    { field: 'first_visit', headerName: 'First visit', width: 200 },
+    { field: 'last_visit', headerName: 'Last visit', width: 200 },
+    { field: 'total_visits', headerName: 'Total visits', width: 200 },
+    { field: 'total_spent', headerName: 'Total spent', width: 200 },
 
 ];
 
