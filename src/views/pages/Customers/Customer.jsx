@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { DataGrid } from '@material-ui/data-grid';
+import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import SearchIcon from '@material-ui/icons/Search'
+import { dataGridUseStyles } from '../../../assets/material-styles/styles'
 
 
 const columns = [
@@ -25,27 +24,9 @@ const rows = [
 ];
 
 
-const useStyles = makeStyles((theme) => ({
-    addCustomerBtn: {
-        margin: theme.spacing(1),
-        backgroundColor: '#4caf50',
-        color: '#FFF',
-        fontWeight: '600'
-    },
-    btn: {
-        margin: theme.spacing(1, 1, 1, 0),
-    },
-    searchField: {
-        margin: theme.spacing(1),
-        width: '100%'
-    }
-  }));
-
-
-
 const Customers = () => {
 
-    const classes = useStyles();
+    const classes = dataGridUseStyles();
 
     return (
         <>
@@ -58,7 +39,7 @@ const Customers = () => {
                                     <Button 
                                         variant="contained"
                                         color='primary' 
-                                        className={classes.addCustomerBtn}
+                                        className={classes.addBtn}
                                         startIcon={<PersonAddIcon />}    
                                     >
                                         Add Customer
@@ -70,21 +51,20 @@ const Customers = () => {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item xs={12} sm={12} md={4} lg={4}>
-                            <Grid container spacing={1} alignItems="flex-end">
-                                <Grid item>
-                                    <SearchIcon />
-                                </Grid>
-                                <Grid item xs={10} sm={10} md={10} lg={10}>
-                                    <TextField id="input-with-icon-grid" label="Search" className={classes.searchField}/>
-                                </Grid>
-                            </Grid>
-                        </Grid>
                     </Grid>
                 </CardContent>
             </Card>
-            <div style={{ height: 400, width: '100%' }}>
-                <DataGrid rows={rows} columns={columns} pageSize={5} checkboxSelection />
+            <div style={{ height: 450, width: '100%' }}>
+                <DataGrid 
+                    showToolbar
+                    components={{
+                        Toolbar: GridToolbar,
+                    }}
+                    rows={rows} 
+                    columns={columns} 
+                    pageSize={5} 
+                    checkboxSelection 
+                />
             </div>
         </>
     );

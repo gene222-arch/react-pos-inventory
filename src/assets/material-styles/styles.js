@@ -204,3 +204,17 @@ export const registrationFormUseStyles = makeStyles((theme) => ({
         }
     }
 }));
+
+
+
+export const dataGridUseStyles = makeStyles((theme) => ({
+    addBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: '#4caf50',
+        color: '#FFF',
+        fontWeight: '600'
+    },
+    btn: {
+        margin: theme.spacing(1, 1, 1, 0),
+    }
+  }));
