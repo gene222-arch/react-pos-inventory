@@ -353,6 +353,21 @@ const AdminLayout = ({children}) =>
                                     <ListItemText primary="Purchase Orders" className={classes.dropDownItem}/>
                                 </ListItem>
                             </NavLink>
+
+                            {/*Purchase Order Details */}
+                            <NavLink className={classes.navLinks} to={'/inventory-mngmt/purchase-order-details'}>
+                                <ListItem 
+                                    button 
+                                    className={classes.dropdownLists} 
+                                    selected={ selectedItem === '/inventory-mngmt/purchase-order-details' }
+                                    onClick={ 
+                                        e => handleSelectedItem(e, '/inventory-mngmt/purchase-order-details') 
+                                    }
+                                >
+                                    <ListItemText primary="Purchase Order Details" className={classes.dropDownItem}/>
+                                </ListItem>
+                            </NavLink>
+
                             {/* Suppliers */}
                             <NavLink className={classes.navLinks} to={'/inventory-mngmt/suppliers'}>
                                 <ListItem 
