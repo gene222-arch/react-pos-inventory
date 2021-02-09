@@ -19,6 +19,7 @@ const Customers = React.lazy(() => import('../views/pages/Customers/Customer'));
 const AccessRights = React.lazy(() => import('../views/pages/Employees/AccessRights'));
 const EmployeeList = React.lazy(() => import('../views/pages/Employees/EmployeeList'));
 const PurchaseOrders = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrders'));
+const PurchaseOrderDetails = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrderDetails'));
 const Suppliers = React.lazy(() => import('../views/pages/InventoryManagement/Suppliers'));
 const ReceivedStocks = React.lazy(() => import('../views/pages/Transactions/ReceivedStocks'));
 const Settings = React.lazy(() => import('../views/pages/Settings'))
@@ -135,6 +136,14 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: PurchaseOrders,
+            access: 'view_purchase_orders', 
+        },
+        {
+            path: '/inventory-mngmt/purchase-order-details',
+            name: 'PurchaseOrdersDetails',
+            icon: '',
+            exact: true,
+            component: PurchaseOrderDetails,
             access: 'view_purchase_orders', 
         },
         {
