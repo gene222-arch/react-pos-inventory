@@ -214,8 +214,14 @@ export const dataGridUseStyles = makeStyles((theme) => ({
         color: '#FFF',
         fontWeight: '600'
     },
+    cancelDeleteBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: theme.palette.secondary.main,
+        color: '#FFF',
+        fontWeight: '600'
+    },
     btn: {
-        margin: theme.spacing(1, 1, 1, 0),
+        margin: theme.spacing(1),
     }
 }));
 
@@ -246,5 +252,32 @@ export const purchaseOrderDetailsUseStyles = makeStyles((theme) => ({
         [theme.breakpoints.down('sm')]: {
             display: 'block'
         },
+    },
+    links: {
+        textDecoration: 'none',
+        color: '#3a3a3a'
     }
-  }));
+}));
+
+export const receivePOTextFieldUseStyles = makeStyles((theme) => ({
+    addBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: '#4caf50',
+        color: '#FFF',
+        fontWeight: '600'
+    },
+    cancelDeleteBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: theme.palette.secondary.main,
+        color: '#FFF',
+        fontWeight: '600'
+    },
+    toReceiveTextField: {
+        textAlign: 'center'
+    },
+    title: {
+        textDecoration: 'none',
+        color: '#3a3a3a',
+        fontSize: '1rem'
+    },
+}));

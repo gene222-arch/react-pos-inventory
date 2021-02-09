@@ -11,11 +11,13 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ExpandMore from '@material-ui/icons/ExpandMore';
+import { TrainOutlined } from '@material-ui/icons';
 
 
 const columns = [
-    { field: 'po_id', headerName: 'Purchase order #', width: 200, hide: true, },
-    { field: 'po_details_id', headerName: 'Purchase order #', width: 200, hide: true },
+    { field: 'po_id',  hide: true, },
+    { field: 'po_details_id', hide: true },
+    { field: 'product_id', hide: true },
     { field: 'product', headerName: 'Date', width: 160 },
     { field: 'quantity', headerName: 'Date', width: 160 },
     { field: 'purchase_cost', headerName: 'Date', width: 160 },
@@ -23,14 +25,17 @@ const columns = [
 ];
 
 const rows = [
-  { id: 1, po_id: 1, po_details_id: 1, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
-  { id: 1, po_id: 1, po_details_id: 2, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
-  { id: 1, po_id: 1, po_details_id: 3, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
-  { id: 1, po_id: 1, po_details_id: 4, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
+  { id: 1, po_id: 1, po_details_id: 1, product_id: 1, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
+  { id: 1, po_id: 1, po_details_id: 2, product_id: 1, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
+  { id: 1, po_id: 1, po_details_id: 3, product_id: 1, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
+  { id: 1, po_id: 1, po_details_id: 4, product_id: 1, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
 ];
 
 
-const PurchaseOrderDetails = () => {
+const PurchaseOrderDetails = () => 
+{
+
+    const classes = purchaseOrderDetailsUseStyles();
 
     const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
     const openMobileMenu = Boolean(mobileAnchorEl);
@@ -40,7 +45,7 @@ const PurchaseOrderDetails = () => {
 
     const handleClickMenu = (event) => {
         setAnchorEl(event.currentTarget);
-      };
+    };
 
     const handleClickMobileMenu = (event) => {
       setMobileAnchorEl(event.currentTarget);
@@ -52,9 +57,9 @@ const PurchaseOrderDetails = () => {
 
     const handleMobileMenuClose = () => {
         setMobileAnchorEl(null);
-      };
-    const classes = purchaseOrderDetailsUseStyles();
+    };
 
+   
     return (
         <>
             <Card>
@@ -78,7 +83,9 @@ const PurchaseOrderDetails = () => {
                             <Grid container>
                                 <Grid item>
                                     <Button variant="subtitle1" color="default">
-                                        Receive
+                                        <NavLink to={'/inventory-mngmt/receive-purchase-orders'} className={classes.links}>
+                                            Receive
+                                        </NavLink>
                                     </Button>
                                 </Grid>
                                 <Grid item>
@@ -215,7 +222,6 @@ const PurchaseOrderDetails = () => {
                     components={{
                         Toolbar: GridToolbar,
                     }}
-                    disableColumnSelector={true}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 
