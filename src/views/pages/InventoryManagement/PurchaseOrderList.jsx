@@ -26,7 +26,7 @@ const rows = [
 ];
 
 
-const PurchaseOrders = () => {
+const PurchaseOrderList = () => {
 
     const classes = dataGridUseStyles();
 
@@ -72,4 +72,4 @@ const PurchaseOrders = () => {
     );
 }
 
-export default PurchaseOrders
+export default PurchaseOrderList
