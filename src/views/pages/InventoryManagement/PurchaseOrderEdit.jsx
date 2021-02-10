@@ -8,6 +8,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import DateFnsUtils from '@date-io/date-fns';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 
 
@@ -15,8 +16,8 @@ const PurchaseOrderEdit = ({match}) =>
 {
     const classes = purchaseOrderUseStyles();
     const history = useHistory();
-    const {purchaseOrderId} = match.params;
-    console.log(match)
+    const { purchaseOrderId } = match.params;
+
     const [supplier, setSupplier] = useState('Supplier Name');
     const [purchaseOrderDate, setPurchaseOrderDate] = useState(new Date('2014-08-18T21:11:54'));
     const [expectedDate, setExpectedDate] = useState(new Date('2014-08-18T21:11:54'));
@@ -61,6 +62,22 @@ const PurchaseOrderEdit = ({match}) =>
         { field: 'amount', headerName: 'Amount', width: 160,
             valueFormatter: (params) => (quantity * purchaseCost)
         },
+        {
+            field: 'delete_action', 
+            headerName: 'Action',
+            width: 100,
+            renderCell: (params) => (
+                <Button
+                    className={classes.deleteAction} 
+                    variant="text" 
+                    color="default" 
+                    onClick={() => console.log(params)}
+                >
+                    <DeleteForeverIcon />
+                </Button>
+            )
+            
+        }
     ];
     
     const rows = [
@@ -142,7 +159,6 @@ const PurchaseOrderEdit = ({match}) =>
                     components={{
                         Toolbar: GridToolbar,
                     }}
-                    onRowClick={(param) => history.push('/inventory-mngmt/purchase-order-details')}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 

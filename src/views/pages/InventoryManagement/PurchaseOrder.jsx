@@ -8,6 +8,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import DateFnsUtils from '@date-io/date-fns';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 
 
@@ -60,6 +61,22 @@ const PurchaseOrder = () =>
         { field: 'amount', headerName: 'Amount', width: 160,
             valueFormatter: (params) => (quantity * purchaseCost)
         },
+        {
+            field: 'delete_action', 
+            headerName: 'Action',
+            width: 100,
+            renderCell: (params) => (
+                <Button
+                    className={classes.deleteAction} 
+                    variant="text" 
+                    color="default" 
+                    onClick={() => console.log(params)}
+                >
+                    <DeleteForeverIcon />
+                </Button>
+            )
+            
+        }
     ];
     
     const rows = [
@@ -147,7 +164,6 @@ const PurchaseOrder = () =>
                     components={{
                         Toolbar: GridToolbar,
                     }}
-                    onRowClick={(param) => history.push('/inventory-mngmt/purchase-order-details')}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 

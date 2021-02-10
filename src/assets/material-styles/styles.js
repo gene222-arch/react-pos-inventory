@@ -287,6 +287,11 @@ export const purchaseOrderUseStyles = makeStyles((theme) => ({
             backgroundColor: '#dc3545'
         }
     },
+    deleteAction: {
+        '&:hover': {
+            color: '#dc3545'
+    }
+    },
     purchaseOrderCard: {
         marginBottom: theme.spacing(1)
     }
