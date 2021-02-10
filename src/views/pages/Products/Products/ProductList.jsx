@@ -64,6 +64,7 @@ const ProductList = () => {
                     components={{
                         Toolbar: GridToolbar,
                     }}
+                    onRowClick={(params) => history.push(`/products/${params.row.id}/edit`)}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 

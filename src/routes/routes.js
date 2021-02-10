@@ -14,6 +14,7 @@ const SalesByEmployee = React.lazy(() => import('../views/pages/Reports/SalesByE
 const SalesByPaymentType = React.lazy(() => import('../views/pages/Reports/SalesByPaymentType'))
 const ProductList = React.lazy(() => import('../views/pages/Products/Products/ProductList'));
 const CreateProduct = React.lazy(() => import('../views/pages/Products/Products/CreateProduct'));
+const EditProduct = React.lazy(() => import('../views/pages/Products/Products/EditProduct'));
 const Categories = React.lazy(() => import('../views/pages/Products/Categories/Categories'));
 const Discounts = React.lazy(() => import('../views/pages/Products/Discounts/Discounts'));
 const Customers = React.lazy(() => import('../views/pages/Customers/Customer'));
@@ -220,6 +221,15 @@ export const adminRoutes = {
             exact: true,
             component: CreateProduct,
             access: 'create_products',
+            restricted: true 
+        },
+        {
+            path: '/products/:productId/edit',
+            name: 'EditProduct',
+            icon: '',
+            exact: true,
+            component: EditProduct,
+            access: 'update_products',
             restricted: true 
         },
         {
