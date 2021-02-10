@@ -403,13 +403,13 @@ const AdminLayout = ({children}) =>
                         <List component="div" disablePadding>
 
                             {/*Employee list */}
-                            <NavLink className={classes.navLinks} to={'/employees/list'}>
+                            <NavLink className={classes.navLinks} to={'/employees'}>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/employees/list' }
+                                    selected={ selectedItem === '/employees' }
                                     onClick={ 
-                                        e => handleSelectedItem(e, '/employees/list') 
+                                        e => handleSelectedItem(e, '/employees') 
                                     }
                                 >
                                     <ListItemText primary="Employee list" className={classes.dropDownItem}/>

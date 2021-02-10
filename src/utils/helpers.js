@@ -295,3 +295,9 @@ export const countryList = [
     "Zimbabwe",
     "Åland Islands"
 ];
+
+
+export const roleList = [
+    'Manager',
+    'Cashier'
+]

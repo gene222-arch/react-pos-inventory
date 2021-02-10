@@ -26,6 +26,7 @@ const CreateCustomer = lazy(() => import('../views/pages/Customers/CreateCustome
 const EditCustomer = lazy(() => import('../views/pages/Customers/EditCustomer'));
 const AccessRights = lazy(() => import('../views/pages/Employees/AccessRights'));
 const EmployeeList = lazy(() => import('../views/pages/Employees/Employees/EmployeeList'));
+const CreateEmployee = lazy(() => import('../views/pages/Employees/Employees/CreateEmployee'));
 const PurchaseOrderList = lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderList'));
 const PurchaseOrder = lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrder'));
 const PurchaseOrderEdit = lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderEdit'));
@@ -334,6 +335,15 @@ export const adminRoutes = {
             exact: true,
             component: EmployeeList,
             access: 'view_employees',
+            restricted: true 
+        },
+        {
+            path: '/create-employee',
+            name: 'CreateEmployee',
+            icon: '',
+            exact: true,
+            component: CreateEmployee,
+            access: 'create_employees',
             restricted: true 
         },
         {
