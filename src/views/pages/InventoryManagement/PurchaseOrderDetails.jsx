@@ -91,7 +91,13 @@ const PurchaseOrderDetails = ({match}) =>
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="text" color="default">
+                                    <Button 
+                                        variant="text" 
+                                        color="default"
+                                        onClick={
+                                            () => history.push(`/inventory-mngmt/purchase-order/${purchaseOrderId}/edit`)
+                                        }
+                                    >
                                         <EditIcon />
                                     </Button>
                                 </Grid>
@@ -152,7 +158,9 @@ const PurchaseOrderDetails = ({match}) =>
                                 <MenuItem >
                                     Receive
                                 </MenuItem>
-                                <MenuItem onClick={() => history.push('/inventory-mngmt/purchase-order/edit/:purchaseOrderIdEdit')}>
+                                <MenuItem onClick={
+                                    () => history.push(`/inventory-mngmt/purchase-order/${purchaseOrderId}`)
+                                }>
                                     Edit
                                 </MenuItem>
                                 <MenuItem >
