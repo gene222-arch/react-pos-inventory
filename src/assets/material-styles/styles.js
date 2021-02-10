@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core'
-import { green } from '@material-ui/core/colors';
+import { green, blue } from '@material-ui/core/colors';
 import visualData from '../storage/images/background-image/visual_data.svg'
 
 export const notFoundUseStyles = makeStyles({
@@ -320,6 +320,48 @@ export const receivePOTextFieldUseStyles = makeStyles((theme) => ({
         fontSize: '1rem'
     },
 }));
+
+
+export const createSupplierUseStyles = makeStyles((theme) => ({
+    
+    cardContent: {
+        [theme.breakpoints.up('md')]: {
+            width: '100%',
+            padding: theme.spacing(3)
+        }
+    },
+    cardContainer: {
+        [theme.breakpoints.up('md')]: {
+            width: '50%',
+        }  
+    },
+    shippingIcon: {
+        fontSize: '7rem',
+        color: blue[500]
+    },
+    formControl: {
+        width: '100%',
+    },
+    addBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: '#4caf50',
+        color: '#FFF',
+        '&:hover': {
+            backgroundColor: green[400]
+        }
+    },
+    cancelBtn: {
+        margin: theme.spacing(1),
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: '#dc3545'
+        }
+    },
+    divider: {
+        marginTop: theme.spacing(2)
+    }
+}));
+
 
 
 export const sendMailDialogUseStyles = makeStyles((theme) => ({

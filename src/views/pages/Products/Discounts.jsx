@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import AddIcon from '@material-ui/icons/Add';
 import { dataGridUseStyles } from '../../../assets/material-styles/styles'
 
 
@@ -34,7 +34,7 @@ const Discounts = () => {
                                 variant="contained"
                                 color='primary' 
                                 className={classes.addBtn}
-                                startIcon={<PersonAddIcon />}    
+                                startIcon={<AddIcon />}    
                             >
                                 Add Discount
                             </Button>

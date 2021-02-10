@@ -24,6 +24,7 @@ const PurchaseOrderEdit = React.lazy(() => import('../views/pages/InventoryManag
 const PurchaseOrderReceive = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrderReceive'));
 const PurchaseOrderDetails = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrderDetails'));
 const Suppliers = React.lazy(() => import('../views/pages/InventoryManagement/Suppliers'));
+const CreateSupplier = React.lazy(() => import('../views/pages/InventoryManagement/CreateSupplier'));
 const ReceivedStocks = React.lazy(() => import('../views/pages/Transactions/ReceivedStocks'));
 const Settings = React.lazy(() => import('../views/pages/Settings'))
 const NotFound = React.lazy(() => import('../views/errors/NotFound'));
@@ -180,6 +181,15 @@ export const adminRoutes = {
             exact: true,
             component: Suppliers,
             access: 'view_suppliers',
+            restricted: true 
+        },
+        {
+            path: '/inventory-mngmt/create-supplier',
+            name: 'CreateSupplier',
+            icon: '',
+            exact: true,
+            component: CreateSupplier,
+            access: 'create_suppliers',
             restricted: true 
         },
         {
