@@ -222,6 +222,10 @@ export const dataGridUseStyles = makeStyles((theme) => ({
     },
     btn: {
         margin: theme.spacing(1),
+    },
+    links: {
+        textDecoration: 'none',
+        color: '#FFF'
     }
 }));
 
@@ -258,6 +262,36 @@ export const purchaseOrderDetailsUseStyles = makeStyles((theme) => ({
         color: '#3a3a3a'
     }
 }));
+
+
+export const purchaseOrderUseStyles = makeStyles((theme) => ({
+    formControl: {
+        minWidth: 120,
+    },
+    selectEmpty: {
+        marginTop: theme.spacing(2),
+        width: '20rem'
+    },
+    addBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: '#4caf50',
+        color: '#FFF',
+        '&:hover': {
+            backgroundColor: green[400]
+        }
+    },
+    cancelBtn: {
+        margin: theme.spacing(1),
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: '#dc3545'
+        }
+    },
+    purchaseOrderCard: {
+        marginBottom: theme.spacing(1)
+    }
+}))
+
 
 export const receivePOTextFieldUseStyles = makeStyles((theme) => ({
     addBtn: {

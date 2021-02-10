@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom'
+import { NavLink, useHistory } from 'react-router-dom'
 import LinearWithValueLabel from '../../../components/LinearWithValueLabel'
 import { purchaseOrderDetailsUseStyles } from '../../../assets/material-styles/styles'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
@@ -27,22 +27,23 @@ const columns = [
 
 const rows = [
   { id: 1, po_id: 1, po_details_id: 1, product_id: 1, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
-  { id: 1, po_id: 1, po_details_id: 2, product_id: 1, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
-  { id: 1, po_id: 1, po_details_id: 3, product_id: 1, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
-  { id: 1, po_id: 1, po_details_id: 4, product_id: 1, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
+  { id: 2, po_id: 1, po_details_id: 2, product_id: 1, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
+  { id: 3, po_id: 1, po_details_id: 3, product_id: 1, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
+  { id: 4, po_id: 1, po_details_id: 4, product_id: 1, product: 'Guitar', quantity: 100, purchase_cost: 12.00,  amount: 1200.00},
 ];
 
 
-const PurchaseOrderDetails = () => 
+const PurchaseOrderDetails = ({match}) => 
 {
-
     const classes = purchaseOrderDetailsUseStyles();
+    const history = useHistory();
+    const purchaseOrderId = match.params.purchaseOrderId;
 
     const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
     const openMobileMenu = Boolean(mobileAnchorEl);
     const [anchorEl, setAnchorEl] = useState(null);
     const openMenu = Boolean(anchorEl);
-
+    
 
     const handleClickMenu = (event) => {
         setAnchorEl(event.currentTarget);
@@ -83,14 +84,14 @@ const PurchaseOrderDetails = () =>
                         <Grid item className={classes.options}>
                             <Grid container>
                                 <Grid item>
-                                    <Button variant="subtitle1" color="default">
+                                    <Button variant="text" color="default">
                                         <NavLink to={'/inventory-mngmt/receive-purchase-orders'} className={classes.links}>
                                             Receive
                                         </NavLink>
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="subtitle1" color="default">
+                                    <Button variant="text" color="default">
                                         <EditIcon />
                                     </Button>
                                 </Grid>
@@ -108,7 +109,6 @@ const PurchaseOrderDetails = () =>
                                        <ExpandMore />
                                     </IconButton>
                                         <Menu
-                                            id="long-menu"
                                             anchorEl={anchorEl}
                                             keepMounted
                                             open={openMenu}
@@ -138,7 +138,6 @@ const PurchaseOrderDetails = () =>
                                 <MoreVertIcon />
                             </IconButton>
                                 <Menu
-                                    id="long-menu"
                                     anchorEl={mobileAnchorEl}
                                     keepMounted
                                     open={openMobileMenu}
@@ -153,7 +152,7 @@ const PurchaseOrderDetails = () =>
                                 <MenuItem >
                                     Receive
                                 </MenuItem>
-                                <MenuItem >
+                                <MenuItem onClick={() => history.push('/inventory-mngmt/purchase-order/edit/:purchaseOrderIdEdit')}>
                                     Edit
                                 </MenuItem>
                                 <MenuItem >
@@ -175,7 +174,7 @@ const PurchaseOrderDetails = () =>
                     <Grid container justify='space-between' className={classes.purchaseOrderDetails}>
                         <Grid item>
                             <Typography variant="h3" color="initial">
-                                PO1
+                                PO{purchaseOrderId}
                             </Typography>
                             <Typography variant="subtitle2" color="initial">
                                 Pending
@@ -186,7 +185,7 @@ const PurchaseOrderDetails = () =>
                                 <LinearWithValueLabel 
                                     label={'Received'}
                                     value={10}
-                                    max={100}
+                                    maxvalue={100}
                                 />
                             </Typography>
                         </Grid>

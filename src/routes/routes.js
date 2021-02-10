@@ -19,6 +19,7 @@ const Customers = React.lazy(() => import('../views/pages/Customers/Customer'));
 const AccessRights = React.lazy(() => import('../views/pages/Employees/AccessRights'));
 const EmployeeList = React.lazy(() => import('../views/pages/Employees/EmployeeList'));
 const PurchaseOrderList = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrderList'));
+const PurchaseOrder = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder'));
 const PurchaseOrderReceive = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrderReceive'));
 const PurchaseOrderDetails = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrderDetails'));
 const Suppliers = React.lazy(() => import('../views/pages/InventoryManagement/Suppliers'));
@@ -140,7 +141,15 @@ export const adminRoutes = {
             access: 'view_purchase_orders', 
         },
         {
-            path: '/inventory-mngmt/purchase-order-details',
+            path: '/inventory-mngmt/create-order',
+            name: 'PurchaseOrder',
+            icon: '',
+            exact: true,
+            component: PurchaseOrder,
+            access: 'create_purchase_orders', 
+        },
+        {
+            path: '/inventory-mngmt/purchase-order-details/:purchaseOrderId',
             name: 'PurchaseOrdersDetails',
             icon: '',
             exact: true,

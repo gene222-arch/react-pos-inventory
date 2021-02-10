@@ -12,7 +12,7 @@ const LinearProgressWithLabel = (props) => {
             </Box>
             <Box minWidth={35}>
             <Typography variant="body2" color="textSecondary">
-                {props.label} {`${Math.round(props.value,)} ${props.extension}`} of {props.maxValue}
+                {props.label} {`${Math.round(props.value,)} ${props.extension}`} of {props.maxvalue}
             </Typography>
 
             </Box>
@@ -27,12 +27,12 @@ const useStyles = makeStyles({
     },
   });
   
-const LinearWithValueLabel = ({label = 'Label', extension = '', value = 0, maxValue = 100}) => {
+const LinearWithValueLabel = ({label = 'Label', extension = '', value = 0, maxvalue = 100}) => {
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
-            <LinearProgressWithLabel label={label} extension={extension} value={value} maxValue={maxValue}/>
+            <LinearProgressWithLabel label={label} extension={extension} value={value} maxvalue={maxvalue}/>
         </div>
     );
 }

@@ -25,7 +25,7 @@ const PurchaseOrderReceive = () => {
                 <TextField
                     id=""
                     label=""
-                    value={0}
+                    value={toReceive}
                     onChange={handleOnChangeToReceive}
                     className={classes.toReceiveTextField}
                 />

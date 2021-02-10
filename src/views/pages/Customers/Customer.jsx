@@ -12,7 +12,6 @@ const columns = [
     { field: 'last_visit', headerName: 'Last visit', width: 200 },
     { field: 'total_visits', headerName: 'Total visits', width: 200 },
     { field: 'total_spent', headerName: 'Total spent', width: 200 },
-
 ];
 
 const rows = [
@@ -35,7 +34,7 @@ const Customers = () => {
                     <Grid container>
                         <Grid item xs={12} sm={12} md={8} lg={8}>
                             <Grid container>
-                                <Grid item xs={12} sm={5} md={4} lg={4}>
+                                <Grid item>
                                     <Button 
                                         variant="contained"
                                         color='primary' 
@@ -45,7 +44,7 @@ const Customers = () => {
                                         Add Customer
                                     </Button>
                                 </Grid>
-                                <Grid item xs={12} sm={6} md={7} lg={8}>
+                                <Grid item>
                                     <Button variant="text" className={classes.btn}> Import </Button>
                                     <Button variant="text" className={classes.btn}> Export </Button>
                                 </Grid>

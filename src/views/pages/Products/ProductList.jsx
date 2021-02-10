@@ -36,7 +36,7 @@ const ProductList = () => {
                     <Grid container>
                         <Grid item xs={12} sm={12} md={8} lg={8}>
                             <Grid container>
-                                <Grid item xs={12} sm={5} md={4} lg={4}>
+                                <Grid item>
                                     <Button 
                                         variant="contained"
                                         color='primary' 
@@ -46,7 +46,7 @@ const ProductList = () => {
                                         Add Product
                                     </Button>
                                 </Grid>
-                                <Grid item xs={12} sm={6} md={7} lg={8}>
+                                <Grid item>
                                     <Button variant="text" className={classes.btn}> Import </Button>
                                     <Button variant="text" className={classes.btn}> Export </Button>
                                 </Grid>

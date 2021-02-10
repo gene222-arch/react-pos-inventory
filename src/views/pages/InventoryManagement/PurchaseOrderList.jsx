@@ -1,9 +1,10 @@
-import * as React from 'react';
+import React from 'react';
+import { NavLink, useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import { dataGridUseStyles } from '../../../assets/material-styles/styles'
+import AddIcon from '@material-ui/icons/Add';
 
 
 const columns = [
@@ -29,6 +30,7 @@ const rows = [
 const PurchaseOrderList = () => {
 
     const classes = dataGridUseStyles();
+    const history = useHistory();
 
     return (
         <>
@@ -37,17 +39,19 @@ const PurchaseOrderList = () => {
                     <Grid container>
                         <Grid item xs={12} sm={12} md={8} lg={8}>
                             <Grid container>
-                                <Grid item xs={12} sm={5} md={4} lg={4}>
+                                <Grid item>
                                     <Button 
                                         variant="contained"
                                         color='primary' 
                                         className={classes.addBtn}
-                                        startIcon={<PersonAddIcon />}    
+                                        startIcon={<AddIcon />}    
                                     >
-                                        Add Purchase Order
+                                        <NavLink to={'/inventory-mngmt/create-order'} className={classes.links}>
+                                            Add Purchase Order
+                                        </NavLink>
                                     </Button>
                                 </Grid>
-                                <Grid item xs={12} sm={6} md={7} lg={8}>
+                                <Grid item>
                                     <Button variant="text" className={classes.btn}> Import </Button>
                                     <Button variant="text" className={classes.btn}> Export </Button>
                                 </Grid>
@@ -62,6 +66,7 @@ const PurchaseOrderList = () => {
                     components={{
                         Toolbar: GridToolbar,
                     }}
+                    onRowClick={(param) => history.push(`/inventory-mngmt/purchase-order-details/${param.row.id}`)}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 
