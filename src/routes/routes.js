@@ -13,6 +13,7 @@ const SalesByCategory = React.lazy(() => import('../views/pages/Reports/SalesByC
 const SalesByEmployee = React.lazy(() => import('../views/pages/Reports/SalesByEmployee'))
 const SalesByPaymentType = React.lazy(() => import('../views/pages/Reports/SalesByPaymentType'))
 const ProductList = React.lazy(() => import('../views/pages/Products/Products/ProductList'));
+const CreateProduct = React.lazy(() => import('../views/pages/Products/Products/CreateProduct'));
 const Categories = React.lazy(() => import('../views/pages/Products/Categories/Categories'));
 const Discounts = React.lazy(() => import('../views/pages/Products/Discounts/Discounts'));
 const Customers = React.lazy(() => import('../views/pages/Customers/Customer'));
@@ -195,12 +196,30 @@ export const adminRoutes = {
             restricted: true 
         },
         {
-            path: '/products/list',
+            path: '/products',
             name: 'ProductList',
             icon: '',
             exact: true,
             component: ProductList,
             access: 'view_products',
+            restricted: true 
+        },
+        {
+            path: '/products',
+            name: 'ProductList',
+            icon: '',
+            exact: true,
+            component: ProductList,
+            access: 'view_products',
+            restricted: true 
+        },
+        {
+            path: '/create-product',
+            name: 'CreateProduct',
+            icon: '',
+            exact: true,
+            component: CreateProduct,
+            access: 'create_products',
             restricted: true 
         },
         {

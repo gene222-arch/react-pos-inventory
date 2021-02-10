@@ -27,7 +27,7 @@ export const createPageUseStyles = makeStyles((theme) => ({
     cardContent: {
         [theme.breakpoints.up('md')]: {
             width: '100%',
-            padding: theme.spacing(3)
+            padding: theme.spacing(4)
         }
     },
     cardContainer: {
@@ -197,8 +197,6 @@ export const AdminLayoutUseStyles = makeStyles((theme) => ({
     }
 }));
 
-
-
 export const loginFormUseStyles = makeStyles((theme) => ({
     root: {
         height: '100vh',
@@ -236,9 +234,6 @@ export const loginFormUseStyles = makeStyles((theme) => ({
         }
     }
 }));
-
-
-
 
 export const registrationFormUseStyles = makeStyles((theme) => ({
     root: {
@@ -279,8 +274,6 @@ export const registrationFormUseStyles = makeStyles((theme) => ({
     }
 }));
 
-
-
 export const dataGridUseStyles = makeStyles((theme) => ({
     addBtn: {
         margin: theme.spacing(1),
@@ -302,8 +295,6 @@ export const dataGridUseStyles = makeStyles((theme) => ({
         color: '#FFF'
     }
 }));
-
-
   
 export const purchaseOrderDetailsUseStyles = makeStyles((theme) => ({
     addBtn: {
@@ -336,7 +327,6 @@ export const purchaseOrderDetailsUseStyles = makeStyles((theme) => ({
         color: '#3a3a3a'
     }
 }));
-
 
 export const purchaseOrderUseStyles = makeStyles((theme) => ({
     formControl: {
@@ -371,6 +361,53 @@ export const purchaseOrderUseStyles = makeStyles((theme) => ({
     }
 }))
 
+export const createProductUseStyles = makeStyles((theme) => ({
+    formControl: {
+        width: '100%',
+    },
+    selectEmpty: {
+        marginTop: theme.spacing(2),
+        width: '20rem'
+    },
+    addBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: '#4caf50',
+        color: '#FFF',
+        '&:hover': {
+            backgroundColor: green[400]
+        }
+    },
+    cancelBtn: {
+        margin: theme.spacing(1),
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: '#dc3545'
+        }
+    },
+    deleteAction: {
+    '&:hover': {
+        color: '#dc3545'
+    }
+    },
+    createProductCard: {
+        marginBottom: theme.spacing(2),
+        [theme.breakpoints.up('sm')]: {
+            width: '70%',
+            padding: '1rem'
+        }
+    },
+    btnContainer: {
+        [theme.breakpoints.up('sm')]: {
+            width: '70%'
+        }
+    },
+    productImagePreview: {
+        width: '100%'
+    },
+    cardHeaderIcons: {
+        color: '#3a3a3a'
+    }
+}))
 
 export const receivePOTextFieldUseStyles = makeStyles((theme) => ({
     addBtn: {

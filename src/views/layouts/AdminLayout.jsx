@@ -284,12 +284,12 @@ const AdminLayout = ({children}) =>
                         <List component="div" disablePadding>
 
                             {/*Products */}
-                            <NavLink className={classes.navLinks} to={'/products/list'}>
+                            <NavLink className={classes.navLinks} to={'/products'}>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/products/list' }
-                                    onClick={ e => handleSelectedItem(e, '/products/list') }
+                                    selected={ selectedItem === '/products' }
+                                    onClick={ e => handleSelectedItem(e, '/products') }
                                 >
                                     <ListItemText primary="Products" className={classes.dropDownItem}/>
                                 </ListItem>

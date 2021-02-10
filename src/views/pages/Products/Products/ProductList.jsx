@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React from 'react';
+import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
@@ -28,6 +29,7 @@ const rows = [
 const ProductList = () => {
 
     const classes = dataGridUseStyles();
+    const history = useHistory();
 
     return (
         <>
@@ -41,7 +43,8 @@ const ProductList = () => {
                                         variant="contained"
                                         color='primary' 
                                         className={classes.addBtn}
-                                        startIcon={<PersonAddIcon />}    
+                                        startIcon={<PersonAddIcon />}
+                                        onClick={() => history.push('/create-product')}
                                     >
                                         Add Product
                                     </Button>
