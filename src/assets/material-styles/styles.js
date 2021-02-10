@@ -438,7 +438,7 @@ export const createDiscountUseStyles = makeStyles((theme) => ({
     createDiscountCard: {
         marginBottom: theme.spacing(2),
         [theme.breakpoints.up('md')]: {
-            width: '40%',
+            width: '50%',
             padding: '1rem'
         }
     },
@@ -460,8 +460,7 @@ export const createDiscountUseStyles = makeStyles((theme) => ({
     discountIcon: {
         fontSize: '4rem',
         color: theme.palette.secondary.main,
-        textAlign: 'center',
-        width: '100%'
+        textAlign: 'center'
     }
 }))
 

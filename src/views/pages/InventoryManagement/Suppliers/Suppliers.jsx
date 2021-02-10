@@ -51,6 +51,7 @@ const Suppliers = () => {
                     components={{
                         Toolbar: GridToolbar,
                     }}
+                    onRowClick={(params) => history.push(`/inventory-mngmt/suppliers/${params.row.id}/edit`)}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 

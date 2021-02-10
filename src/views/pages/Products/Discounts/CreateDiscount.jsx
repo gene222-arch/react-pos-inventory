@@ -25,7 +25,7 @@ const CreateDiscount = () =>
         <>
             <Card className={classes.createDiscountCard}>
                 <Grid container justify='center'>
-                    <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <Grid item>
                         <CardHeader
                             avatar={
                                 <LoyaltyIcon className={classes.discountIcon}/>
