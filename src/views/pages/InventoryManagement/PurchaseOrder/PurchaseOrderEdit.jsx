@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, useHistory } from 'react-router-dom'
-import { purchaseOrderUseStyles } from '../../../assets/material-styles/styles'
+import { purchaseOrderUseStyles } from '../../../../assets/material-styles/styles'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Divider, Grid, Typography, TextField, Button } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
@@ -12,12 +12,13 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 
 
-const PurchaseOrder = () => 
+const PurchaseOrderEdit = ({match}) => 
 {
     const classes = purchaseOrderUseStyles();
     const history = useHistory();
+    const { purchaseOrderId } = match.params;
 
-    const [supplier, setSupplier] = useState('');
+    const [supplier, setSupplier] = useState('Supplier Name');
     const [purchaseOrderDate, setPurchaseOrderDate] = useState(new Date('2014-08-18T21:11:54'));
     const [expectedDate, setExpectedDate] = useState(new Date('2014-08-18T21:11:54'));
     const [ quantity, setQuantity ] = useState(0);
@@ -84,9 +85,6 @@ const PurchaseOrder = () =>
         
     ];
 
-    const handleChange = (event) => {
-        setSupplier(event.target.value);
-    };
 
     const handlePurchaseOrderDate = (date) => {
       setPurchaseOrderDate(date);
@@ -102,21 +100,18 @@ const PurchaseOrder = () =>
                 <CardContent>
                     <Grid container spacing={1}>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <Typography variant="h3" color="initial">
+                                PO{purchaseOrderId}
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
                             <FormControl className={classes.formControl}>
-                                <Select
-                                    value={supplier}
-                                    onChange={handleChange}
-                                    displayEmpty
+                                <TextField
                                     className={classes.selectEmpty}
-                                    inputProps={{ 'aria-label': 'Without label' }}
-                                    fullWidth
-                                >
-                                <MenuItem value="">Supplier</MenuItem>
-                                <MenuItem value={10}>Robots</MenuItem>
-                                <MenuItem value={20}>MOA</MenuItem>
-                                <MenuItem value={30}>CCC</MenuItem>
-                                </Select>
-                                <FormHelperText>Select a supplier</FormHelperText>
+                                    value={supplier}
+                                    disabled
+                                />
+                                <FormHelperText>Supplier</FormHelperText>
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} sm={12} md={10} lg={10}>
@@ -175,14 +170,14 @@ const PurchaseOrder = () =>
                         variant='text' 
                         color="default" 
                         className={classes.cancelBtn}
-                        onClick={() => history.push('/inventory-mngmt/purchase-orders')}
+                        onClick={() => history.goBack()}
                     >
                         Cancel
                     </Button>
                 </Grid>
                 <Grid item>
                     <Button variant='text' color="default" className={classes.addBtn}>
-                        Create
+                        Save
                     </Button>
                 </Grid>
             </Grid>
@@ -190,4 +185,4 @@ const PurchaseOrder = () =>
     );
 }
 
-export default PurchaseOrder
+export default PurchaseOrderEdit

@@ -3,24 +3,25 @@ import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import { dataGridUseStyles } from '../../../assets/material-styles/styles'
+import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 
 
 const columns = [
     { field: 'name', headerName: 'Name', width: 270 },
-    { field: 'products', headerName: 'Products', width: 270 }
+    { field: 'email', headerName: 'Email', width: 250 },
+    { field: 'role', headerName: 'Role', width: 200 },
 
 ];
 
 const rows = [
-  { id: 1, name: 'Snow', products: 2},
-  { id: 2, name: 'Snow', products: 2},
-  { id: 3, name: 'Snow', products: 2},
-  { id: 4, name: 'Snow', products: 2},
+  { id: 1, name: 'Snow', email: 'test@yahoo.com', role: 'Administrator' },
+  { id: 2, name: 'Snow', email: 'test@yahoo.com', role: 'Cashier' },
+  { id: 3, name: 'Snow', email: 'test@yahoo.com', role: 'Administrator' },
+  { id: 4, name: 'Snow', email: 'test@yahoo.com', role: 'Administrator' },
 ];
 
 
-const Categories = () => {
+const EmployeeList = () => {
 
     const classes = dataGridUseStyles();
 
@@ -36,7 +37,7 @@ const Categories = () => {
                                 className={classes.addBtn}
                                 startIcon={<PersonAddIcon />}    
                             >
-                                Add Category
+                                Add Employee
                             </Button>
                         </Grid>
                     </Grid>
@@ -58,4 +59,4 @@ const Categories = () => {
     );
 }
 
-export default Categories
+export default EmployeeList

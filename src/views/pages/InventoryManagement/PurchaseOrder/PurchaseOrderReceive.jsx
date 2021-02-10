@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, Typography, TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import { receivePOTextFieldUseStyles } from '../../../assets/material-styles/styles'
+import { receivePOTextFieldUseStyles } from '../../../../assets/material-styles/styles'
 
 
 const PurchaseOrderReceive = () => {

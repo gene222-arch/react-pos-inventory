@@ -1,28 +1,30 @@
-import * as React from 'react';
+import React from 'react';
+import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
-import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
+import { Card, CardContent, Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
+import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 import AddIcon from '@material-ui/icons/Add';
-import { dataGridUseStyles } from '../../../assets/material-styles/styles'
-
 
 const columns = [
     { field: 'name', headerName: 'Name', width: 300 },
-    { field: 'value', headerName: 'Value', width: 270 }
-
+    { field: 'contact', headerName: 'Contact', width: 270 },
+    { field: 'phone_number', headerName: 'Phone Number', width: 270 },
+    { field: 'email', headerName: 'Email', width: 270 },
 ];
 
 const rows = [
-  { id: 1, name: 'Snow', value: '2%'},
-  { id: 2, name: 'Snow', value: '2%'},
-  { id: 3, name: 'Snow', value: '2%'},
-  { id: 4, name: 'Snow', value: '2%'},
+  { id: 1, name: 'Snow', contact: '2%', phone_number: '2%', email: '2%'},
+  { id: 2, name: 'Snow', contact: '2%', phone_number: '2%', email: '2%'},
+  { id: 3, name: 'Snow', contact: '2%', phone_number: '2%', email: '2%'},
+  { id: 4, name: 'Snow', contact: '2%', phone_number: '2%', email: '2%'},
 ];
 
 
-const Discounts = () => {
+const Suppliers = () => {
 
     const classes = dataGridUseStyles();
+    const history = useHistory();
 
     return (
         <>
@@ -34,9 +36,10 @@ const Discounts = () => {
                                 variant="contained"
                                 color='primary' 
                                 className={classes.addBtn}
-                                startIcon={<AddIcon />}    
+                                startIcon={<AddIcon />}  
+                                onClick={() => history.push('/inventory-mngmt/create-supplier')}  
                             >
-                                Add Discount
+                                Add Supplier
                             </Button>
                         </Grid>
                     </Grid>
@@ -58,4 +61,4 @@ const Discounts = () => {
     );
 }
 
-export default Discounts
+export default Suppliers

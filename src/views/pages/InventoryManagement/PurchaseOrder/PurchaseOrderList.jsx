@@ -1,33 +1,36 @@
-import * as React from 'react';
+import React from 'react';
+import { NavLink, useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import { dataGridUseStyles } from '../../../assets/material-styles/styles'
+import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
+import AddIcon from '@material-ui/icons/Add';
 
 
 const columns = [
-    { field: 'product_description', headerName: 'Product name', width: 367 },
-    { field: 'category', headerName: 'Category', width: 250 },
-    { field: 'price', headerName: 'Price', width: 130 },
-    { field: 'cost', headerName: 'Cost', width: 130 },
-    { field: 'margin', headerName: 'Margin', width: 130 },
-    { field: 'in_stock', headerName: 'In stock', width: 130 },
+    { field: 'po_id', headerName: 'Purchase order #', width: 200 },
+    { field: 'po_date', headerName: 'Date', width: 165 },
+    { field: 'supplier', headerName: 'Supplier', width: 150 },
+    { field: 'status', headerName: 'Status', width: 150 },
+    { field: 'received', headerName: 'Received', width: 150 },
+    { field: 'expected_on', headerName: 'Expected on', width: 165 },
+    { field: 'total', headerName: 'Total', width: 150 },
 
 ];
 
 const rows = [
-  { id: 1, product_description: 'Snow', category: '2021', price: '2021', cost: 12,  margin: '35%', in_stock: 100 },
-  { id: 2, product_description: 'Lannister', category: '2021', price: '2021', cost: 12,  margin: '42%', in_stock: 100 },
-  { id: 3, product_description: 'Lannister', category: '2021', price: '2021', cost: 12,  margin: '45%', in_stock: 100 },
-  { id: 4, product_description: 'Stark', category: '2021', price: '2021', cost: 12,  margin: '16%', in_stock: 100 },
-  { id: 5, product_description: 'Targaryen', category: '2021', price: '2021', cost: 12,  margin: null, in_stock: 100 },
+  { id: 1, po_id: 'Snow', po_date: 'January 12, 2021', supplier: '2021', status: 12,  received: '35%', expected_on: 100 },
+  { id: 2, po_id: 'Lannister', po_date: '2021', supplier: '2021', status: 12,  received: '42%', expected_on: 100 },
+  { id: 3, po_id: 'Lannister', po_date: '2021', supplier: '2021', status: 12,  received: '45%', expected_on: 100 },
+  { id: 4, po_id: 'Stark', po_date: '2021', supplier: '2021', status: 12,  received: '16%', expected_on: 100 },
+  { id: 5, po_id: 'Targaryen', po_date: '2021', supplier: '2021', status: 12,  received: null, expected_on: 100 },
 ];
 
 
-const ProductList = () => {
+const PurchaseOrderList = () => {
 
     const classes = dataGridUseStyles();
+    const history = useHistory();
 
     return (
         <>
@@ -41,9 +44,11 @@ const ProductList = () => {
                                         variant="contained"
                                         color='primary' 
                                         className={classes.addBtn}
-                                        startIcon={<PersonAddIcon />}    
+                                        startIcon={<AddIcon />}    
                                     >
-                                        Add Product
+                                        <NavLink to={'/inventory-mngmt/create-order'} className={classes.links}>
+                                            Add Purchase Order
+                                        </NavLink>
                                     </Button>
                                 </Grid>
                                 <Grid item>
@@ -61,6 +66,7 @@ const ProductList = () => {
                     components={{
                         Toolbar: GridToolbar,
                     }}
+                    onRowClick={(param) => history.push(`/inventory-mngmt/purchase-order-details/${param.row.id}`)}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 
@@ -71,4 +77,4 @@ const ProductList = () => {
     );
 }
 
-export default ProductList
+export default PurchaseOrderList

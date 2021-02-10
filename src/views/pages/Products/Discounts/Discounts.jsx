@@ -2,26 +2,25 @@ import * as React from 'react';
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import { dataGridUseStyles } from '../../../assets/material-styles/styles'
+import AddIcon from '@material-ui/icons/Add';
+import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 
 
 const columns = [
-    { field: 'name', headerName: 'Name', width: 270 },
-    { field: 'email', headerName: 'Email', width: 250 },
-    { field: 'role', headerName: 'Role', width: 200 },
+    { field: 'name', headerName: 'Name', width: 300 },
+    { field: 'value', headerName: 'Value', width: 270 }
 
 ];
 
 const rows = [
-  { id: 1, name: 'Snow', email: 'test@yahoo.com', role: 'Administrator' },
-  { id: 2, name: 'Snow', email: 'test@yahoo.com', role: 'Cashier' },
-  { id: 3, name: 'Snow', email: 'test@yahoo.com', role: 'Administrator' },
-  { id: 4, name: 'Snow', email: 'test@yahoo.com', role: 'Administrator' },
+  { id: 1, name: 'Snow', value: '2%'},
+  { id: 2, name: 'Snow', value: '2%'},
+  { id: 3, name: 'Snow', value: '2%'},
+  { id: 4, name: 'Snow', value: '2%'},
 ];
 
 
-const EmployeeList = () => {
+const Discounts = () => {
 
     const classes = dataGridUseStyles();
 
@@ -35,9 +34,9 @@ const EmployeeList = () => {
                                 variant="contained"
                                 color='primary' 
                                 className={classes.addBtn}
-                                startIcon={<PersonAddIcon />}    
+                                startIcon={<AddIcon />}    
                             >
-                                Add Employee
+                                Add Discount
                             </Button>
                         </Grid>
                     </Grid>
@@ -59,4 +58,4 @@ const EmployeeList = () => {
     );
 }
 
-export default EmployeeList
+export default Discounts

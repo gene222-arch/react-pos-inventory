@@ -1,30 +1,28 @@
-import React from 'react';
-import { useHistory } from 'react-router-dom'
+import * as React from 'react';
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
-import { Card, CardContent, Grid } from '@material-ui/core';
+import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import { dataGridUseStyles } from '../../../assets/material-styles/styles'
-import AddIcon from '@material-ui/icons/Add';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
+
 
 const columns = [
-    { field: 'name', headerName: 'Name', width: 300 },
-    { field: 'contact', headerName: 'Contact', width: 270 },
-    { field: 'phone_number', headerName: 'Phone Number', width: 270 },
-    { field: 'email', headerName: 'Email', width: 270 },
+    { field: 'name', headerName: 'Name', width: 270 },
+    { field: 'products', headerName: 'Products', width: 270 }
+
 ];
 
 const rows = [
-  { id: 1, name: 'Snow', contact: '2%', phone_number: '2%', email: '2%'},
-  { id: 2, name: 'Snow', contact: '2%', phone_number: '2%', email: '2%'},
-  { id: 3, name: 'Snow', contact: '2%', phone_number: '2%', email: '2%'},
-  { id: 4, name: 'Snow', contact: '2%', phone_number: '2%', email: '2%'},
+  { id: 1, name: 'Snow', products: 2},
+  { id: 2, name: 'Snow', products: 2},
+  { id: 3, name: 'Snow', products: 2},
+  { id: 4, name: 'Snow', products: 2},
 ];
 
 
-const Suppliers = () => {
+const Categories = () => {
 
     const classes = dataGridUseStyles();
-    const history = useHistory();
 
     return (
         <>
@@ -36,10 +34,9 @@ const Suppliers = () => {
                                 variant="contained"
                                 color='primary' 
                                 className={classes.addBtn}
-                                startIcon={<AddIcon />}  
-                                onClick={() => history.push('/inventory-mngmt/create-supplier')}  
+                                startIcon={<PersonAddIcon />}    
                             >
-                                Add Supplier
+                                Add Category
                             </Button>
                         </Grid>
                     </Grid>
@@ -61,4 +58,4 @@ const Suppliers = () => {
     );
 }
 
-export default Suppliers
+export default Categories

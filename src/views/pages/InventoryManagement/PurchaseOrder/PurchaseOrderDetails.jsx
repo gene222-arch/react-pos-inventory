@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useHistory } from 'react-router-dom'
-import LinearWithValueLabel from '../../../components/LinearWithValueLabel'
-import { purchaseOrderDetailsUseStyles } from '../../../assets/material-styles/styles'
+import LinearWithValueLabel from '../../../../components/LinearWithValueLabel'
+import { purchaseOrderDetailsUseStyles } from '../../../../assets/material-styles/styles'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Divider, Grid, Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
@@ -11,7 +11,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import SendMailDialog from '../../../components/SendMailDialog'
+import SendMailDialog from '../../../../components/SendMailDialog'
 import EditIcon from '@material-ui/icons/Edit';
 
 
