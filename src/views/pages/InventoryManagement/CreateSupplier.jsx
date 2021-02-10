@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom'
 import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider } from '@material-ui/core';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -6,11 +7,13 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { createSupplierUseStyles } from '../../../assets/material-styles/styles'
+import * as Helper from '../../../utils/helpers'
 
 
 const CreateSupplier = () => {
 
     const classes = createSupplierUseStyles();
+    const history = useHistory();
     const [country, setCountry] = useState('');
 
     const handleChange = (event) => {
@@ -24,8 +27,6 @@ const CreateSupplier = () => {
                         avatar={
                             <LocalShippingIcon className={classes.shippingIcon}/>
                         }
-                        title="ss"
-                        subheader="Test"
                     />
                 </Grid>
                 <CardContent className={classes.cardContent}>
@@ -88,9 +89,14 @@ const CreateSupplier = () => {
                                 fullWidth
                                 margin='normal'
                             >
-                                <MenuItem value={'Philippines'}>Philippines</MenuItem>
-                                <MenuItem value={'USA'}>USA</MenuItem>
-                                <MenuItem value={'Japan'}>Japan</MenuItem>
+                                {
+                                    Helper.countryList.map((country, index) => (
+                                        <MenuItem key={index} value={country}>
+                                            {country}
+                                        </MenuItem>
+                                    ))
+                                }
+                                
                             </Select>
                         </FormControl>
                     </Grid>
@@ -106,7 +112,12 @@ const CreateSupplier = () => {
                 <Divider className={classes.divider}/>
                 <Grid container justify='flex-end'>
                     <Grid item>
-                        <Button variant='text' color="default" className={classes.cancelBtn}>
+                        <Button 
+                            variant='text' 
+                            color="default" 
+                            className={classes.cancelBtn}
+                            onClick={() => history.push('/inventory-mngmt/suppliers')}
+                        >
                             Cancel
                         </Button>
                     </Grid>

@@ -171,7 +171,12 @@ const PurchaseOrder = () =>
             </div>
             <Grid container justify='flex-end'>
                 <Grid item>
-                    <Button variant='text' color="default" className={classes.cancelBtn}>
+                    <Button 
+                        variant='text' 
+                        color="default" 
+                        className={classes.cancelBtn}
+                        onClick={() => history.push('/inventory-mngmt/purchase-orders')}
+                    >
                         Cancel
                     </Button>
                 </Grid>
