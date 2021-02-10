@@ -51,6 +51,7 @@ const Categories = () => {
                     components={{
                         Toolbar: GridToolbar,
                     }}
+                    onRowClick={(params) => history.push(`/products/categories/${params.row.id}/edit`)}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 
