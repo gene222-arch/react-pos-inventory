@@ -167,7 +167,7 @@ const PurchaseOrderEdit = ({match}) =>
             <Grid container justify='flex-end'>
                 <Grid item>
                     <Button 
-                        variant='text' 
+                        variant='contained' 
                         color="default" 
                         className={classes.cancelBtn}
                         onClick={() => history.goBack()}
@@ -176,8 +176,8 @@ const PurchaseOrderEdit = ({match}) =>
                     </Button>
                 </Grid>
                 <Grid item>
-                    <Button variant='text' color="default" className={classes.addBtn}>
-                        Save
+                    <Button variant='contained' color="default" className={classes.addBtn}>
+                        Update
                     </Button>
                 </Grid>
             </Grid>

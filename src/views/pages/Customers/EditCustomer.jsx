@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom'
-import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider } from '@material-ui/core';
+import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider, Avatar, IconButton } from '@material-ui/core';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -8,6 +8,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
+import { MoreVert as MoreVertIcon } from '@material-ui/icons'
 import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
 import RoomIcon from '@material-ui/icons/Home';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
@@ -15,10 +16,13 @@ import { createPageUseStyles } from '../../../assets/material-styles/styles'
 import * as Helper from '../../../utils/helpers'
 
 
-const CreateCustomer = () => {
+const EditCustomer = ({match}) => {
 
     const classes = createPageUseStyles();
     const history = useHistory();
+
+    const {customerId} = match.params;
+
     const [country, setCountry] = useState('');
 
     const handleChange = (event) => {
@@ -32,6 +36,7 @@ const CreateCustomer = () => {
                         avatar={
                             <AccountCircleIcon className={classes.headerIcon}/>
                         }
+                        subheader={`Customer id: #${ customerId }`}
                     />
                 </Grid>
                 <CardContent className={classes.cardContent}>
@@ -143,7 +148,7 @@ const CreateCustomer = () => {
                     </Grid>
                     <Grid item>
                         <Button variant='contained' color="default" className={classes.addBtn}>
-                            Create
+                            Update
                         </Button>
                     </Grid>
                 </Grid>
@@ -152,4 +157,4 @@ const CreateCustomer = () => {
     );
 }
 
-export default CreateCustomer
+export default EditCustomer

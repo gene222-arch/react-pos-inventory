@@ -172,7 +172,7 @@ const PurchaseOrder = () =>
             <Grid container justify='flex-end'>
                 <Grid item>
                     <Button 
-                        variant='text' 
+                        variant='contained' 
                         color="default" 
                         className={classes.cancelBtn}
                         onClick={() => history.push('/inventory-mngmt/purchase-orders')}
@@ -181,7 +181,7 @@ const PurchaseOrder = () =>
                     </Button>
                 </Grid>
                 <Grid item>
-                    <Button variant='text' color="default" className={classes.addBtn}>
+                    <Button variant='contained' color="default" className={classes.addBtn}>
                         Create
                     </Button>
                 </Grid>

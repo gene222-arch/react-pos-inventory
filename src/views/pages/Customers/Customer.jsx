@@ -62,6 +62,7 @@ const Customers = () => {
                     components={{
                         Toolbar: GridToolbar,
                     }}
+                    onRowClick={ (param) => history.push(`/customers/${param.row.id}/edit`)}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 
