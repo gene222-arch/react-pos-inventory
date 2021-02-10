@@ -20,6 +20,7 @@ const CreateCategory = lazy(() => import('../views/pages/Products/Categories/Cre
 const EditCategory = lazy(() => import('../views/pages/Products/Categories/EditCategory'));
 const Discounts = lazy(() => import('../views/pages/Products/Discounts/Discounts'));
 const CreateDiscount = lazy(() => import('../views/pages/Products/Discounts/CreateDiscount'));
+const EditDiscount = lazy(() => import('../views/pages/Products/Discounts/EditDiscount'));
 const Customers = lazy(() => import('../views/pages/Customers/Customer'));
 const CreateCustomer = lazy(() => import('../views/pages/Customers/CreateCustomer'));
 const EditCustomer = lazy(() => import('../views/pages/Customers/EditCustomer'));
@@ -278,6 +279,15 @@ export const adminRoutes = {
             exact: true,
             component: CreateDiscount,
             access: 'create_discounts',
+            restricted: true 
+        },
+        {
+            path: '/products/discounts/:discountId/edit',
+            name: 'EditDiscount',
+            icon: '',
+            exact: true,
+            component: EditDiscount,
+            access: 'update_discounts',
             restricted: true 
         },
         {
