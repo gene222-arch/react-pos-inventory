@@ -10,7 +10,7 @@ import { createPageUseStyles } from '../../../../assets/material-styles/styles'
 import * as Helper from '../../../../utils/helpers'
 
 
-const CreateSupplier = () => {
+const CreateCustomer = () => {
 
     const classes = createPageUseStyles();
     const history = useHistory();
@@ -116,7 +116,7 @@ const CreateSupplier = () => {
                             variant='text' 
                             color="default" 
                             className={classes.cancelBtn}
-                            onClick={() => history.push('/inventory-mngmt/suppliers')}
+                            onClick={() => history.push('/employees/list')}
                         >
                             Cancel
                         </Button>
@@ -132,4 +132,4 @@ const CreateSupplier = () => {
     );
 }
 
-export default CreateSupplier
+export default CreateCustomer

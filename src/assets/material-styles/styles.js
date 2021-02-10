@@ -322,7 +322,7 @@ export const receivePOTextFieldUseStyles = makeStyles((theme) => ({
 }));
 
 
-export const createSupplierUseStyles = makeStyles((theme) => ({
+export const createPageUseStyles = makeStyles((theme) => ({
     
     cardContent: {
         [theme.breakpoints.up('md')]: {
