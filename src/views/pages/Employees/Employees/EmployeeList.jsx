@@ -52,6 +52,7 @@ const EmployeeList = () => {
                     components={{
                         Toolbar: GridToolbar,
                     }}
+                    onRowClick={(params) => history.push(`/employees/${params.row.id}/edit`)}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 
