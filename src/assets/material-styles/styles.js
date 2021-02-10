@@ -410,7 +410,7 @@ export const createProductUseStyles = makeStyles((theme) => ({
 }))
 
 export const createCategoryUseStyles = makeStyles((theme) => ({
-    createProductCard: {
+    createCategoryCard: {
         marginBottom: theme.spacing(2),
         [theme.breakpoints.up('sm')]: {
             width: '70%',
@@ -432,6 +432,37 @@ export const createCategoryUseStyles = makeStyles((theme) => ({
             backgroundColor: '#dc3545'
         }
     },
+}))
+
+export const createDiscountUseStyles = makeStyles((theme) => ({
+    createDiscountCard: {
+        marginBottom: theme.spacing(2),
+        [theme.breakpoints.up('md')]: {
+            width: '40%',
+            padding: '1rem'
+        }
+    },
+    addBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: '#4caf50',
+        color: '#FFF',
+        '&:hover': {
+            backgroundColor: green[400]
+        }
+    },
+    cancelBtn: {
+        margin: theme.spacing(1),
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: '#dc3545'
+        }
+    },
+    discountIcon: {
+        fontSize: '4rem',
+        color: theme.palette.secondary.main,
+        textAlign: 'center',
+        width: '100%'
+    }
 }))
 
 export const receivePOTextFieldUseStyles = makeStyles((theme) => ({

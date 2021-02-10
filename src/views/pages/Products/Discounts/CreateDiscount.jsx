@@ -10,22 +10,38 @@ import {
     InputLabel, 
     Avatar, 
     CardHeader,
-    Divider
+    Divider, IconButton
     } from '@material-ui/core';
-import { createCategoryUseStyles } from '../../../../assets/material-styles/styles'
+import LoyaltyIcon from '@material-ui/icons/Loyalty';
+import { createDiscountUseStyles } from '../../../../assets/material-styles/styles'
+import { MoreVert as MoreVertIcon } from '@material-ui/icons'
 
-const CreateCategory = () => 
+const CreateDiscount = () => 
 {
-    const classes = createCategoryUseStyles();
+    const classes = createDiscountUseStyles();
     const history = useHistory();
 
     return (
         <>
-            <Card className={classes.createCategoryCard}>
+            <Card className={classes.createDiscountCard}>
+                <Grid container justify='center'>
+                    <Grid item xs={12} sm={12} md={12} lg={12}>
+                        <CardHeader
+                            avatar={
+                                <LoyaltyIcon className={classes.discountIcon}/>
+                            }
+                        />
+                    </Grid>
+                </Grid>
                 <CardContent>
                     <TextField
                         id=""
-                        label="Category name"
+                        label="Name"
+                        fullWidth
+                    />
+                    <TextField
+                        id=""
+                        label="Percent Value"
                         fullWidth
                     />
                 </CardContent>
@@ -35,7 +51,7 @@ const CreateCategory = () =>
                             variant='contained' 
                             color="default" 
                             className={classes.cancelBtn}
-                            onClick={() => history.push('/products/categories')}
+                            onClick={() => history.push('/products/discounts')}
                         >
                             Cancel
                         </Button>
@@ -51,4 +67,4 @@ const CreateCategory = () =>
     )
 }
 
-export default CreateCategory
+export default CreateDiscount
