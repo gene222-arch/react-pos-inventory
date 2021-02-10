@@ -16,6 +16,7 @@ const ProductList = React.lazy(() => import('../views/pages/Products/Products/Pr
 const Categories = React.lazy(() => import('../views/pages/Products/Categories/Categories'));
 const Discounts = React.lazy(() => import('../views/pages/Products/Discounts/Discounts'));
 const Customers = React.lazy(() => import('../views/pages/Customers/Customer'));
+const CreateCustomer = React.lazy(() => import('../views/pages/Customers/CreateCustomer'));
 const AccessRights = React.lazy(() => import('../views/pages/Employees/AccessRights'));
 const EmployeeList = React.lazy(() => import('../views/pages/Employees/Employees/EmployeeList'));
 const PurchaseOrderList = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderList'));
@@ -226,6 +227,15 @@ export const adminRoutes = {
             exact: true,
             component: Customers,
             access: 'view_customers',
+            restricted: true 
+        },
+        {
+            path: '/create-customer',
+            name: 'CreateCustomer',
+            icon: '',
+            exact: true,
+            component: CreateCustomer,
+            access: 'create_customers',
             restricted: true 
         },
         {

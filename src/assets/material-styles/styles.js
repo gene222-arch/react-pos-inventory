@@ -2,6 +2,10 @@ import { makeStyles } from '@material-ui/core'
 import { green, blue } from '@material-ui/core/colors';
 import visualData from '../storage/images/background-image/visual_data.svg'
 
+
+/**
+ * Global Styling
+ */
 export const notFoundUseStyles = makeStyles({
     typography: {
         fontSize: '3rem',
@@ -18,7 +22,77 @@ export const notFoundUseStyles = makeStyles({
     }
 });
 
+export const createPageUseStyles = makeStyles((theme) => ({
+    
+    cardContent: {
+        [theme.breakpoints.up('md')]: {
+            width: '100%',
+            padding: theme.spacing(3)
+        }
+    },
+    cardContainer: {
+        [theme.breakpoints.up('md')]: {
+            width: '50%',
+        }  
+    },
+    headerIcon: {
+        fontSize: '7rem',
+        color: blue[500]
+    },
+    formControl: {
+        width: '100%',
+    },
+    addBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: '#4caf50',
+        color: '#FFF',
+        '&:hover': {
+            backgroundColor: green[400]
+        }
+    },
+    cancelBtn: {
+        margin: theme.spacing(1),
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: '#dc3545'
+        }
+    },
+    textFieldIcons: {
+        color: '#a8a7a7'
+    },
+    divider: {
+        marginTop: theme.spacing(2)
+    }
+}));
 
+export const sendMailDialogUseStyles = makeStyles((theme) => ({
+    dialog: {
+        padding: theme.spacing(3)
+    },
+    cancelBtn: {
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: '#dc3545'
+        }
+    },
+    sendMailBtn: {
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: theme.palette.primary.main
+        }
+    }
+}));
+
+
+/**
+ * End of Global Styling
+ */
+
+
+
+/**
+ * Component Styling
+ */
 const drawerWidth = 320;
 
 export const AdminLayoutUseStyles = makeStyles((theme) => ({
@@ -322,62 +396,6 @@ export const receivePOTextFieldUseStyles = makeStyles((theme) => ({
 }));
 
 
-export const createPageUseStyles = makeStyles((theme) => ({
-    
-    cardContent: {
-        [theme.breakpoints.up('md')]: {
-            width: '100%',
-            padding: theme.spacing(3)
-        }
-    },
-    cardContainer: {
-        [theme.breakpoints.up('md')]: {
-            width: '50%',
-        }  
-    },
-    shippingIcon: {
-        fontSize: '7rem',
-        color: blue[500]
-    },
-    formControl: {
-        width: '100%',
-    },
-    addBtn: {
-        margin: theme.spacing(1),
-        backgroundColor: '#4caf50',
-        color: '#FFF',
-        '&:hover': {
-            backgroundColor: green[400]
-        }
-    },
-    cancelBtn: {
-        margin: theme.spacing(1),
-        '&:hover': {
-            color: '#FFF',
-            backgroundColor: '#dc3545'
-        }
-    },
-    divider: {
-        marginTop: theme.spacing(2)
-    }
-}));
-
-
-
-export const sendMailDialogUseStyles = makeStyles((theme) => ({
-    dialog: {
-        padding: theme.spacing(3)
-    },
-    cancelBtn: {
-        '&:hover': {
-            color: '#FFF',
-            backgroundColor: '#dc3545'
-        }
-    },
-    sendMailBtn: {
-        '&:hover': {
-            color: '#FFF',
-            backgroundColor: theme.palette.primary.main
-        }
-    }
-}));
+/**
+ * Component Styling
+ */

@@ -6,11 +6,16 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import { createPageUseStyles } from '../../../../assets/material-styles/styles'
-import * as Helper from '../../../../utils/helpers'
+import InputAdornment from '@material-ui/core/InputAdornment';
+import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
+import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
+import RoomIcon from '@material-ui/icons/Home';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import { createPageUseStyles } from '../../../assets/material-styles/styles'
+import * as Helper from '../../../utils/helpers'
 
 
-const CreateSupplier = () => {
+const CreateCustomer = () => {
 
     const classes = createPageUseStyles();
     const history = useHistory();
@@ -25,20 +30,14 @@ const CreateSupplier = () => {
                 <Grid container spacing={1} justify='center'>
                     <CardHeader
                         avatar={
-                            <LocalShippingIcon className={classes.headerIcon}/>
+                            <AccountCircleIcon className={classes.headerIcon}/>
                         }
                     />
                 </Grid>
                 <CardContent className={classes.cardContent}>
                     <TextField
                         id=""
-                        label="Supplier name"
-                        fullWidth
-                        margin='normal'
-                    />
-                    <TextField
-                        id=""
-                        label="Contact"
+                        label="Name"
                         fullWidth
                         margin='normal'
                     />
@@ -47,18 +46,39 @@ const CreateSupplier = () => {
                         label="Email"
                         fullWidth
                         margin='normal'
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <AlternateEmailIcon className={classes.textFieldIcons}/>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                     <TextField
                         id=""
                         label="Phone"
                         fullWidth
                         margin='normal'
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <PhoneAndroidIcon className={classes.textFieldIcons}/>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                     <TextField
                         id=""
                         label="Address"
                         fullWidth
                         margin='normal'
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <RoomIcon className={classes.textFieldIcons}/>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                     <Grid container justify='space-between'>
                         <Grid item xs={6} sm={6} md={5} lg={5}>
@@ -116,7 +136,7 @@ const CreateSupplier = () => {
                             variant='text' 
                             color="default" 
                             className={classes.cancelBtn}
-                            onClick={() => history.push('/inventory-mngmt/suppliers')}
+                            onClick={() => history.push('/employees/list')}
                         >
                             Cancel
                         </Button>
@@ -132,4 +152,4 @@ const CreateSupplier = () => {
     );
 }
 
-export default CreateSupplier
+export default CreateCustomer
