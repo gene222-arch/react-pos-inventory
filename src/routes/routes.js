@@ -1,37 +1,38 @@
-import React from 'react'
+import React, { lazy } from 'react'
 import { Route, Switch, Redirect } from "react-router-dom";
 import { determineIsAuthenticated } from '../utils/helpers'
-const LoginForm = React.lazy(() => import('../views/auth/LoginForm'));
-const AdminRegistrationForm = React.lazy(() => import('../views/auth/admin/RegistrationForm'));
-const ManagerRegistrationForm = React.lazy(() => import('../views/auth/manager/RegistrationForm'));
-const CashierRegistrationForm = React.lazy(() => import('../views/auth/cashier/RegistrationForm'));
-const Dashboard = React.lazy(() => import('../views/pages/Dashboard/Dashboard'))
-const Pos = React.lazy(() => import('../views/pages/Pos/Pos'))
-const SalesSummary = React.lazy(() => import('../views/pages/Reports/SalesSummary'))
-const SalesByItem = React.lazy(() => import('../views/pages/Reports/SalesByItem'))
-const SalesByCategory = React.lazy(() => import('../views/pages/Reports/SalesByCategory'))
-const SalesByEmployee = React.lazy(() => import('../views/pages/Reports/SalesByEmployee'))
-const SalesByPaymentType = React.lazy(() => import('../views/pages/Reports/SalesByPaymentType'))
-const ProductList = React.lazy(() => import('../views/pages/Products/Products/ProductList'));
-const CreateProduct = React.lazy(() => import('../views/pages/Products/Products/CreateProduct'));
-const EditProduct = React.lazy(() => import('../views/pages/Products/Products/EditProduct'));
-const Categories = React.lazy(() => import('../views/pages/Products/Categories/Categories'));
-const Discounts = React.lazy(() => import('../views/pages/Products/Discounts/Discounts'));
-const Customers = React.lazy(() => import('../views/pages/Customers/Customer'));
-const CreateCustomer = React.lazy(() => import('../views/pages/Customers/CreateCustomer'));
-const EditCustomer = React.lazy(() => import('../views/pages/Customers/EditCustomer'));
-const AccessRights = React.lazy(() => import('../views/pages/Employees/AccessRights'));
-const EmployeeList = React.lazy(() => import('../views/pages/Employees/Employees/EmployeeList'));
-const PurchaseOrderList = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderList'));
-const PurchaseOrder = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrder'));
-const PurchaseOrderEdit = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderEdit'));
-const PurchaseOrderReceive = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderReceive'));
-const PurchaseOrderDetails = React.lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderDetails'));
-const Suppliers = React.lazy(() => import('../views/pages/InventoryManagement/Suppliers/Suppliers'));
-const CreateSupplier = React.lazy(() => import('../views/pages/InventoryManagement/Suppliers/CreateSupplier'));
-const ReceivedStocks = React.lazy(() => import('../views/pages/Transactions/ReceivedStocks'));
-const Settings = React.lazy(() => import('../views/pages/Settings'))
-const NotFound = React.lazy(() => import('../views/errors/NotFound'));
+const LoginForm = lazy(() => import('../views/auth/LoginForm'));
+const AdminRegistrationForm = lazy(() => import('../views/auth/admin/RegistrationForm'));
+const ManagerRegistrationForm = lazy(() => import('../views/auth/manager/RegistrationForm'));
+const CashierRegistrationForm = lazy(() => import('../views/auth/cashier/RegistrationForm'));
+const Dashboard = lazy(() => import('../views/pages/Dashboard/Dashboard'))
+const Pos = lazy(() => import('../views/pages/Pos/Pos'))
+const SalesSummary = lazy(() => import('../views/pages/Reports/SalesSummary'))
+const SalesByItem = lazy(() => import('../views/pages/Reports/SalesByItem'))
+const SalesByCategory = lazy(() => import('../views/pages/Reports/SalesByCategory'))
+const SalesByEmployee = lazy(() => import('../views/pages/Reports/SalesByEmployee'))
+const SalesByPaymentType = lazy(() => import('../views/pages/Reports/SalesByPaymentType'))
+const ProductList = lazy(() => import('../views/pages/Products/Products/ProductList'));
+const CreateProduct = lazy(() => import('../views/pages/Products/Products/CreateProduct'));
+const EditProduct = lazy(() => import('../views/pages/Products/Products/EditProduct'));
+const Categories = lazy(() => import('../views/pages/Products/Categories/Categories'));
+const CreateCategory = lazy(() => import('../views/pages/Products/Categories/CreateCategory'));
+const Discounts = lazy(() => import('../views/pages/Products/Discounts/Discounts'));
+const Customers = lazy(() => import('../views/pages/Customers/Customer'));
+const CreateCustomer = lazy(() => import('../views/pages/Customers/CreateCustomer'));
+const EditCustomer = lazy(() => import('../views/pages/Customers/EditCustomer'));
+const AccessRights = lazy(() => import('../views/pages/Employees/AccessRights'));
+const EmployeeList = lazy(() => import('../views/pages/Employees/Employees/EmployeeList'));
+const PurchaseOrderList = lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderList'));
+const PurchaseOrder = lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrder'));
+const PurchaseOrderEdit = lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderEdit'));
+const PurchaseOrderReceive = lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderReceive'));
+const PurchaseOrderDetails = lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderDetails'));
+const Suppliers = lazy(() => import('../views/pages/InventoryManagement/Suppliers/Suppliers'));
+const CreateSupplier = lazy(() => import('../views/pages/InventoryManagement/Suppliers/CreateSupplier'));
+const ReceivedStocks = lazy(() => import('../views/pages/Transactions/ReceivedStocks'));
+const Settings = lazy(() => import('../views/pages/Settings'))
+const NotFound = lazy(() => import('../views/errors/NotFound'));
 
 
 
@@ -239,6 +240,15 @@ export const adminRoutes = {
             exact: true,
             component: Categories,
             access: 'view_categories',
+            restricted: true 
+        },
+        {
+            path: '/products/create-category',
+            name: 'CreateCategory',
+            icon: '',
+            exact: true,
+            component: CreateCategory,
+            access: 'create_categories',
             restricted: true 
         },
         {

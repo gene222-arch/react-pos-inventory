@@ -385,9 +385,9 @@ export const createProductUseStyles = makeStyles((theme) => ({
         }
     },
     deleteAction: {
-    '&:hover': {
-        color: '#dc3545'
-    }
+        '&:hover': {
+            color: '#dc3545'
+        }
     },
     createProductCard: {
         marginBottom: theme.spacing(2),
@@ -407,6 +407,31 @@ export const createProductUseStyles = makeStyles((theme) => ({
     cardHeaderIcons: {
         color: '#3a3a3a'
     }
+}))
+
+export const createCategoryUseStyles = makeStyles((theme) => ({
+    createProductCard: {
+        marginBottom: theme.spacing(2),
+        [theme.breakpoints.up('sm')]: {
+            width: '70%',
+            padding: '1rem'
+        }
+    },
+    addBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: '#4caf50',
+        color: '#FFF',
+        '&:hover': {
+            backgroundColor: green[400]
+        }
+    },
+    cancelBtn: {
+        margin: theme.spacing(1),
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: '#dc3545'
+        }
+    },
 }))
 
 export const receivePOTextFieldUseStyles = makeStyles((theme) => ({
