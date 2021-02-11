@@ -28,7 +28,7 @@ export const createPageUseStyles = makeStyles((theme) => ({
         [theme.breakpoints.up('md')]: {
             width: '100%',
             padding: theme.spacing(4)
-        }
+        },
     },
     cardContainer: {
         [theme.breakpoints.up('md')]: {

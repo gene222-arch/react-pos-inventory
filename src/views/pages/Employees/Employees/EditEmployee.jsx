@@ -120,7 +120,7 @@ const EditEmployee = ({match}) => {
                     </Grid>
                     <Grid item>
                         <Button variant='contained' color="default" className={classes.addBtn}>
-                            Create
+                            Update
                         </Button>
                     </Grid>
                 </Grid>
