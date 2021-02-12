@@ -543,7 +543,7 @@ const MainLayout = ({children}) =>
                             </NavLink>
                         </List>
                     </Collapse>   
-                {/* End of Report */}
+                {/* End of Transactions */}
 
                 {/* Settings */}
                     <NavLink className={classes.navLinks} to={'/settings'}>
