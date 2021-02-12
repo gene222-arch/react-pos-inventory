@@ -1,7 +1,7 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { adminRoutes, managerRoutes, cashierRoutes, globalRoutes, RenderRoutes } from './routes/routes'
-const AdminLayout = React.lazy(() => import('./views/layouts/AdminLayout'));
+const MainLayout = React.lazy(() => import('./views/layouts/MainLayout'));
 const AuthLayout = React.lazy(() => import('./views/layouts/AuthLayout'));
 const NotFound = React.lazy(() => import('./views/errors/NotFound'));
 
@@ -35,9 +35,9 @@ const App = () =>
 				</Route>
 
 				<Route path='/:path?' exact={false}>
-					<AdminLayout>
+					<MainLayout>
 						<RenderRoutes routes={adminRoutes.privateRoutes}/>
-					</AdminLayout>
+					</MainLayout>
 				</Route>
 
 				<Route component={NotFound} />

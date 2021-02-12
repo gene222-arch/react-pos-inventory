@@ -38,7 +38,7 @@ import * as Cookie from '../../utils/cookies'
 
 
 
-const AdminLayout = ({children}) => 
+const MainLayout = ({children}) => 
 {
 // Styling
     const classes = AdminLayoutUseStyles();
@@ -537,4 +537,4 @@ const AdminLayout = ({children}) =>
 }
 
 
-export default AdminLayout
+export default MainLayout
