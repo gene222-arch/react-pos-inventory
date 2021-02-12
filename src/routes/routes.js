@@ -40,6 +40,7 @@ const Suppliers = lazy(() => import('../views/pages/InventoryManagement/Supplier
 const CreateSupplier = lazy(() => import('../views/pages/InventoryManagement/Suppliers/CreateSupplier'));
 const EditSupplier = lazy(() => import('../views/pages/InventoryManagement/Suppliers/EditSupplier'));
 const SalesReturnList = lazy(() => import('../views/pages/SalesReturns/SalesReturnList'))
+const SalesReturnDetails = lazy(() => import('../views/pages/SalesReturns/SalesReturnDetails'))
 const CreateSalesReturn = lazy(() => import('../views/pages/SalesReturns/CreateSalesReturn'))
 const ReceivedStocks = lazy(() => import('../views/pages/Transactions/ReceivedStocks'));
 const Settings = lazy(() => import('../views/pages/Settings'))
@@ -247,6 +248,15 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: SalesReturnList,
+            access: 'view_sales_returns',
+            restricted: true 
+        },
+        {
+            path: '/sales-return-details/:salesReturnId',
+            name: 'SalesReturnDetails',
+            icon: '',
+            exact: true,
+            component: SalesReturnDetails,
             access: 'view_sales_returns',
             restricted: true 
         },

@@ -108,7 +108,7 @@ const CreateSalesReturn = () => {
                         variant='contained' 
                         color="default" 
                         className={classes.cancelBtn}
-                        onClick={() => history.push('/inventory-mngmt/sales-returns')}
+                        onClick={() => history.push('/sales-returns')}
                     >
                         Cancel
                     </Button>
