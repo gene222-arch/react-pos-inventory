@@ -9,7 +9,6 @@ import { Grid, Divider } from '@material-ui/core'
 import { Button } from '@material-ui/core'
 import { makeStyles, Container } from '@material-ui/core'
 import {List, ListItem, ListItemText, ListItemAvatar} from '@material-ui/core';
-import { green, red, orange, blue, yellow, indigo } from '@material-ui/core/colors'
 import RevenueIcon from '@material-ui/icons/Storefront';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
@@ -19,61 +18,13 @@ import { MoreVert as MoreVertIcon } from '@material-ui/icons'
 import NetSalesIcon from '@material-ui/icons/MultilineChart';
 import InvoiceIcon from '@material-ui/icons/Receipt';
 import PurchaseOrdersIcon from '@material-ui/icons/AddShoppingCart';
+import { dashboardUseStyles } from '../../../assets/material-styles/styles'
 
 HighchartsExporting(Highcharts)
 
-const useStyles = makeStyles( theme => ({
-    root: {
-        width: '100%'
-    },
-    cardHeaderIcon: {
-        position: 'absolute',
-        marginTop: '-60px',
-        marginRight: '15px',
-        height: theme.spacing(11),
-        width: theme.spacing(11),
-        boxShadow: theme.shadows[5]
-    },
-    additionalInfo: {
-        color: '#999999'
-    },
-    salesReportIcons: {
-        height: theme.spacing(7),
-        width: theme.spacing(7),
-    },
-    title: {
-        marginLeft: '5.5rem',
-        fontWeight: '400',
-        wordWrap: 'break-word'
-    },
-    subheader: {
-        marginLeft: '5.5rem',
-        fontWeight: '400'
-    },
-    revenueContainer: {
-        backgroundColor: green[500]
-    },
-    salesReturnContainer: {
-        backgroundColor: red[500]
-    },
-    grossProfitContainer: {
-        backgroundColor: indigo[500]
-    },
-    netSalesContainer: {
-        backgroundColor: yellow[600]
-    },
-    chartContainer: {
-        width: '100%',
-        margin: '0 auto'
-    },
-    pendingOrdersIcon: {
-        backgroundColor: blue[500]
-    },
-}));
-
 const Dashboard = () => 
 {
-    const classes = useStyles();
+    const classes = dashboardUseStyles();
     const [ salesType, setSalesType ] = useState('Monthly');
 
 

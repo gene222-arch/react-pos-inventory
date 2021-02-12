@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core'
-import { green, blue } from '@material-ui/core/colors';
+import { green, red, orange, blue, yellow, indigo } from '@material-ui/core/colors'
 import visualData from '../storage/images/background-image/visual_data.svg'
 
 
@@ -196,6 +196,56 @@ export const AdminLayoutUseStyles = makeStyles((theme) => ({
         color: '#78909c'
     }
 }));
+
+export const dashboardUseStyles = makeStyles( theme => ({
+    root: {
+        width: '100%'
+    },
+    cardHeaderIcon: {
+        position: 'absolute',
+        marginTop: '-60px',
+        marginRight: '15px',
+        height: theme.spacing(11),
+        width: theme.spacing(11),
+        boxShadow: theme.shadows[3]
+    },
+    additionalInfo: {
+        color: '#999999'
+    },
+    salesReportIcons: {
+        height: theme.spacing(6),
+        width: theme.spacing(6),
+    },
+    title: {
+        marginLeft: '5rem',
+        fontWeight: '400',
+        wordWrap: 'break-word'
+    },
+    subheader: {
+        marginLeft: '5rem',
+        fontWeight: '400'
+    },
+    revenueContainer: {
+        backgroundColor: green[500]
+    },
+    salesReturnContainer: {
+        backgroundColor: red[500]
+    },
+    grossProfitContainer: {
+        backgroundColor: indigo[500]
+    },
+    netSalesContainer: {
+        backgroundColor: yellow[600]
+    },
+    chartContainer: {
+        width: '100%',
+        margin: '0 auto'
+    },
+    pendingOrdersIcon: {
+        backgroundColor: blue[500]
+    },
+}));
+
 
 export const loginFormUseStyles = makeStyles((theme) => ({
     root: {
