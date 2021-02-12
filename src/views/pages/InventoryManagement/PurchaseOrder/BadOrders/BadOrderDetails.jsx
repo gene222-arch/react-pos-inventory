@@ -78,7 +78,6 @@ const BadOrderDetails = ({match}) => {
                     components={{
                         Toolbar: GridToolbar,
                     }}
-                    onRowClick={(param) => history.push(`/inventory-mngmt/bad-order-details/${param.row.id}`)}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 
