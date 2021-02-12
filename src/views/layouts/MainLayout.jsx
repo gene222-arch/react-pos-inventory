@@ -33,6 +33,7 @@ import Report from '@material-ui/icons/Assessment';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
+import TransactionsIcon from '@material-ui/icons/ThumbsUpDown';
 import { AdminLayoutUseStyles } from '../../assets/material-styles/styles'
 import * as Cookie from '../../utils/cookies'
 
@@ -52,6 +53,7 @@ const MainLayout = ({children}) =>
     const [openInventoryMngmt, setOpenInventoryMngmt] = useState(false);
     const [openProduct, setOpenProduct] = useState(false);
     const [openEmployees, setOpenEmployees] = useState(false);
+    const [ openTransactions, setOpenTransactions ] = useState(false);
     const [ selectedItem, setSelectedItem ] = useState('Dashboard');
     const [ selectedMenu, setSelectedMenu ] = useState('');
 
@@ -102,15 +104,20 @@ const MainLayout = ({children}) =>
         closeDropdownExcept(path);
     }; 
 
+    const handleOpenTransactionsDropdown = (path) => 
+    {
+        setOpenTransactions(!openTransactions);
+        setSelectedMenu(path);
+        closeDropdownExcept(path);
+    }; 
+
     const handleSelectedMenu = (menuName) => {
         setSelectedItem('');
         setSelectedMenu(menuName);
         closeDropdownExcept(menuName);
     };
 
-    const handleSelectedItem = (selectedItemName) => {
-        setSelectedItem(selectedItemName);
-    };
+    const handleSelectedItem = (selectedItemName) => setSelectedItem(selectedItemName);
 
 
     const handleSetAuth = () => {
@@ -151,6 +158,7 @@ const MainLayout = ({children}) =>
                 setOpenEmployees(false);
         }
     }
+
 
     return (
         <div className={classes.root}>
@@ -432,8 +440,6 @@ const MainLayout = ({children}) =>
                                     <ListItemText primary="Suppliers" className={classes.dropDownItem}/>
                                 </ListItem>  
                             </NavLink>  
-
-                    
                         </List>
                     </Collapse>                   
                 </List>
@@ -507,6 +513,37 @@ const MainLayout = ({children}) =>
                         </List>
                     </Collapse>   
                     {/* End of Employees */}
+
+
+                {/* Transactions */}
+                <ListItem 
+                        onClick={() => handleOpenTransactionsDropdown('Transactions')}
+                        selected={selectedMenu === 'Transactions'}
+                        button
+                    >
+                            <ListItemIcon><TransactionsIcon className={classes.transactions}/></ListItemIcon>
+                            <ListItemText primary={
+                                <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                                    Transactions
+                                </Typography>} />
+                            {openTransactions ? <ExpandLess /> : <ExpandMore />}
+                    </ListItem>
+                    <Collapse in={openTransactions} timeout="auto" unmountOnExit>
+                        <List component="div" disablePadding>
+                            {/* Received Stocks */}
+                            <NavLink className={classes.navLinks} to={'/transactions/received-stocks'}>
+                                <ListItem 
+                                    button 
+                                    className={classes.dropdownLists} 
+                                    selected={ selectedItem === 'Received Stocks' }
+                                    onClick={ e => handleSelectedItem( 'Received Stocks') }
+                                >
+                                    <ListItemText primary="Received Stocks" className={classes.dropDownItem}/>
+                                </ListItem>
+                            </NavLink>
+                        </List>
+                    </Collapse>   
+                {/* End of Report */}
 
                 {/* Settings */}
                     <NavLink className={classes.navLinks} to={'/settings'}>

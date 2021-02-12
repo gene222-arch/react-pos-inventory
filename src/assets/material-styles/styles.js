@@ -201,6 +201,9 @@ export const AdminLayoutUseStyles = makeStyles((theme) => ({
     employees: {
         color: green[500]
     },
+    transactions: {
+
+    },
     settings: {
         color: '#78909c'
     },
