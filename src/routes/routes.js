@@ -1,5 +1,5 @@
 import React, { lazy } from 'react'
-import { Route, Switch, Redirect } from "react-router-dom";
+import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import { determineIsAuthenticated } from '../utils/helpers'
 const LoginForm = lazy(() => import('../views/auth/LoginForm'));
 const AdminRegistrationForm = lazy(() => import('../views/auth/admin/RegistrationForm'));
@@ -48,7 +48,10 @@ const NotFound = lazy(() => import('../views/errors/NotFound'));
 
 
 
-export const RenderRoutes = ({routes}) => {
+export const RenderRoutes = ({routes, isAuthenticated = false}) => {
+
+    const history = useHistory();
+
     return (
         <Switch>
             {
@@ -58,7 +61,29 @@ export const RenderRoutes = ({routes}) => {
                         path={route.path}
                         strict={route.strict}
                         exact={route.exact}
-                        render={ props => { return <route.component {...props} route={route} />
+                        render={ props => { 
+                            if (route.restricted)
+                            {
+                                if (isAuthenticated)
+                                {
+                                    return <route.component {...props} route={route} />
+                                }
+                                else 
+                                {
+                                    history.push('/auth/login')
+                                }
+                            }
+                            else 
+                            {
+                                if (isAuthenticated)
+                                {
+                                    history.push('/dashboard')
+                                }
+                                else 
+                                {
+                                    return <route.component {...props} route={route} />
+                                }   
+                            }
                         }}
                     />
                 ))
@@ -110,6 +135,7 @@ export const adminRoutes = {
             exact: true,
             component: Pos,
             access: 'view_pos', 
+            restricted: true
         },
         {
             path: '/reports/sales-summary',
@@ -117,7 +143,8 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: SalesSummary,
-            access: 'view_sales_summary_reports', 
+            access: 'view_sales_summary_reports',
+            restricted: true 
         },
         {
             path: '/reports/sales-by-item',
@@ -126,6 +153,7 @@ export const adminRoutes = {
             exact: true,
             component: SalesByItem,
             access: 'view_sales_by_item_reports', 
+            restricted: true
         },
         {
             path: '/reports/sales-by-category',
@@ -133,7 +161,8 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: SalesByCategory,
-            access: 'view_sales_by_category_reports', 
+            access: 'view_sales_by_category_reports',
+            restricted: true 
         },
         {
             path: '/reports/sales-by-employee',
@@ -141,7 +170,8 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: SalesByEmployee,
-            access: 'view_sales_by_employee_reports', 
+            access: 'view_sales_by_employee_reports',
+            restricted: true 
         },
         {
             path: '/reports/sales-by-payment-type',
@@ -149,7 +179,8 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: SalesByPaymentType,
-            access: 'view_sales_by_payment_type_reports', 
+            access: 'view_sales_by_payment_type_reports',
+            restricted: true 
         },
         {
             path: '/inventory-mngmt/purchase-orders',
@@ -157,7 +188,8 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: PurchaseOrderList,
-            access: 'view_purchase_orders', 
+            access: 'view_purchase_orders',
+            restricted: true 
         },
         {
             path: '/inventory-mngmt/create-order',
@@ -165,7 +197,8 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: PurchaseOrder,
-            access: 'create_purchase_orders', 
+            access: 'create_purchase_orders',
+            restricted: true 
         },
         {
             path: '/inventory-mngmt/purchase-order-details/:purchaseOrderId',
@@ -173,7 +206,8 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: PurchaseOrderDetails,
-            access: 'view_purchase_orders', 
+            access: 'view_purchase_orders',
+            restricted: true 
         },
         {
             path: '/inventory-mngmt/purchase-order/:purchaseOrderId/edit',
@@ -181,7 +215,8 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: PurchaseOrderEdit,
-            access: 'update_purchase_orders', 
+            access: 'update_purchase_orders',
+            restricted: true 
         },
         {
             path: '/inventory-mngmt/receive-purchase-orders',
@@ -189,7 +224,8 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: PurchaseOrderReceive,
-            access: 'receive_purchase_orders', 
+            access: 'receive_purchase_orders',
+            restricted: true 
         },
         {
             path: '/inventory-mngmt/bad-orders',
@@ -197,7 +233,8 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: BadOrderList,
-            access: 'view_bad_orders', 
+            access: 'view_bad_orders',
+            restricted: true 
         },
         {
             path: '/inventory-mngmt/bad-order-details/:badOrderId',
@@ -205,7 +242,8 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: BadOrderDetails,
-            access: 'view_bad_orders', 
+            access: 'view_bad_orders',
+            restricted: true 
         },
         {
             path: '/inventory-mngmt/create-bad-order',
@@ -213,7 +251,8 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CreateBadOrders,
-            access: 'create_bad_orders', 
+            access: 'create_bad_orders',
+            restricted: true 
         },
         {
             path: '/inventory-mngmt/suppliers',
@@ -443,7 +482,6 @@ export const adminRoutes = {
     ]
 };
 
-
 export const managerRoutes = {
     publicRoutes: [
         {
@@ -461,7 +499,6 @@ export const managerRoutes = {
 
     ]
 };
-
 
 export const cashierRoutes = {
     publicRoutes: [
