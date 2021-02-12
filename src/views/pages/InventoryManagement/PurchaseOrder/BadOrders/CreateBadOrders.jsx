@@ -5,10 +5,10 @@ import { Card, CardContent, Grid } from '@material-ui/core';
 import { FormControl, InputLabel, Select, MenuItem, TextField } from '@material-ui/core'
 import Button from '@material-ui/core/Button';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import { createBadOrdersUseStyles } from '../../../../assets/material-styles/styles'
+import { createBadOrdersUseStyles } from '../../../../../assets/material-styles/styles'
 
 
-const BadOrders = () => {
+const CreateBadOrders = () => {
 
     const classes = createBadOrdersUseStyles();
     const history = useHistory();
@@ -120,4 +120,4 @@ const BadOrders = () => {
     );
 }
 
-export default BadOrders
+export default CreateBadOrders

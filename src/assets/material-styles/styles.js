@@ -204,6 +204,9 @@ export const AdminLayoutUseStyles = makeStyles((theme) => ({
     transactions: {
 
     },
+    salesReturnsIcon: {
+        color: red[500]
+    },
     settings: {
         color: '#78909c'
     },
@@ -427,6 +430,34 @@ export const purchaseOrderUseStyles = makeStyles((theme) => ({
 }))
 
 export const createBadOrdersUseStyles = makeStyles((theme) => ({
+    formControl: {
+        width: '100%',
+    },
+    selectEmpty: {
+        marginTop: theme.spacing(2),
+        width: '20rem'
+    },
+    selectPOContainer: {
+        marginBottom: theme.spacing(2)
+    },
+    addBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: '#4caf50',
+        color: '#FFF',
+        '&:hover': {
+            backgroundColor: green[400]
+        }
+    },
+    cancelBtn: {
+        margin: theme.spacing(1),
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: '#dc3545'
+        }
+    },
+}));
+
+export const createSalesReturnsUseStyles = makeStyles((theme) => ({
     formControl: {
         width: '100%',
     },

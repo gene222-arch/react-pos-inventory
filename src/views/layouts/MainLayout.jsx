@@ -34,6 +34,7 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import TransactionsIcon from '@material-ui/icons/ThumbsUpDown';
+import SalesReturnsIcon from '@material-ui/icons/RemoveShoppingCart';
 import { AdminLayoutUseStyles } from '../../assets/material-styles/styles'
 import * as Cookie from '../../utils/cookies'
 
@@ -456,10 +457,25 @@ const MainLayout = ({children}) =>
                             </NavLink>
  
                         </List>
-                    </Collapse>                   
+                    </Collapse>   
+
+                    {/* Sales Returns */}
+                    <NavLink className={classes.navLinks} to={'/sales-returns'}>
+                            <ListItem 
+                            selected={ selectedMenu === 'Sales Returns' }
+                            onClick={ 
+                                () => handleSelectedMenu( 'Sales Returns') 
+                            }
+                            button>
+                            <ListItemIcon><SalesReturnsIcon className={classes.salesReturnsIcon}/></ListItemIcon>
+                            <ListItemText primary={
+                                <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                                    Sales Returns
+                                </Typography>} />
+                        </ListItem>
+                    </NavLink>                
                 </List>
                 {/* End of Inventory Management */}
-                            
                     <Divider />
 
                 <List>
