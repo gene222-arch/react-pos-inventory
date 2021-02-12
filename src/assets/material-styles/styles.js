@@ -361,6 +361,9 @@ export const dataGridUseStyles = makeStyles((theme) => ({
     links: {
         textDecoration: 'none',
         color: '#FFF'
+    },
+    card: {
+        marginBottom: theme.spacing(2)
     }
 }));
   
