@@ -19,7 +19,7 @@ const SalesByEmployee = () =>
     const columns = [
         { field: 'name', headerName: 'Name', width: 320 },
         { field: 'gross_sales', headerName: 'Gross sales', width: 289 },
-        { field: 'discounts', headerName: 'Name', width: 289 },
+        { field: 'discounts', headerName: 'Discounts', width: 289 },
         { field: 'net_sales', headerName: 'Net sales', width: 289 },
     ];
 
