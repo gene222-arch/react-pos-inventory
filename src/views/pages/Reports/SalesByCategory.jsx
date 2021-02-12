@@ -5,15 +5,11 @@ import { Button } from '@material-ui/core'
 import Grid from '@material-ui/core/Grid'
 import DateFnsUtils from '@date-io/date-fns';
 import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
-import { salesByUseStyles } from '../../../assets/material-styles/styles'
 import * as DateHelper from '../../../utils/dates'
 
 
 const SalesByCategory = () => 
 {
-    const classes = salesByUseStyles();
-    const [ salesType, setSalesType ] = useState('Monthly');
-
     const [purchaseOrderDate, setPurchaseOrderDate] = useState(DateHelper.currentDate);
     const [expectedDate, setExpectedDate] = useState(DateHelper.currentDate);
 
