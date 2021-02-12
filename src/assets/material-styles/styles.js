@@ -203,6 +203,9 @@ export const AdminLayoutUseStyles = makeStyles((theme) => ({
     },
     settings: {
         color: '#78909c'
+    },
+    active: {
+        backgroundColor: '#2c2c2c'
     }
 }));
 
