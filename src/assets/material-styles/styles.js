@@ -83,6 +83,15 @@ export const sendMailDialogUseStyles = makeStyles((theme) => ({
     }
 }));
 
+export const salesByUseStyles = makeStyles((theme) => ({
+
+    topFiveItemAvatar: {
+        backgroundColor: '#2c2c2c'
+    },
+    topFiveItemIcon: {
+        color: yellow[500]
+    }
+}));
 
 /**
  * End of Global Styling
