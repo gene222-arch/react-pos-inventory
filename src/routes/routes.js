@@ -33,6 +33,7 @@ const PurchaseOrder = lazy(() => import('../views/pages/InventoryManagement/Purc
 const PurchaseOrderEdit = lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderEdit'));
 const PurchaseOrderReceive = lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderReceive'));
 const PurchaseOrderDetails = lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/PurchaseOrderDetails'));
+const BadOrders = lazy(() => import('../views/pages/InventoryManagement/PurchaseOrder/BadOrders'));
 const Suppliers = lazy(() => import('../views/pages/InventoryManagement/Suppliers/Suppliers'));
 const CreateSupplier = lazy(() => import('../views/pages/InventoryManagement/Suppliers/CreateSupplier'));
 const EditSupplier = lazy(() => import('../views/pages/InventoryManagement/Suppliers/EditSupplier'));
@@ -184,6 +185,14 @@ export const adminRoutes = {
             exact: true,
             component: PurchaseOrderReceive,
             access: 'receive_purchase_orders', 
+        },
+        {
+            path: '/inventory-mngmt/bad-orders',
+            name: 'BadOrders',
+            icon: '',
+            exact: true,
+            component: BadOrders,
+            access: 'create_bad_orders', 
         },
         {
             path: '/inventory-mngmt/suppliers',

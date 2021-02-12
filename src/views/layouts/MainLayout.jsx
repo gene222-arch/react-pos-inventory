@@ -439,7 +439,22 @@ const MainLayout = ({children}) =>
                                 >
                                     <ListItemText primary="Suppliers" className={classes.dropDownItem}/>
                                 </ListItem>  
-                            </NavLink>  
+                            </NavLink> 
+
+                            {/*Bad Orders */}
+                            <NavLink className={classes.navLinks} to={'/inventory-mngmt/bad-orders'}>
+                                <ListItem 
+                                    button 
+                                    className={classes.dropdownLists} 
+                                    selected={ selectedItem === 'Bad Orders' }
+                                    onClick={ 
+                                        e => handleSelectedItem( 'Bad Orders') 
+                                    }
+                                >
+                                    <ListItemText primary="Bad Orders" className={classes.dropDownItem}/>
+                                </ListItem>
+                            </NavLink>
+ 
                         </List>
                     </Collapse>                   
                 </List>
