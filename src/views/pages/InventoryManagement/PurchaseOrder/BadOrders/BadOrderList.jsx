@@ -3,31 +3,29 @@ import { NavLink, useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
+import { dataGridUseStyles } from '../../../../../assets/material-styles/styles'
 import AddIcon from '@material-ui/icons/Add';
 
 
 const columns = [
-    { field: 'po_id', headerName: 'Purchase order #', width: 200 },
-    { field: 'po_date', headerName: 'Date', width: 165 },
-    { field: 'supplier', headerName: 'Supplier', width: 150 },
-    { field: 'status', headerName: 'Status', width: 150 },
-    { field: 'received', headerName: 'Received', width: 150 },
-    { field: 'expected_on', headerName: 'Expected on', width: 165 },
-    { field: 'total', headerName: 'Total', width: 150 },
-
+    { field: 'bo_id', hide: true},
+    { field: 'supplier', headerName: 'Supplier', width: 300 },
+    { field: 'purchase_return', headerName: 'Purchase return', width: 300 },
+    { field: 'no_of_items', headerName: 'Number of items', width: 240 },
+    { field: 'po_date', headerName: 'Purchase order date', width: 300 },
 ];
 
 const rows = [
-  { id: 1, po_id: 'Snow', po_date: 'January 12, 2021', supplier: '2021', status: 12,  received: '35%', expected_on: 100 },
-  { id: 2, po_id: 'Lannister', po_date: '2021', supplier: '2021', status: 12,  received: '42%', expected_on: 100 },
-  { id: 3, po_id: 'Lannister', po_date: '2021', supplier: '2021', status: 12,  received: '45%', expected_on: 100 },
-  { id: 4, po_id: 'Stark', po_date: '2021', supplier: '2021', status: 12,  received: '16%', expected_on: 100 },
-  { id: 5, po_id: 'Targaryen', po_date: '2021', supplier: '2021', status: 12,  received: null, expected_on: 100 },
+  { id: 1, bo_id: 'Snow', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January 12, 2021' },
+  { id: 2, bo_id: 'Lannister', supplier: 12, purchase_return: '2021', no_of_items: 12, po_date: 'January, 12 2021' },
+  { id: 3, bo_id: 'Lannister', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January, 12 2021' },
+  { id: 4, bo_id: 'Stark', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January, 12 2021' },
+  { id: 5, bo_id: 'Targaryen', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January, 12 2021' },
+
 ];
 
 
-const PurchaseOrderList = () => {
+const BadOrderList = () => {
 
     const classes = dataGridUseStyles();
     const history = useHistory();
@@ -44,11 +42,10 @@ const PurchaseOrderList = () => {
                                         variant="contained"
                                         color='primary' 
                                         className={classes.addBtn}
-                                        startIcon={<AddIcon />}    
+                                        startIcon={<AddIcon />}  
+                                        onClick={() => history.push('/inventory-mngmt/create-bad-order')}  
                                     >
-                                        <NavLink to={'/inventory-mngmt/create-order'} className={classes.links}>
-                                            Add Purchase Order
-                                        </NavLink>
+                                        Add Bad Order
                                     </Button>
                                 </Grid>
                                 <Grid item>
@@ -59,13 +56,14 @@ const PurchaseOrderList = () => {
                     </Grid>
                 </CardContent>
             </Card>
-            <div style={{ height: 450, width: '100%' }}>
+            <div style={{ width: '100%' }}>
                 <DataGrid 
+                    autoHeight
                     showToolbar
                     components={{
                         Toolbar: GridToolbar,
                     }}
-                    onRowClick={(param) => history.push(`/inventory-mngmt/purchase-order-details/${param.row.id}`)}
+                    onRowClick={(param) => history.push(`/inventory-mngmt/bad-order-details/${param.row.id}`)}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 
@@ -76,4 +74,4 @@ const PurchaseOrderList = () => {
     );
 }
 
-export default PurchaseOrderList
+export default BadOrderList
