@@ -52,7 +52,8 @@ const AdminLayout = ({children}) =>
     const [openInventoryMngmt, setOpenInventoryMngmt] = useState(false);
     const [openProduct, setOpenProduct] = useState(false);
     const [openEmployees, setOpenEmployees] = useState(false);
-    const [ selectedItem, setSelectedItem ] = useState('/dashboard');
+    const [ selectedItem, setSelectedItem ] = useState('Dashboard');
+    const [ selectedMenu, setSelectedMenu ] = useState('');
 
 // 
     const [auth, setAuth] = useState(true);
@@ -73,18 +74,83 @@ const AdminLayout = ({children}) =>
         setAnchorEl(null);
     };
 
-    const handleOpenReport = (e) => setOpenReport(!openReport); 
-    const handleOpenProduct = (e) => setOpenProduct(!openProduct); 
-    const handleOpenInventoryMngmt = (e) => setOpenInventoryMngmt(!openInventoryMngmt); 
-    const handleOpenEmployees = (e) => setOpenEmployees(!openEmployees); 
+    const handleOpenReportDropdown = (path) => 
+    {
+        setOpenReport(!openReport);
+        setSelectedMenu(path);
+        closeDropdownExcept(path);
+    }; 
 
-    const handleSelectedItem = (e, path) => setSelectedItem(path);
+    const handleOpenProductDropdown = (path) => 
+    {
+        setOpenProduct(!openProduct);
+        setSelectedMenu(path);
+        closeDropdownExcept(path);
+    }; 
+
+    const handleOpenInventoryMngmtDropdown = (path) => 
+    {
+        setOpenInventoryMngmt(!openInventoryMngmt);
+        setSelectedMenu(path);
+        closeDropdownExcept(path);
+    }; 
+
+    const handleOpenEmployeesDropdown = (path) => 
+    {
+        setOpenEmployees(!openEmployees);
+        setSelectedMenu(path);
+        closeDropdownExcept(path);
+    }; 
+
+    const handleSelectedMenu = (menuName) => {
+        setSelectedItem('');
+        setSelectedMenu(menuName);
+        closeDropdownExcept(menuName);
+    };
+
+    const handleSelectedItem = (selectedItemName) => {
+        setSelectedItem(selectedItemName);
+    };
+
 
     const handleSetAuth = () => {
         setAuth(!auth);
         Cookie.removeItem('access_token');
         return <Redirect to='/auth/login' />
     };
+
+    const closeDropdownExcept = (path) => {
+        
+        setSelectedItem('');
+
+        switch (path) {
+            case 'Report':
+                setOpenProduct(false);
+                setOpenInventoryMngmt(false);
+                setOpenEmployees(false);
+                break;
+            case 'Product': 
+                setOpenReport(false);
+                setOpenInventoryMngmt(false);
+                setOpenEmployees(false);
+                break;
+            case 'Inventory Management':
+                setOpenReport(false);
+                setOpenProduct(false);
+                setOpenEmployees(false);
+                break;
+            case 'Employees':
+                setOpenReport(false);
+                setOpenProduct(false);
+                setOpenInventoryMngmt(false);
+                break;
+            default:                
+                setOpenReport(false);
+                setOpenProduct(false);
+                setOpenInventoryMngmt(false);
+                setOpenEmployees(false);
+        }
+    }
 
     return (
         <div className={classes.root}>
@@ -107,8 +173,8 @@ const AdminLayout = ({children}) =>
                     >
                     <MenuIcon />
                     </IconButton>
-                    <Typography variant="subtitle1" noWrap className={classes.title}>
-                        
+                    <Typography variant='h5' noWrap className={classes.title}>
+                        {selectedItem || selectedMenu}
                     </Typography>
                     {auth && (
                         <div>
@@ -169,7 +235,11 @@ const AdminLayout = ({children}) =>
                 <List>
                 {/* Dashboard */}
                     <NavLink className={classes.navLinks} to={'/dashboard'}>
-                        <ListItem button>
+                        <ListItem 
+                            selected={ selectedMenu === 'Dashboard' }
+                            onClick={ () => handleSelectedMenu( 'Dashboard') }
+                            button
+                        >
                             <ListItemIcon><Dashboard className={classes.dashboard}/></ListItemIcon>
                             <ListItemText primary={
                                 <Typography variant='subtitle1' className={classes.dropdownTitle}>
@@ -181,7 +251,8 @@ const AdminLayout = ({children}) =>
 
                 {/* Report */}
                     <ListItem 
-                        onClick={handleOpenReport}
+                        onClick={() => handleOpenReportDropdown('Report')}
+                        selected={selectedMenu === 'Report'}
                         button
                     >
                             <ListItemIcon><Report className={classes.reports}/></ListItemIcon>
@@ -194,25 +265,13 @@ const AdminLayout = ({children}) =>
                     <Collapse in={openReport} timeout="auto" unmountOnExit>
                         <List component="div" disablePadding>
 
-                            {/* Sales Summary */}
-                            <NavLink className={classes.navLinks} to={'/reports/sales-summary'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/reports/sales-summary' }
-                                    onClick={ e => handleSelectedItem(e, '/reports/sales-summary') }
-                                >
-                                    <ListItemText primary="Sales Summary" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>
-
                             {/* Sales by item */}
                             <NavLink className={classes.navLinks} to={'/reports/sales-by-item'}>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/reports/sales-by-item' }
-                                    onClick={ e => handleSelectedItem(e, '/reports/sales-by-item') }
+                                    selected={ selectedItem === 'Sales by item' }
+                                    onClick={ e => handleSelectedItem( 'Sales by item') }
                                 >
                                     <ListItemText primary="Sales by item" className={classes.dropDownItem}/>
                                 </ListItem>
@@ -223,8 +282,8 @@ const AdminLayout = ({children}) =>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/reports/sales-by-category' }
-                                    onClick={ e => handleSelectedItem(e, '/reports/sales-by-category') }
+                                    selected={ selectedItem === 'Sales by category' }
+                                    onClick={ e => handleSelectedItem( 'Sales by category') }
                                 >
                                     <ListItemText primary="Sales by category" className={classes.dropDownItem}/>
                                 </ListItem>
@@ -235,8 +294,8 @@ const AdminLayout = ({children}) =>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/reports/sales-by-employee' }
-                                    onClick={ e => handleSelectedItem(e, '/reports/sales-by-employee') }
+                                    selected={ selectedItem === 'Sales by employee' }
+                                    onClick={ e => handleSelectedItem( 'Sales by employee') }
                                 >
                                     <ListItemText primary="Sales by employee" className={classes.dropDownItem}/>
                                 </ListItem>
@@ -246,8 +305,8 @@ const AdminLayout = ({children}) =>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/reports/sales-by-payment-type' }
-                                    onClick={ e => handleSelectedItem(e, '/reports/sales-by-payment-type') }
+                                    selected={ selectedItem === 'Sales by payment type' }
+                                    onClick={ e => handleSelectedItem( 'Sales by payment type') }
                                 >
                                     <ListItemText primary="Sales by payment type" className={classes.dropDownItem}/>
                                 </ListItem>
@@ -258,11 +317,14 @@ const AdminLayout = ({children}) =>
 
                 {/* Pos */}
                     <NavLink className={classes.navLinks} to={'/pos'}>
-                        <ListItem button>
+                        <ListItem 
+                            selected={ selectedMenu === 'POS' }
+                            onClick={ () => handleSelectedMenu( 'POS') }
+                            button>
                             <ListItemIcon><Pos /></ListItemIcon>
                             <ListItemText primary={
                                 <Typography variant='subtitle1' className={classes.dropdownTitle}>
-                                    Pos
+                                    POS
                                 </Typography>} className={classes.pos}/>
                         </ListItem>
                     </NavLink>
@@ -270,7 +332,8 @@ const AdminLayout = ({children}) =>
 
                 {/* Product */}
                     <ListItem 
-                        onClick={handleOpenProduct}
+                        onClick={() => handleOpenProductDropdown('Product')}
+                        selected={selectedMenu === 'Product'}
                         button
                     >
                         <ListItemIcon><Product className={classes.product}/></ListItemIcon>
@@ -288,8 +351,8 @@ const AdminLayout = ({children}) =>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/products' }
-                                    onClick={ e => handleSelectedItem(e, '/products') }
+                                    selected={ selectedItem === 'Products' }
+                                    onClick={ e => handleSelectedItem('Products') }
                                 >
                                     <ListItemText primary="Products" className={classes.dropDownItem}/>
                                 </ListItem>
@@ -300,8 +363,8 @@ const AdminLayout = ({children}) =>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/products/categories' }
-                                    onClick={ e => handleSelectedItem(e, '/products/categories') }
+                                    selected={ selectedItem === 'Categories' }
+                                    onClick={ e => handleSelectedItem( 'Categories') }
                                 >
                                     <ListItemText primary="Categories" className={classes.dropDownItem}/>
                                 </ListItem>
@@ -312,8 +375,8 @@ const AdminLayout = ({children}) =>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/products/discounts' }
-                                    onClick={ e => handleSelectedItem(e, '/products/discounts') }
+                                    selected={ selectedItem === 'Discounts' }
+                                    onClick={ e => handleSelectedItem( 'Discounts') }
                                 >
                                     <ListItemText primary="Discounts" className={classes.dropDownItem}/>
                                 </ListItem>    
@@ -324,7 +387,8 @@ const AdminLayout = ({children}) =>
 
                 {/* Inventory Management */}
                     <ListItem 
-                        onClick={handleOpenInventoryMngmt}
+                        onClick={() => handleOpenInventoryMngmtDropdown('Inventory Management')}
+                        selected={selectedMenu === 'Inventory Management'}
                         button
                     >
                         <ListItemIcon>
@@ -345,9 +409,9 @@ const AdminLayout = ({children}) =>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/inventory-mngmt/purchase-orders' }
+                                    selected={ selectedItem === 'Purchase Orders' }
                                     onClick={ 
-                                        e => handleSelectedItem(e, '/inventory-mngmt/purchase-orders') 
+                                        e => handleSelectedItem( 'Purchase Orders') 
                                     }
                                 >
                                     <ListItemText primary="Purchase Orders" className={classes.dropDownItem}/>
@@ -360,14 +424,16 @@ const AdminLayout = ({children}) =>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/inventory-mngmt/suppliers' }
+                                    selected={ selectedItem === 'Suppliers' }
                                     onClick={ 
-                                        e => handleSelectedItem(e, '/inventory-mngmt/suppliers') 
+                                        e => handleSelectedItem( 'Suppliers') 
                                     }
                                 >
                                     <ListItemText primary="Suppliers" className={classes.dropDownItem}/>
                                 </ListItem>  
-                            </NavLink>                      
+                            </NavLink>  
+
+                    
                         </List>
                     </Collapse>                   
                 </List>
@@ -379,7 +445,12 @@ const AdminLayout = ({children}) =>
                 
                 {/* Customer */}
                     <NavLink className={classes.navLinks} to={'/customers'}>
-                        <ListItem button>
+                        <ListItem 
+                            selected={ selectedMenu === 'Customers' }
+                            onClick={ 
+                                () => handleSelectedMenu( 'Customers') 
+                            }
+                            button>
                             <ListItemIcon><Customer className={classes.customers}/></ListItemIcon>
                             <ListItemText primary={
                                 <Typography variant='subtitle1' className={classes.dropdownTitle}>
@@ -389,7 +460,11 @@ const AdminLayout = ({children}) =>
                     </NavLink>
                 {/* Employees */}
                     <ListItem 
-                        onClick={handleOpenEmployees}
+                        onClick={() => handleOpenEmployeesDropdown('Employees')}
+                        selected={selectedMenu === 'Employees'}
+                        classes={{ 
+                            
+                        }}
                         button
                     >
                         <ListItemIcon><Employee className={classes.employees}/></ListItemIcon>
@@ -407,9 +482,9 @@ const AdminLayout = ({children}) =>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/employees' }
+                                    selected={ selectedItem === 'Employees list' }
                                     onClick={ 
-                                        e => handleSelectedItem(e, '/employees') 
+                                        e => handleSelectedItem( 'Employees list') 
                                     }
                                 >
                                     <ListItemText primary="Employee list" className={classes.dropDownItem}/>
@@ -421,9 +496,9 @@ const AdminLayout = ({children}) =>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === '/employees/access-rights' }
+                                    selected={ selectedItem === 'Access Rights' }
                                     onClick={ 
-                                        e => handleSelectedItem(e, '/employees/access-rights') 
+                                        e => handleSelectedItem( 'Access Rights') 
                                     }
                                 >
                                     <ListItemText primary="Access Rights" className={classes.dropDownItem}/>
@@ -435,7 +510,13 @@ const AdminLayout = ({children}) =>
 
                 {/* Settings */}
                     <NavLink className={classes.navLinks} to={'/settings'}>
-                        <ListItem button>
+                        <ListItem 
+                            button
+                            selected={ selectedMenu === 'Settings' }
+                            onClick={ 
+                                () => handleSelectedMenu( 'Settings') 
+                            }
+                        >
                             <ListItemIcon><Settings className={classes.settings}/></ListItemIcon>
                             <ListItemText primary={
                                 <Typography variant='subtitle1' className={classes.dropdownTitle}>
