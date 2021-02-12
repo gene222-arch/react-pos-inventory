@@ -39,7 +39,8 @@ const BadOrderDetails = lazy(() => import('../views/pages/InventoryManagement/Pu
 const Suppliers = lazy(() => import('../views/pages/InventoryManagement/Suppliers/Suppliers'));
 const CreateSupplier = lazy(() => import('../views/pages/InventoryManagement/Suppliers/CreateSupplier'));
 const EditSupplier = lazy(() => import('../views/pages/InventoryManagement/Suppliers/EditSupplier'));
-const CreateSalesReturn = lazy(() => import('../views/pages/CreateSalesReturn'))
+const SalesReturnList = lazy(() => import('../views/pages/SalesReturns/SalesReturnList'))
+const CreateSalesReturn = lazy(() => import('../views/pages/SalesReturns/CreateSalesReturn'))
 const ReceivedStocks = lazy(() => import('../views/pages/Transactions/ReceivedStocks'));
 const Settings = lazy(() => import('../views/pages/Settings'))
 const NotFound = lazy(() => import('../views/errors/NotFound'));
@@ -241,12 +242,21 @@ export const adminRoutes = {
             restricted: true 
         },
         {
+            path: '/sales-returns',
+            name: 'SalesReturnList',
+            icon: '',
+            exact: true,
+            component: SalesReturnList,
+            access: 'view_sales_returns',
+            restricted: true 
+        },
+        {
             path: '/create-sales-return',
             name: 'CreateSalesReturn',
             icon: '',
             exact: true,
             component: CreateSalesReturn,
-            access: 'view_sales_returns',
+            access: 'create_sales_returns',
             restricted: true 
         },
         {
