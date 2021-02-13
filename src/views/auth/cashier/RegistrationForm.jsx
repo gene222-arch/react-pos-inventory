@@ -60,7 +60,7 @@ const RegistrationForm = () =>
                             helperText={''}
                             variant="outlined"
                             margin="normal"
-                            required
+                            
                             fullWidth
                             id="name"
                             label="Name"
@@ -73,7 +73,7 @@ const RegistrationForm = () =>
                             helperText={''}
                             variant="outlined"
                             margin="normal"
-                            required
+                        
                             fullWidth
                             id="email"
                             label="Email"
@@ -86,7 +86,7 @@ const RegistrationForm = () =>
                             helperText={''}
                             variant="outlined"
                             margin="normal"
-                            required
+                            
                             fullWidth
                             name="password"
                             label="Password"
@@ -99,7 +99,6 @@ const RegistrationForm = () =>
                             helperText={''}
                             variant="outlined"
                             margin="normal"
-                            required
                             fullWidth
                             name="password_confirmation"
                             label="Confirm Password"
@@ -121,11 +120,6 @@ const RegistrationForm = () =>
                             Sign up
                         </Button>
                         <Grid container>
-                            <Grid item xs>
-                                <Link href="#" variant="body2">
-                                    
-                                </Link>
-                            </Grid>
                             <Grid item>
                                 <NavLink to="/auth/login" variant="body2" className={classes.loginLink}>
                                     {"Already have an account? Sign In"}
