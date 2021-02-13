@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Highcharts from 'highcharts'
 import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsReact from 'highcharts-react-official'
@@ -20,6 +20,7 @@ const SalesByItem = () =>
 {
     const classes = salesByUseStyles();
     const [ salesType, setSalesType ] = useState('Monthly');
+    const [componentKey, setComponentKey] = useState((new Date()).toISOString());
 
     const [purchaseOrderDate, setPurchaseOrderDate] = useState(DateHelper.currentDate);
     const [expectedDate, setExpectedDate] = useState(DateHelper.currentDate);
@@ -84,6 +85,14 @@ const SalesByItem = () =>
         setExpectedDate(date);
     };
 
+
+    useEffect(() => {
+        window.addEventListener('resize', () => {
+            setComponentKey((new Date()).toISOString());
+        });
+    }, []);
+
+    
     return (
         <>
             <Grid container spacing={1}>
@@ -171,7 +180,8 @@ const SalesByItem = () =>
                         <Grid item xs={12} sm={12} md={8} lg={8}>
                             <Card>
                                 <CardContent>
-                                    <HighchartsReact 
+                                    <HighchartsReact                                
+                                        key={componentKey} 
                                         highcharts={Highcharts} 
                                         options={salesByItemChartOptions} 
                                         

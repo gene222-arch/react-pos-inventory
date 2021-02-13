@@ -4,12 +4,12 @@ import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid } from '@material-ui/core';
 import { FormControl, InputLabel, Select, MenuItem, TextField } from '@material-ui/core'
 import Button from '@material-ui/core/Button';
-import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
+import { createPageUseStyles } from '../../../../assets/material-styles/styles'
 
 
 const CreateStockAdjustment = () => {
 
-    const classes = dataGridUseStyles();
+    const classes = createPageUseStyles();
     const history = useHistory();
 
     const [reason, setReason] = useState('Received items');
@@ -195,7 +195,7 @@ const CreateStockAdjustment = () => {
             <Card className={classes.selectPOContainer}>
                 <CardContent>
                     <Grid container>
-                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                        <Grid item xs={12} sm={12} md={5} lg={5}>
                             <FormControl className={classes.formControl}>
                                 <InputLabel id="demo-simple-select-label">
                                     Reason

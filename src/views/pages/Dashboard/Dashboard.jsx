@@ -1,20 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Highcharts from 'highcharts'
 import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsReact from 'highcharts-react-official'
 import Typography from '@material-ui/core/Typography'
-import { Card, CardContent, CardHeader, CardActionArea, CardActions, IconButton } from '@material-ui/core'
+import { Card, CardContent, CardHeader, CardActions } from '@material-ui/core'
 import { Avatar } from '@material-ui/core'
 import { Grid, Divider } from '@material-ui/core'
-import { Button } from '@material-ui/core'
-import { makeStyles, Container } from '@material-ui/core'
 import {List, ListItem, ListItemText, ListItemAvatar} from '@material-ui/core';
 import RevenueIcon from '@material-ui/icons/Storefront';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import GrossProfitIcon from '@material-ui/icons/ShowChart';
 import SalesReturnIcon from '@material-ui/icons/RemoveShoppingCart';
-import { MoreVert as MoreVertIcon } from '@material-ui/icons'
 import NetSalesIcon from '@material-ui/icons/MultilineChart';
 import InvoiceIcon from '@material-ui/icons/Receipt';
 import PurchaseOrdersIcon from '@material-ui/icons/AddShoppingCart';
@@ -26,7 +23,7 @@ const Dashboard = () =>
 {
     const classes = dashboardUseStyles();
     const [ salesType, setSalesType ] = useState('Monthly');
-
+    const [componentKey, setComponentKey] = useState((new Date()).toISOString());
 
     const salesChartOptions = {
         chart: {
@@ -64,6 +61,12 @@ const Dashboard = () =>
             data: [100, 200, 300, 400, 500, 600, 100, 200, 300, 400, 500, 600]
         }]
     };
+    
+    useEffect(() => {
+        window.addEventListener('resize', () => {
+            setComponentKey((new Date()).toISOString());
+        });
+    }, []);
 
     return (    
         <div className={classes.root}> 
@@ -195,7 +198,8 @@ const Dashboard = () =>
                 <Grid item xs={11} sm={11} md={11} lg={11}>
                     <Card className={classes.chartContainer}>
                         <CardContent className={classes.chartContainer}>
-                            <HighchartsReact 
+                            <HighchartsReact
+                                key={componentKey}
                                 highcharts={Highcharts} 
                                 options={salesChartOptions} 
                                 
