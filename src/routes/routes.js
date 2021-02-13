@@ -39,6 +39,9 @@ const BadOrderDetails = lazy(() => import('../views/pages/InventoryManagement/Pu
 const Suppliers = lazy(() => import('../views/pages/InventoryManagement/Suppliers/Suppliers'));
 const CreateSupplier = lazy(() => import('../views/pages/InventoryManagement/Suppliers/CreateSupplier'));
 const EditSupplier = lazy(() => import('../views/pages/InventoryManagement/Suppliers/EditSupplier'));
+const StockAdjustmentList = lazy(() => import('../views/pages/InventoryManagement/Stocks/StockAdjustmentList'))
+const StockAdjustmentDetails = lazy(() => import('../views/pages/InventoryManagement/Stocks/StockAdjustmentDetails'))
+const CreateStockAdjustment = lazy(() => import('../views/pages/InventoryManagement/Stocks/CreateStockAdjustment'))
 const SalesReturnList = lazy(() => import('../views/pages/SalesReturns/SalesReturnList'))
 const SalesReturnDetails = lazy(() => import('../views/pages/SalesReturns/SalesReturnDetails'))
 const CreateSalesReturn = lazy(() => import('../views/pages/SalesReturns/CreateSalesReturn'))
@@ -48,7 +51,7 @@ const NotFound = lazy(() => import('../views/errors/NotFound'));
 
 
 
-export const RenderRoutes = ({routes, isAuthenticated = false}) => {
+export const RenderRoutes = ({routes, isAuthenticated = true}) => {
 
     const history = useHistory();
 
@@ -77,7 +80,7 @@ export const RenderRoutes = ({routes, isAuthenticated = false}) => {
                             {
                                 if (isAuthenticated)
                                 {
-                                    history.push('/dashboard')
+                                    history.push('/')
                                 }
                                 else 
                                 {
@@ -279,6 +282,33 @@ export const adminRoutes = {
             exact: true,
             component: EditSupplier,
             access: 'update_suppliers',
+            restricted: true 
+        },
+        {
+            path: '/inventory-mngmt/stock-adjustments',
+            name: 'StockAdjustmentList',
+            icon: '',
+            exact: true,
+            component: StockAdjustmentList,
+            access: 'view_stock_adjustments',
+            restricted: true 
+        },
+        {
+            path: '/inventory-mngmt/stock-adjustments/:stockAdjustmentId',
+            name: 'StockAdjustmentDetails',
+            icon: '',
+            exact: true,
+            component: StockAdjustmentDetails,
+            access: 'view_stock_adjustments',
+            restricted: true 
+        },
+        {
+            path: '/inventory-mngmt/create-stock-adjustment',
+            name: 'CreateStockAdjustment',
+            icon: '',
+            exact: true,
+            component: CreateStockAdjustment,
+            access: 'create_stock_adjustment',
             restricted: true 
         },
         {
