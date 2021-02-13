@@ -120,7 +120,7 @@ export const adminRoutes = {
     ],
     privateRoutes: [
         {
-            path: '/dashboard',
+            path: '/',
             name: 'Dashboard',
             icon: '',
             exact: true,

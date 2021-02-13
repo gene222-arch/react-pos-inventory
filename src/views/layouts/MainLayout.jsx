@@ -243,7 +243,7 @@ const MainLayout = ({children}) =>
 
                 <List>
                 {/* Dashboard */}
-                    <NavLink className={classes.navLinks} to={'/dashboard'}>
+                    <NavLink className={classes.navLinks} to={'/'}>
                         <ListItem 
                             selected={ selectedMenu === 'Dashboard' }
                             onClick={ () => handleSelectedMenu( 'Dashboard') }
