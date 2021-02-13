@@ -4,67 +4,70 @@ import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid } from '@material-ui/core';
 import { FormControl, InputLabel, Select, MenuItem, TextField } from '@material-ui/core'
 import Button from '@material-ui/core/Button';
-import { createSalesReturnsUseStyles } from '../../../../assets/material-styles/styles'
+import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 
 
 const CreateStockAdjustment = () => {
 
-    const classes = createSalesReturnsUseStyles();
+    const classes = dataGridUseStyles();
     const history = useHistory();
+
     const [reason, setReason] = useState('Received items');
     const [columns, setColumns] = useState([]);
-
     const [stockAdjustments, setStockAdjustments] = useState([
         {
             id: 1,
-            product_id: 1,
+            stock_id: 1,
             product_description: 'Bag',
             in_stock: 10,
             added_stock: 0,
-            remove_stock: 0,
+            removed_stock: 0,
             counted_stock: 0,
             stock_after: 0,
         },
         {
             id: 2,
-            product_id: 2,
+            stock_id: 2,
             product_description: 'Shoes',
             in_stock: 20,
             added_stock: 0,
-            remove_stock: 0,
+            removed_stock: 0,
             counted_stock: 0,
             stock_after: 0,
         }
     ]);
+
 
     const handleOnChangeSelect = (e) => setReason(e.target.value);
 
     const handleOnReceivedItems = (e, productId) => 
     {
         const quantity = parseInt(e.target.value) || 0;
-        const newAdjustment = stockAdjustments.find(stock => (stock.product_id === productId));
+
+        const newAdjustment = stockAdjustments.find(stock => (stock.stock_id === productId));
         newAdjustment.added_stock = quantity;
         newAdjustment.stock_after = (newAdjustment.in_stock + quantity);
 
         const newAdjustments = stockAdjustments.map(stock => 
-            stock.product_id === productId 
+            stock.stock_id === productId 
                 ? newAdjustment 
                 : stock
-        )
+        );
 
         setStockAdjustments(newAdjustments);
     };
+
 
     const handleOnDamagedLossItems = (e, productId) => 
     {
         const quantity = parseInt(e.target.value) || 0; 
         
-        const newAdjustment = stockAdjustments.find(stock => (stock.product_id === productId));
-        newAdjustment.remove_stock = quantity; 
+        const newAdjustment = stockAdjustments.find(stock => (stock.stock_id === productId));
+        newAdjustment.removed_stock = quantity; 
         newAdjustment.stock_after = (newAdjustment.in_stock - quantity);
 
         const newAdjustments = stockAdjustments.map(stock => 
-            stock.product_id === productId 
+            stock.stock_id === productId 
                 ? newAdjustment 
                 : stock
         )
@@ -72,13 +75,14 @@ const CreateStockAdjustment = () => {
         setStockAdjustments(newAdjustments);
     };
 
+
     const handleOnInventoryCount = (e, productId) => 
     {
-        const newAdjustment = stockAdjustments.find(stock => (stock.product_id === productId));
-        newAdjustment.counted_stock = parseInt(e.target.value);
+        const newAdjustment = stockAdjustments.find(stock => (stock.stock_id === productId));
+        newAdjustment.counted_stock = parseInt(e.target.value) || 0;
 
         const newAdjustments = stockAdjustments.map(stock => 
-            stock.product_id === productId 
+            stock.stock_id === productId 
                 ? newAdjustment 
                 : stock
         )
@@ -86,9 +90,10 @@ const CreateStockAdjustment = () => {
         setStockAdjustments(newAdjustments);
     }
 
+    
     const receivedItemColumns = () => [
         { field: 'id', hide: true },
-        { field: 'product_id', hide: true },
+        { field: 'stock_id', hide: true },
         { field: 'product_description', headerName: 'Product', width: 150 },
         { field: 'in_stock', headerName: 'In stock', width: 150 },
         { 
@@ -101,7 +106,7 @@ const CreateStockAdjustment = () => {
                     name={params.row.product_description}
                     onChange={(e) => handleOnReceivedItems(
                             e, 
-                            params.row.product_id
+                            params.row.stock_id
                         )}
                 />
             ),
@@ -115,7 +120,7 @@ const CreateStockAdjustment = () => {
 
 
     const inventoryCountColumns = () => [
-        { field: 'product_id', hide: true },
+        { field: 'stock_id', hide: true },
         { field: 'product_description', headerName: 'Product', width: 150 },
         { field: 'in_stock', headerName: 'Expected stock', width: 150 },
         { 
@@ -128,18 +133,18 @@ const CreateStockAdjustment = () => {
                     name={params.row.field}
                     onChange={(e) => handleOnInventoryCount(
                         e, 
-                        params.row.product_id)}
+                        params.row.stock_id)}
                 />
             ),
         },
     ];
 
     const lossDamagedColumns = () => [
-        { field: 'product_id', hide: true },
+        { field: 'stock_id', hide: true },
         { field: 'product_description', headerName: 'Product', width: 150 },
         { field: 'in_stock', headerName: 'In stock', width: 150 },
         { 
-            field: 'remove_stock', 
+            field: 'removed_stock', 
             headerName: 'Remove stock', 
             width: 250,
             renderCell: (params) => (
@@ -147,7 +152,7 @@ const CreateStockAdjustment = () => {
                     name={params.row.field}
                     onChange={(e) => handleOnDamagedLossItems(
                         e, 
-                        params.row.product_id)}
+                        params.row.stock_id)}
                 />
             ),
         },
@@ -174,7 +179,7 @@ const CreateStockAdjustment = () => {
                 break;
         }
         const resetStockAdustments = stockAdjustments.map(stock => (
-            {...stock, added_stock:0, counted_stock: 0, remove_stock: 0, stock_after: 0}
+            {...stock, added_stock:0, counted_stock: 0, removed_stock: 0, stock_after: 0}
         ));
 
         setStockAdjustments(resetStockAdustments);

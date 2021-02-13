@@ -347,13 +347,16 @@ export const dataGridUseStyles = makeStyles((theme) => ({
         margin: theme.spacing(1),
         backgroundColor: '#4caf50',
         color: '#FFF',
-        fontWeight: '600'
+        '&:hover': {
+            backgroundColor: green[400]
+        }
     },
-    cancelDeleteBtn: {
+    cancelBtn: {
         margin: theme.spacing(1),
-        backgroundColor: theme.palette.secondary.main,
-        color: '#FFF',
-        fontWeight: '600'
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: '#dc3545'
+        }
     },
     btn: {
         margin: theme.spacing(1),
