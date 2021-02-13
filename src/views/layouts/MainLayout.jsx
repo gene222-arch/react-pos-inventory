@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, Redirect } from 'react-router-dom'
+import { NavLink, Redirect, useHistory } from 'react-router-dom'
 import clsx from 'clsx';
 import { useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -45,6 +45,7 @@ const MainLayout = ({children}) =>
 // Styling
     const classes = AdminLayoutUseStyles();
     const theme = useTheme();
+    const history = useHistory();
 
 // Buttons
     const [open, setOpen] = useState(false);
@@ -120,13 +121,6 @@ const MainLayout = ({children}) =>
 
     const handleSelectedItem = (selectedItemName) => setSelectedItem(selectedItemName);
 
-
-    const handleSetAuth = () => {
-        setAuth(!auth);
-        Cookie.removeItem('access_token');
-        return <Redirect to='/auth/login' />
-    };
-
     const closeDropdownExcept = (path) => {
         
         setSelectedItem('');
@@ -157,6 +151,23 @@ const MainLayout = ({children}) =>
                 setOpenProduct(false);
                 setOpenInventoryMngmt(false);
                 setOpenEmployees(false);
+        }
+    }
+
+    
+    const handleSetAuth = () => {
+        setAuth(!auth);
+        Cookie.removeItem('access_token');
+        return <Redirect to='/auth/login' />
+    };
+
+
+    const logout = () => {
+        Cookie.removeItem('access_token');
+
+        if (!Cookie.has('access_token'))
+        {
+            history.push('/auth/login');
         }
     }
 
@@ -213,7 +224,7 @@ const MainLayout = ({children}) =>
                             >
                                 <MenuItem onClick={handleClose}>Profile</MenuItem>
                                 <MenuItem onClick={handleClose}>My account</MenuItem>
-                                <MenuItem onClick={handleSetAuth}>Logout</MenuItem>
+                                <MenuItem onClick={logout}>Logout</MenuItem>
                             </Menu>
                         </div>
                     )}

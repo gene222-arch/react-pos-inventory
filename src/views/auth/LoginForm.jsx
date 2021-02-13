@@ -34,6 +34,8 @@ const Copyright = () => {
 const LoginForm = () => 
 {
     const classes = loginFormUseStyles();
+    const history = useHistory();
+
     const [credentials, setCredentials] = useState({
         email: '',
         password: '',
@@ -42,7 +44,10 @@ const LoginForm = () =>
 
     const handleOnSignIn = () => {
         Cookie.setItem('access_token', 'ACCESS_TOKEN');
-        return <Redirect to={'/dashboard'} />
+        if (Cookie.has('access_token'))
+        {
+            history.push('/');
+        }
     }
 
     return (
@@ -100,12 +105,12 @@ const LoginForm = () =>
                         </Button>
                         <Grid container>
                             <Grid item xs>
-                                <Link href="#" variant="body2">
+                                <NavLink to={'/forgot-password/email'} variant="body2" className={classes.links}>
                                     Forgot password?
-                                </Link>
+                                </NavLink>
                             </Grid>
                             <Grid item>
-                                <NavLink to="/auth/register" variant="body2" className={classes.registrationLink}>
+                                <NavLink to="/auth/register" variant="body2" className={classes.links}>
                                     {"Don't have an account? Sign Up"}
                                 </NavLink>
                             </Grid>

@@ -1,7 +1,10 @@
 import React, { lazy } from 'react'
 import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import { determineIsAuthenticated } from '../utils/helpers'
+import * as Cookie from '../utils/cookies'
 const LoginForm = lazy(() => import('../views/auth/LoginForm'));
+const ForgotPassword = lazy(() => import('../views/auth/forgot-password/ForgotPassword'));
+const ResetPassword = lazy(() => import('../views/auth/forgot-password/ResetPassword'));
 const AdminRegistrationForm = lazy(() => import('../views/auth/admin/RegistrationForm'));
 const ManagerRegistrationForm = lazy(() => import('../views/auth/manager/RegistrationForm'));
 const CashierRegistrationForm = lazy(() => import('../views/auth/cashier/RegistrationForm'));
@@ -51,7 +54,8 @@ const NotFound = lazy(() => import('../views/errors/NotFound'));
 
 
 
-export const RenderRoutes = ({routes, isAuthenticated = true}) => {
+
+export const RenderRoutes = ({routes}) => {
 
     const history = useHistory();
 
@@ -67,7 +71,7 @@ export const RenderRoutes = ({routes, isAuthenticated = true}) => {
                         render={ props => { 
                             if (route.restricted)
                             {
-                                if (isAuthenticated)
+                                if (Cookie.has('access_token'))
                                 {
                                     return <route.component {...props} route={route} />
                                 }
@@ -78,7 +82,7 @@ export const RenderRoutes = ({routes, isAuthenticated = true}) => {
                             }
                             else 
                             {
-                                if (isAuthenticated)
+                                if (Cookie.has('access_token'))
                                 {
                                     history.push('/')
                                 }
@@ -97,7 +101,8 @@ export const RenderRoutes = ({routes, isAuthenticated = true}) => {
 }
 
 
-export const globalRoutes = [
+export const globalPublicRoutes = {
+    loginRoute: [
     {
         path: '/auth/login',
         name: 'LoginForm',
@@ -106,8 +111,29 @@ export const globalRoutes = [
         component: LoginForm,
         access: '',
         restricted: false
-    },
-];
+    }],
+    forgotPasswordRoute: [
+        {
+            path: '/forgot-password/email',
+            name: 'ForgotPassword',
+            icon: '',
+            exact: true,
+            component: ForgotPassword,
+            access: '',
+            restricted: false
+        },
+        {
+            path: '/forgot-password/reset',
+            name: 'ResetPassword',
+            icon: '',
+            exact: true,
+            component: ResetPassword,
+            access: '',
+            restricted: false
+        },
+    ]
+
+};
 
 export const adminRoutes = {
     publicRoutes: [

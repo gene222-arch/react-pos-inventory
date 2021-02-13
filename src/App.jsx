@@ -1,6 +1,6 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
-import { adminRoutes, managerRoutes, cashierRoutes, globalRoutes, RenderRoutes } from './routes/routes'
+import { adminRoutes, managerRoutes, cashierRoutes, globalPublicRoutes, RenderRoutes } from './routes/routes'
 const MainLayout = React.lazy(() => import('./views/layouts/MainLayout'));
 const AuthLayout = React.lazy(() => import('./views/layouts/AuthLayout'));
 const NotFound = React.lazy(() => import('./views/errors/NotFound'));
@@ -10,9 +10,14 @@ const App = () =>
 	return (
 		<> 
 			<Switch>
+				<Route path='/forgot-password/:path?' exact>
+					<AuthLayout>
+						<RenderRoutes routes={globalPublicRoutes.forgotPasswordRoute} />
+					</AuthLayout>
+				</Route>
 				<Route path='/auth/login' exact>
 					<AuthLayout>
-						<RenderRoutes routes={globalRoutes} />
+						<RenderRoutes routes={globalPublicRoutes.loginRoute} />
 					</AuthLayout>
 				</Route>
 

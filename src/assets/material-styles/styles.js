@@ -294,7 +294,7 @@ export const loginFormUseStyles = makeStyles((theme) => ({
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
-    registrationLink: {
+    links: {
         textDecoration: 'none',
         color: theme.palette.primary.main,
         '&:hover': {
@@ -615,6 +615,39 @@ export const receivePOTextFieldUseStyles = makeStyles((theme) => ({
         color: '#3a3a3a',
         fontSize: '1rem'
     },
+}));
+
+export const forgotResetPasswordUseStyles = makeStyles((theme) => ({
+    paper: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+    },
+    avatar: {
+      margin: theme.spacing(1),
+    },
+    form: {
+        width: '100%', // Fix IE 11 issue.
+        marginTop: theme.spacing(1),
+    },
+    icon: {
+        fontSize: '4.5rem'
+    },
+    submit: {
+      margin: theme.spacing(3, 0, 2),
+    },
+    title: {
+        fontSize: '2.5rem'
+    },
+    links: {
+        textDecoration: 'none',
+        color: theme.palette.primary.main,
+        '&:hover': {
+            textDecoration: 'underline'
+        }
+    }
 }));
 
 
