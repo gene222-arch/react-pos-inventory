@@ -22,6 +22,7 @@ export const notFoundUseStyles = makeStyles({
     }
 });
 
+
 export const createPageUseStyles = makeStyles((theme) => ({
     
     cardContent: {

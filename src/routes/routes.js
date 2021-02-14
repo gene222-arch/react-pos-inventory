@@ -51,6 +51,7 @@ const CreateSalesReturn = lazy(() => import('../views/pages/SalesReturns/CreateS
 const ReceivedStocks = lazy(() => import('../views/pages/Transactions/ReceivedStocks'));
 const Settings = lazy(() => import('../views/pages/Settings'))
 const NotFound = lazy(() => import('../views/errors/NotFound'));
+const Unauthorized = lazy(() => import('../views/errors/UnAuthorized'))
 
 
 
@@ -77,14 +78,14 @@ export const RenderRoutes = ({routes}) => {
                                 }
                                 else 
                                 {
-                                    history.push('/auth/login')
+                                   history.push('/auth/login')
                                 }
                             }
                             else 
                             {
                                 if (Cookie.has('access_token'))
                                 {
-                                    history.push('/')
+                                    return <Unauthorized />
                                 }
                                 else 
                                 {
