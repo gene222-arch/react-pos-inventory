@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Redirect, useHistory } from 'react-router-dom'
 import clsx from 'clsx';
 import { useTheme } from '@material-ui/core/styles';
@@ -154,15 +154,30 @@ const MainLayout = ({children}) =>
         }
     }
 
-    
-    const handleSetAuth = () => {
-        setAuth(!auth);
-        Cookie.removeItem('access_token');
-        return <Redirect to='/auth/login' />
-    };
+
+    const openDropdown = (path) => 
+    {
+        switch (path) {
+            case 'Report':
+                setOpenReport(true);
+                break;
+            case 'Product': 
+                setOpenProduct(true);
+                break;
+            case 'Inventory Management':
+                setOpenInventoryMngmt(true);
+                break;
+            case 'Employees':
+                setOpenEmployees(true);
+                break;
+            default:                
+                
+        }
+    }
 
 
-    const logout = () => {
+    const logout = () => 
+    {
         Cookie.removeItem('access_token');
 
         if (!Cookie.has('access_token'))
@@ -170,6 +185,14 @@ const MainLayout = ({children}) =>
             history.push('/auth/login');
         }
     }
+
+
+    useEffect(() => {
+        if (open === false) 
+        {
+            closeDropdownExcept('');
+        }
+    }, [open]);
 
 
     return (
@@ -586,15 +609,52 @@ const MainLayout = ({children}) =>
                     </ListItem>
                     <Collapse in={openTransactions} timeout="auto" unmountOnExit>
                         <List component="div" disablePadding>
-                            {/* Received Stocks */}
+
+                      {/* Customer order transactions */}
+                            <NavLink className={classes.navLinks} to={'/transactions/customer-orders'}>
+                                <ListItem 
+                                    button 
+                                    className={classes.dropdownLists} 
+                                    selected={ selectedItem === 'Customer order transactions' }
+                                    onClick={ e => handleSelectedItem( 'Customer order transactions') }
+                                >
+                                    <ListItemText primary="Customer order" className={classes.dropDownItem}/>
+                                </ListItem>
+                            </NavLink>
+
+                        {/* Invoices transactions */}
+                            <NavLink className={classes.navLinks} to={'/transactions/invoices'}>
+                                <ListItem 
+                                    button 
+                                    className={classes.dropdownLists} 
+                                    selected={ selectedItem === 'Invoices transactions' }
+                                    onClick={ e => handleSelectedItem( 'Invoices transactions') }
+                                >
+                                    <ListItemText primary="Invoices" className={classes.dropDownItem}/>
+                                </ListItem>
+                            </NavLink>  
+
+                        {/* Purchase order transactions */}
+                            <NavLink className={classes.navLinks} to={'/transactions/purchase-orders'}>
+                                <ListItem 
+                                    button 
+                                    className={classes.dropdownLists} 
+                                    selected={ selectedItem === 'Purchase order transactions' }
+                                    onClick={ e => handleSelectedItem( 'Purchase order transactions') }
+                                >
+                                    <ListItemText primary="Purchase order" className={classes.dropDownItem}/>
+                                </ListItem>
+                            </NavLink>                 
+
+                            {/* Received stocks transactions */}
                             <NavLink className={classes.navLinks} to={'/transactions/received-stocks'}>
                                 <ListItem 
                                     button 
                                     className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Received Stocks' }
-                                    onClick={ e => handleSelectedItem( 'Received Stocks') }
+                                    selected={ selectedItem === 'Received stocks transactions' }
+                                    onClick={ e => handleSelectedItem( 'Received stocks transactions') }
                                 >
-                                    <ListItemText primary="Received Stocks" className={classes.dropDownItem}/>
+                                    <ListItemText primary="Received stocks" className={classes.dropDownItem}/>
                                 </ListItem>
                             </NavLink>
                         </List>

@@ -48,7 +48,10 @@ const CreateStockAdjustment = lazy(() => import('../views/pages/InventoryManagem
 const SalesReturnList = lazy(() => import('../views/pages/SalesReturns/SalesReturnList'))
 const SalesReturnDetails = lazy(() => import('../views/pages/SalesReturns/SalesReturnDetails'))
 const CreateSalesReturn = lazy(() => import('../views/pages/SalesReturns/CreateSalesReturn'))
-const ReceivedStocks = lazy(() => import('../views/pages/Transactions/ReceivedStocks'));
+const ReceivedStockTransactions = lazy(() => import('../views/pages/Transactions/ReceivedStockTransactions'));
+const CustomerOrderTransactions = lazy(() => import('../views/pages/Transactions/CustomerOrderTransactions'));
+const InvoiceTransactions = lazy(() => import('../views/pages/Transactions/InvoiceTransactions'));
+const PurchaseOrderTransactions = lazy(() => import('../views/pages/Transactions/PurchaseOrderTransactions'));
 const Settings = lazy(() => import('../views/pages/Settings'))
 const NotFound = lazy(() => import('../views/errors/NotFound'));
 const Unauthorized = lazy(() => import('../views/errors/UnAuthorized'))
@@ -519,11 +522,38 @@ export const adminRoutes = {
             restricted: true 
         },
         {
-            path: '/transactions/received-stocks',
-            name: 'ReceivedStocks',
+            path: '/transactions/customer-orders',
+            name: 'CustomerOrderTransactions',
             icon: '',
             exact: true,
-            component: ReceivedStocks,
+            component: CustomerOrderTransactions,
+            access: 'view_transactions',
+            restricted: true 
+        },
+        {
+            path: '/transactions/invoices',
+            name: 'InvoiceTransactions',
+            icon: '',
+            exact: true,
+            component: InvoiceTransactions,
+            access: 'view_transactions',
+            restricted: true 
+        },
+        {
+            path: '/transactions/purchase-orders',
+            name: 'PurchaseOrderTransactions',
+            icon: '',
+            exact: true,
+            component: PurchaseOrderTransactions,
+            access: 'view_transactions',
+            restricted: true 
+        },
+        {
+            path: '/transactions/received-stocks',
+            name: 'ReceivedStockTransactions',
+            icon: '',
+            exact: true,
+            component: ReceivedStockTransactions,
             access: 'view_received_stocks',
             restricted: true 
         },

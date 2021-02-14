@@ -372,7 +372,10 @@ export const dataGridUseStyles = makeStyles((theme) => ({
     },
     card: {
         marginBottom: theme.spacing(2)
-    }
+    },
+    dataGrid: {
+        backgroundColor: '#FFF'
+    },
 }));
 
 export const posUseStyles = makeStyles((theme) => ({
