@@ -621,7 +621,7 @@ const MainLayout = ({children}) =>
             </Drawer>
         <main className={classes.content}>
             <div className={classes.toolbar} />
-                <Container maxWidth="xl">
+                <Container maxWidth="xl" className={classes.container}>
                     {children}
                 </Container>
             </main>

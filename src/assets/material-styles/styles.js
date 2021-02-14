@@ -178,7 +178,10 @@ export const AdminLayoutUseStyles = makeStyles((theme) => ({
     },
     content: {
         flexGrow: 1,
-        padding: theme.spacing(3),
+        padding: theme.spacing(3, 2),
+    },
+    container: {
+        padding: 0,
     },
     dashboard: {
         color: theme.palette.primary.main

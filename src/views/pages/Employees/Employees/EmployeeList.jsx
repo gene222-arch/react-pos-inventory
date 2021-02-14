@@ -46,8 +46,9 @@ const EmployeeList = () => {
                     </Grid>
                 </CardContent>
             </Card>
-            <div style={{ height: 450, width: '100%' }}>
+            <div style={{ width: '100%' }}>
                 <DataGrid 
+                    autoHeight
                     showToolbar
                     components={{
                         Toolbar: GridToolbar,
