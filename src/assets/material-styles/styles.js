@@ -1,5 +1,6 @@
 import { makeStyles } from '@material-ui/core'
 import { green, red, orange, blue, yellow, indigo } from '@material-ui/core/colors'
+import { fade } from '@material-ui/core/styles/colorManipulator';
 import visualData from '../storage/images/background-image/visual_data.svg'
 
 
@@ -372,6 +373,116 @@ export const dataGridUseStyles = makeStyles((theme) => ({
     card: {
         marginBottom: theme.spacing(2)
     }
+}));
+
+export const posUseStyles = makeStyles((theme) => ({
+    itemListContainer: {
+        height: '64vh'
+    },
+    itemListOptionsContainer: {
+        width: '100%'
+    },
+    itemListOptionsBtn: {
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'space-evenly',
+        fontWeight: '600'
+    },
+    itemActionArea: {
+        color: '#FFF',
+        padding: theme.spacing(0, 1),
+        backgroundColor: fade('#2c2c2c', .5)
+    },
+    discountIcon: {
+        color: red[500]
+    },
+    formControl: {
+        width: '100%',
+        marginBottom: theme.spacing(1)
+    },
+    selectLabel: {
+        padding: theme.spacing(0, 1)
+    },
+    orderDetails: {
+        padding: theme.spacing(0, .5)
+    },
+    dataGrid: {
+        backgroundColor: '#FFF',
+    },
+    dataGridContainer: {
+        width: '100%',
+        height: '43vh'
+    },
+    items: {
+        backgroundColor: '#dddddd'
+    },
+    chargeBtn: {
+        margin: theme.spacing(.3, 0),
+        backgroundColor: '#4caf50',
+        color: '#FFF',
+        '&:hover': {
+            backgroundColor: green[400]
+        },
+        width: '100%'
+    },
+    deleteBtnContainer: {
+        padding: theme.spacing(0, 1, .5, 1),
+        margin: theme.spacing(0, .5, .5)
+    },
+    deleteBtn: {
+        margin: theme.spacing(.3, 0),
+        backgroundColor: '#FFF',
+        color: '#2c2c2c',
+        '&:hover': {
+            color: red[400],
+            backgroundColor: '#FFF'
+        },
+        width: '100%'
+    },
+
+    productDetailDialog: {
+        minWidth: '70%',
+        height: '100vh',
+        padding: theme.spacing(2)
+    },
+    modifyOrderContainerDialog: {
+        marginTop: '1.5rem'
+    },
+    productDetailDialogActions: {
+        borderTop: '.5px solid #999999'
+    },
+    decrementBtn: {
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: red[400]
+        }
+    },
+    incrementBtn: {
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: green[400]
+        }
+    },
+    saveBtn: {
+        color: '#FFF',
+        backgroundColor: green[400],
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: green[300]
+        }
+    },
+    selectEmpty: {
+        textAlign: 'center'
+    },
+    closeBtn: {
+        color: '#2c2c2c',
+        backgroundColor: '#FFF',
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: red[400]
+        }
+    }
+
 }));
   
 export const purchaseOrderDetailsUseStyles = makeStyles((theme) => ({

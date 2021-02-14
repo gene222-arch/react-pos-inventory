@@ -12,7 +12,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Charge = () => 
+
+
+const ProcessPayment = () => 
 {
     const classes = useStyles();
 
@@ -72,4 +74,4 @@ const Charge = () =>
     )
 }
 
-export default Charge
+export default ProcessPayment

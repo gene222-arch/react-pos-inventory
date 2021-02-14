@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { useHistory, NavLink } from 'react-router-dom'
+import { columnsReducer } from '../../../../hooks/useReducer/reducerHooks'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid } from '@material-ui/core';
 import { Typography, Divider } from '@material-ui/core'
@@ -13,9 +14,15 @@ const StockAdjustmentDetails = ({match}) => {
     const classes = dataGridUseStyles();
     const history = useHistory();
 
-    const [ rows, setRows ] = useState([]);
-    const [ columns, setColumns ] = useState([]);
-    const {stockAdjustmentId} = match.params;
+    const [columnsState, dispatchColumnsState] = useReducer(columnsReducer,
+        [
+            {
+                field: '',
+                headerName: '',
+                width: ''
+            }
+        ]
+    );
     const [stockAdjustments, setStockAdjustments] = useState({
         id: 1,
         reason: 'Received items',
@@ -25,6 +32,7 @@ const StockAdjustmentDetails = ({match}) => {
                 id: 1,
                 stock_adjustment_id: 1,
                 stock_id: 1,
+                product_description: 'Bag',
                 in_stock: 100,
                 added_stock: 0,
                 removed_stock: 0,
@@ -35,6 +43,7 @@ const StockAdjustmentDetails = ({match}) => {
                 id: 2,
                 stock_adjustment_id: 1,
                 stock_id: 2,
+                product_description: 'Shoes',
                 in_stock: 100,
                 added_stock: 0,
                 removed_stock: 0,
@@ -43,46 +52,16 @@ const StockAdjustmentDetails = ({match}) => {
             }
         ]
     });
-
-
-    const handleDatagridColumns = () => {
-        switch (stockAdjustments.reason) {
-            case 'Received items':
-                setColumns([
-                    { field: 'product_description', headerName: 'Product', width: 150 },
-                    { field: 'added_stock', headerName: 'Added stock', width: 150 }
-                ])
-                break;
-
-            case 'Inventory count':
-                setColumns([
-                    { field: 'product_description', headerName: 'Product', width: 150 },
-                    { field: 'counted_stock', headerName: 'Counted stock', width: 150 }
-                ])
-                break;
-
-            case 'Loss':
-            case 'Damaged':
-                setColumns([
-                    { field: 'product_description', headerName: 'Product', width: 150 },
-                    { field: 'removed_stock', headerName: 'Removed stock', width: 150 }
-                ])
-                break;
-
-            default:
-                break;
-        }
-    }
+    const {stockAdjustmentId} = match.params;
 
 
     useEffect(() => {
-        handleDatagridColumns();
-        setRows(stockAdjustments.stockAdjustmentDetails);
+        dispatchColumnsState({ type: stockAdjustments.reason })
     }, []);
 
     return (
         <>
-            <Card className={classes.selectPOContainer}>
+            <Card>
                 <CardContent>
                     <Grid container spacing={2}>
                         <Grid item item xs={12} sm={12} md={12} lg={12}>
@@ -128,8 +107,8 @@ const StockAdjustmentDetails = ({match}) => {
                             components={{
                                 Toolbar: GridToolbar,
                             }}
-                            rows={rows} 
-                            columns={columns} 
+                            rows={stockAdjustments.stockAdjustmentDetails} 
+                            columns={columnsState} 
                             pageSize={5} 
                         />
                     </div>
