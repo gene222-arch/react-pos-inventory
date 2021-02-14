@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import EditOrder from './EditOrder'
+import ProcessPayment from './ProcessPayment'
 import {POS_DATAGRID_COLUMNS} from '../../../config/dataGrid'
 import {posUseStyles} from '../../../assets/material-styles/styles'
 import Grid from '@material-ui/core/Grid'
@@ -10,23 +11,27 @@ import { FormControl, InputLabel, Select, MenuItem, Typography, } from '@materia
 import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
 import DeleteIcon from '@material-ui/icons/Delete';
 import DiscountIcon from '@material-ui/icons/Loyalty';
+import {RemoveShoppingCart} from '@material-ui/icons'
 
 
 
 const Pos = () => 
 {
     const classes = posUseStyles();
-
     const [open, setOpen] = useState(false);
-    const [rowIds, setRowIds] = useState([]);
 
+    const [rowIds, setRowIds] = useState([]);
     const [editOrderPayload, setEditOrderPayload] = useState({});
+    const [customerId, setCustomerId] = useState(1);
+    const [customers, setCustomers] = useState([]);
     const [orderDetails, setOrderDetails] = useState([
         { id: 1, pos_details_id: 1, product_description: 'Bag', quantity: 1, price: 12, discounts: 0.00 },
         { id: 2, pos_details_id: 2, product_description: 'Shoes', quantity: 1, price: 12, discounts: 0.00 },
         { id: 3, pos_details_id: 3, product_description: 'Wew', quantity: 1, price: 12, discounts: 0.00 },
         { id: 4, pos_details_id: 4, product_description: 'Shoes', quantity: 1, price: 12, discounts: 1.00 },
     ]);
+
+    const [processPayment, setProcessPayment] = useState(false);
 
 
     /**
@@ -40,13 +45,20 @@ const Pos = () =>
     const handleClose = () => setOpen(false);
 
     /**
-     * 
+     * Cart System
      */
 
-    const handleAddToCart = (productId) => 
+    const handleOnChangeCustomerId = (e) => setCustomerId(e.target.value);
+
+    const getCustomers = () => 
     {
 
-    }
+    };
+
+    const addToCart = (productId) => 
+    {
+
+    }   
 
     const handleOnDeleteProduct = (posDetailIds) => 
     {
@@ -55,13 +67,26 @@ const Pos = () =>
         }));
     }
 
-    const handleOnSelectionChange = (rowIds) =>  setRowIds(rowIds);
+    /**
+     * Datagrid 
+     */
+    const handleOnTableSelectionChange = (rowIds) =>  setRowIds(rowIds);
 
 
-    return (
+    /**
+     * Process payment
+     */
+
+    const handleOnProcessPayment = () => setProcessPayment(!processPayment);
+
+
+    return processPayment && orderDetails.length > 0 
+    ? <ProcessPayment handleOnProcessPayment={handleOnProcessPayment} customerId={customerId}/>
+    : (
         <>
             <EditOrder payload={editOrderPayload} open={open} handleClose={handleClose}/>
             <Grid container>
+                {/* Item List */}
                 <Grid item xs={12} sm={12} md={8} lg={8}>
                     <Grid container>
                         <Grid item xs={12} sm={12} md={10} lg={10}>
@@ -73,11 +98,11 @@ const Pos = () =>
                                         label="Find item"
                                         fullWidth
                                         InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <YoutubeSearchedForIcon />
-                                            </InputAdornment>
-                                        ),
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <YoutubeSearchedForIcon />
+                                                </InputAdornment>
+                                            ),
                                         }}
                                     />
                                 </Grid>
@@ -111,7 +136,7 @@ const Pos = () =>
                                     <Grid container spacing={1}>
                                         {[1, 2, 3, 4, 5].map((data, index) => (
                                             <Grid key={index} item xs={6} sm={6} md={3} lg={3}>
-                                                <Card onClick={() => handleAddToCart(index)}>
+                                                <Card onClick={() => addToCart(index)}>
                                                     <CardContent>
 
                                                     </CardContent>
@@ -149,7 +174,7 @@ const Pos = () =>
                                                             color="default" 
                                                             className={classes.itemListOptionsBtn}
                                                         >
-                                                            Cancel Order
+                                                            Cancel Order <RemoveShoppingCart className={classes.cancelOrderIcon}/>
                                                         </Button>
                                                     )
                                                     : ''
@@ -161,6 +186,8 @@ const Pos = () =>
                         </Grid>
                     </Grid>
                 </Grid>
+                
+                {/* Order Details */}
                 <Grid item xs={12} sm={12} md={4} lg={4} className={classes.orderDetails}>
                     <Grid container>
                     {/* Customer selection */}
@@ -172,16 +199,17 @@ const Pos = () =>
                                         Customer
                                 </InputLabel>
                                 <Select
+                                    value={customerId}
+                                    onChange={handleOnChangeCustomerId}
                                     variant='filled'
                                     className={classes.selectEmpty}
                                     displayEmpty
                                     inputProps={{ 'aria-label': 'Without label' }}
                                     fullWidth
                                 >
-                                    <MenuItem value="">Supplier</MenuItem>
-                                    <MenuItem value={10}>Robots</MenuItem>
-                                    <MenuItem value={20}>MOA</MenuItem>
-                                    <MenuItem value={30}>CCC</MenuItem>
+                                    <MenuItem value={1}>Robots</MenuItem>
+                                    <MenuItem value={2}>MOA</MenuItem>
+                                    <MenuItem value={3}>CCC</MenuItem>
                                 </Select>
                             </FormControl>
                         </Grid>
@@ -218,18 +246,18 @@ const Pos = () =>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                         <div className={classes.dataGridContainer}>
                             <DataGrid 
-                                    disableDensitySelector
-                                    disableColumnSelector={true}
-                                    disableColumnFilter={true}
-                                    disableColumnMenu={true}
-                                    hideFooterPagination={true}
-                                    onCellClick={(params) => handleClickOpen(params.row)}
-                                    checkboxSelection
-                                    onSelectionChange={params => handleOnSelectionChange(params.rowIds)}
-                                    rows={orderDetails} 
-                                    columns={POS_DATAGRID_COLUMNS} 
-                                    className={classes.dataGrid}
-                                />
+                                disableDensitySelector
+                                disableColumnSelector={true}
+                                disableColumnFilter={true}
+                                disableColumnMenu={true}
+                                hideFooterPagination={true}
+                                onCellClick={(params) => handleClickOpen(params.row)}
+                                checkboxSelection
+                                onSelectionChange={params => handleOnTableSelectionChange(params.rowIds)}
+                                rows={orderDetails} 
+                                columns={POS_DATAGRID_COLUMNS} 
+                                className={classes.dataGrid}
+                            />
                         </div>
                     </Grid>
                     {/* Tax, Total, Discounts */}
@@ -286,6 +314,7 @@ const Pos = () =>
                             variant="contained" 
                             color="default" 
                             className={classes.chargeBtn}
+                            onClick={handleOnProcessPayment}
                         >
                             Process Payment
                         </Button>
@@ -293,7 +322,7 @@ const Pos = () =>
                 </Grid>
             </Grid>
         </>
-    )
+    );
 }
 
 

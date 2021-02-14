@@ -25,3 +25,31 @@ export const POS_DATAGRID_COLUMNS = [
         hide: true
     },
 ]
+
+
+export const POS_PAYMENT_DATAGRID_COLUMNS = [
+    { 
+        field: 'pos_details_id', 
+        hide: true
+    },
+    { 
+        field: 'product_description', 
+        headerName: 'Item', 
+        width: 150
+    },
+    { 
+        field: 'quantity', 
+        headerName: 'Qty', 
+        width: 130 
+    },
+    { 
+        field: 'price', 
+        headerName: 'Price', 
+        width: 130,
+        renderCell: (params) => <RenderDiscountColumn params={params} />
+    },
+    { 
+        field: 'discounts', 
+        hide: true
+    },
+]

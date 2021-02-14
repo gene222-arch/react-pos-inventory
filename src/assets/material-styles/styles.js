@@ -396,6 +396,9 @@ export const posUseStyles = makeStyles((theme) => ({
     discountIcon: {
         color: red[500]
     },
+    cancelOrderIcon: {
+        color: theme.palette.warning.main,
+    },
     formControl: {
         width: '100%',
         marginBottom: theme.spacing(1)
@@ -484,6 +487,57 @@ export const posUseStyles = makeStyles((theme) => ({
     }
 
 }));
+
+export const processPaymentUseStyles = makeStyles((theme) => ({
+    dataGridContainer: {
+        width: '100%',
+        height: '66vh'
+    },
+    dataGrid: {
+        backgroundColor: '#FFF',
+    },
+    chargeTxtField: {
+        textAlign: 'center'
+    },
+    paymentTypeBtns: {
+        width: '100%'
+    },
+    chargeBtn: {
+        fontWeight: '600',
+        color: '#FFF',
+        backgroundColor: green[500],
+        '&:hover': {
+            backgroundColor: green[400],
+        }
+    },
+    chargeDefAmount: {
+        width: '100%',
+        height: '10vh',
+    },
+    clearAmountBtn: {
+        '&:hover': {
+            backgroundColor: '#FFF'
+        }
+    },
+    clearAmountIcon: {
+        '&:hover': {
+            color: red[500],
+            backgroundColor: '#FFF'
+        }
+    },
+    cardBtn: {
+        fontWeight: '600',
+    },
+    invoiceBtn: {
+        fontWeight: '600',
+        backgroundColor: '#FFF',
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: orange[400],
+        },
+    },
+}));
+
   
 export const purchaseOrderDetailsUseStyles = makeStyles((theme) => ({
     addBtn: {
