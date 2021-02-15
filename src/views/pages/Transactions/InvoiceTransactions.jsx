@@ -11,21 +11,22 @@ const InvoiceTransactions = () =>
     const history = useHistory();
 
     const columns = [
-        { field: 'product_description', headerName: 'Product name', width: 367 },
-        { field: 'category', headerName: 'Category', width: 250 },
-        { field: 'price', headerName: 'Price', width: 130 },
-        { field: 'cost', headerName: 'Cost', width: 130 },
-        { field: 'margin', headerName: 'Margin', width: 130 },
-        { field: 'in_stock', headerName: 'In stock', width: 130 },
+        { field: 'id', headerName: 'Invoice #', width: 115 },
+        { field: 'status', headerName: 'Status', width: 115 },
+        { field: 'invoiced_at', headerName: 'Date', width: 210 },
+        { field: 'customer_name', headerName: 'Customer', width: 210 },
+        { field: 'number_of_items', headerName: 'Number of items', width: 170 },
+        { field: 'subtotal', headerName: 'Subtotal', width: 170 },
+        { field: 'discount', headerName: 'Discount', width: 170 },
+        { field: 'tax', headerName: 'Tax', width: 170 },
+        { field: 'payment_date', headerName: 'Payment Date', width: 170 },
+        { field: 'total', headerName: 'Total', width: 170 },
     
     ];
     
     const rows = [
-      { id: 1, product_description: 'Snow', category: '2021', price: '2021', cost: 12,  margin: '35%', in_stock: 100 },
-      { id: 2, product_description: 'Lannister', category: '2021', price: '2021', cost: 12,  margin: '42%', in_stock: 100 },
-      { id: 3, product_description: 'Lannister', category: '2021', price: '2021', cost: 12,  margin: '45%', in_stock: 100 },
-      { id: 4, product_description: 'Stark', category: '2021', price: '2021', cost: 12,  margin: '16%', in_stock: 100 },
-      { id: 5, product_description: 'Targaryen', category: '2021', price: '2021', cost: 12,  margin: null, in_stock: 100 },
+      { id: 1, status: 'Pending', invoiced_at: 'January 12, 2020 11:10 P.M', customer_name: 'Customer sample name', number_of_items: 12, subtotal: 102.50, discount: 15.00, tax: 12.50, payment_date: 'January 12, 2020', total: 1200.00},
+      { id: 2, status: 'Pending', invoiced_at: 'January 12, 2020 11:10 P.M', customer_name: 'Customer sample name', number_of_items: 12, subtotal: 102.50, discount: 15.00, tax: 12.50, payment_date: 'January 12, 2020', total: 1200.00},
     ];
 
     

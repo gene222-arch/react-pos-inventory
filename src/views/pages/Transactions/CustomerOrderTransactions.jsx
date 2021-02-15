@@ -11,21 +11,17 @@ const CustomerOrderTransactions = () =>
     const history = useHistory();
 
     const columns = [
-        { field: 'product_description', headerName: 'Product name', width: 367 },
-        { field: 'category', headerName: 'Category', width: 250 },
-        { field: 'price', headerName: 'Price', width: 130 },
-        { field: 'cost', headerName: 'Cost', width: 130 },
-        { field: 'margin', headerName: 'Margin', width: 130 },
-        { field: 'in_stock', headerName: 'In stock', width: 130 },
+        { field: 'id', headerName: 'Order #', width: 115 },
+        { field: 'ordered_at', headerName: 'Date', width: 210 },
+        { field: 'customer', headerName: 'Customer', width: 250 },
+        { field: 'customer_address', headerName: 'Address', width: 460 },
+        { field: 'number_of_items', headerName: 'Number of items', width: 170 },
     
     ];
     
     const rows = [
-      { id: 1, product_description: 'Snow', category: '2021', price: '2021', cost: 12,  margin: '35%', in_stock: 100 },
-      { id: 2, product_description: 'Lannister', category: '2021', price: '2021', cost: 12,  margin: '42%', in_stock: 100 },
-      { id: 3, product_description: 'Lannister', category: '2021', price: '2021', cost: 12,  margin: '45%', in_stock: 100 },
-      { id: 4, product_description: 'Stark', category: '2021', price: '2021', cost: 12,  margin: '16%', in_stock: 100 },
-      { id: 5, product_description: 'Targaryen', category: '2021', price: '2021', cost: 12,  margin: null, in_stock: 100 },
+      { id: 1, ordered_at: 'January 12, 2020 11:10 P.M', customer: 'Customer sample name', customer_address: '134 Daisy St. Brgy. Lingga Calamba City Laguna, 4027, Philippines', number_of_items: 12 },
+      { id: 1, ordered_at: 'January 12, 2020 11:10 P.M', customer: 'Customer sample name', customer_address: '134 Daisy St. Brgy. Lingga Calamba City Laguna, 4027, Philippines', number_of_items: 12 },
     ];
 
     
@@ -37,7 +33,6 @@ const CustomerOrderTransactions = () =>
                     components={{
                         Toolbar: GridToolbar,
                     }}
-                    onRowClick={(params) => history.push(`/products/${params.row.id}/edit`)}
                     rows={rows} 
                     columns={columns} 
                     pageSize={5} 

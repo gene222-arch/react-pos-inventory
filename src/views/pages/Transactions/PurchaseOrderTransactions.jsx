@@ -11,21 +11,20 @@ const PurchaseOrderTransactions = () =>
     const history = useHistory();
 
     const columns = [
-        { field: 'product_description', headerName: 'Product name', width: 367 },
-        { field: 'category', headerName: 'Category', width: 250 },
-        { field: 'price', headerName: 'Price', width: 130 },
-        { field: 'cost', headerName: 'Cost', width: 130 },
-        { field: 'margin', headerName: 'Margin', width: 130 },
-        { field: 'in_stock', headerName: 'In stock', width: 130 },
+        { field: 'id', headerName: 'Order #', width: 115 },
+        { field: 'purchase_date', headerName: 'Date', width: 210 },
+        { field: 'status', headerName: 'Status', width: 210 },
+        { field: 'supplier', headerName: 'Supplier', width: 210 },
+        { field: 'received', headerName: 'Received', width: 210 },
+        { field: 'ordered', headerName: 'Ordered', width: 210 },
+        { field: 'expected_on', headerName: 'Date', width: 210 },
+        { field: 'total', headerName: 'Total amount', width: 170 },
     
     ];
     
     const rows = [
-      { id: 1, product_description: 'Snow', category: '2021', price: '2021', cost: 12,  margin: '35%', in_stock: 100 },
-      { id: 2, product_description: 'Lannister', category: '2021', price: '2021', cost: 12,  margin: '42%', in_stock: 100 },
-      { id: 3, product_description: 'Lannister', category: '2021', price: '2021', cost: 12,  margin: '45%', in_stock: 100 },
-      { id: 4, product_description: 'Stark', category: '2021', price: '2021', cost: 12,  margin: '16%', in_stock: 100 },
-      { id: 5, product_description: 'Targaryen', category: '2021', price: '2021', cost: 12,  margin: null, in_stock: 100 },
+      { id: 1, purchase_date: 'January 12, 2020 11:10 P.M', status: 'Partially Receive', supplier: 'Customer sample name', received: 120, ordered: 200, expected_on: 'January 2021, 2010', total: 12 },
+      { id: 2, purchase_date: 'January 12, 2020 11:10 P.M', status: 'Partially Receive', supplier: 'Customer sample name', received: 120, ordered: 200, expected_on: 'January 2021, 2010', total: 12 },
     ];
 
     

@@ -16,15 +16,11 @@ export default (history = null, redirectPath = null) =>
         headers
     });
 
-    axiosInstance.interceptors.response.use(
-        (response) => response,
+    axiosInstance.interceptors.response.use((response) => {
+        return response
+      },
         (error) => 
         {
-            if (!error.response)
-            {
-                return new Promise.reject(error);
-            }
-
             if (error.response.status === 401 || error.response.status === 403)
             {
                 Cookie.removeItem('access_token');
@@ -39,6 +35,8 @@ export default (history = null, redirectPath = null) =>
                     history.push('/auth/login')
                 }
             }
+
+            return Promise.reject(error);
         }
     )
 
