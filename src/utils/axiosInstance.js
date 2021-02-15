@@ -17,7 +17,7 @@ export default (history = null, redirectPath = null) =>
     });
 
     axiosInstance.interceptors.response.use(
-        (response) => new Promise((resolve, reject) =>  resolve(response)),
+        (response) => response,
         (error) => 
         {
             if (!error.response)
