@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import * as Product from '../../../../services/products/products'
 import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid } from '@material-ui/core';
@@ -26,10 +27,24 @@ const rows = [
 ];
 
 
-const ProductList = () => {
+const ProductList = () => 
+{
 
     const classes = dataGridUseStyles();
     const history = useHistory();
+
+    const fetchProducts = async () => 
+    {
+        const result = await Product.fetchAllAsync();
+
+        console.log(result);
+    }
+
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
 
     return (
         <>

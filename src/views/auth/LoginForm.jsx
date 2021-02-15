@@ -1,6 +1,7 @@
   
 import React, { useState } from 'react';
-import { NavLink, Redirect, useHistory } from 'react-router-dom';
+import loginAsync from '../../services/auth/login/login'
+import { NavLink, useHistory } from 'react-router-dom'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -38,17 +39,42 @@ const LoginForm = () =>
 
     const [credentials, setCredentials] = useState({
         email: '',
-        password: '',
-        remember_me: ''
+        password: ''
     });
 
-    const handleOnSignIn = () => {
-        Cookie.setItem('access_token', 'ACCESS_TOKEN');
-        if (Cookie.has('access_token'))
-        {
-            history.push('/');
-        }
+    const [rememberMe, setRememberMe] = useState(false);
+
+    
+    const handleCredentialsOnChange = (e) => 
+    {
+        const {name, value} = e.target;
+        console.log(`${name} = ${value}`)
+
+        setCredentials({...credentials, [name]: value});
     }
+
+
+    const handleOnChangeCheckbox = (e) => setRememberMe(e.target.checked)
+
+
+    const handleOnClickLogin = async (e) => 
+    {
+        e.preventDefault();
+
+        const result = await loginAsync(credentials);
+        console.log(result);
+        // if (true) 
+        // {
+        //     Cookie.setItem('access_token', 'token');
+
+        //     if (Cookie.has('access_token'))
+        //     {
+        //         history.push('/');
+        //     }
+        // }
+    }
+
+
 
     return (
         <Grid container component="main" className={classes.root}>
@@ -62,7 +88,7 @@ const LoginForm = () =>
                     <Typography component="h1" variant="h5">
                         Sign in
                     </Typography>
-                    <form className={classes.form} noValidate>
+                    <form className={classes.form} noValidate onSubmit={handleOnClickLogin}>
                         <TextField
                             error={false}
                             helperText={''}
@@ -75,6 +101,8 @@ const LoginForm = () =>
                             name="email"
                             autoComplete="email"
                             autoFocus
+                            value={credentials.email}
+                            onChange={handleCredentialsOnChange}
                         />
                         <TextField
                             error={false}
@@ -88,9 +116,18 @@ const LoginForm = () =>
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            value={credentials.password}
+                            onChange={handleCredentialsOnChange}
                         />
                         <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
+                            control={
+                                <Checkbox 
+                                    name='remember_me'
+                                    value={rememberMe} 
+                                    onChange={handleOnChangeCheckbox}
+                                    checked={rememberMe}
+                                    color="primary" 
+                            />}
                             label="Remember me"
                         />
                         <Button
@@ -99,7 +136,6 @@ const LoginForm = () =>
                             variant="contained"
                             color="primary"
                             className={classes.submit}
-                            onClick={ handleOnSignIn }
                         >
                             Sign In
                         </Button>

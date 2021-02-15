@@ -1,5 +1,6 @@
   
 import React, {useState} from 'react';
+import registerAsync from '../../../services/auth/register/register'
 import { NavLink } from 'react-router-dom'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -34,14 +35,33 @@ const Copyright = () => {
 const RegistrationForm = () => 
 {
     const classes = registrationFormUseStyles();
-    const [ reg, setReg ] = useState({
+
+    const [ credentials, setCredentials ] = useState({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
-        role: 'cashier',
-        remember_me: false,
+        role: 'cashier'
     });
+    const [rememberMe, setRememberMe] = useState(false);
+
+
+    const handleCredentialsOnChange = (e) => 
+    {
+        const {name, value} = e.target;
+        setCredentials({...credentials, [name]: value});
+    }
+
+    const handleOnChangeCheckbox = (e) => setRememberMe(e.target.checked);
+
+
+    const handleCredentialsOnSubmit = async (e) => 
+    {
+        e.preventDefault();
+        const result = await registerAsync(credentials);
+        console.log(result)
+    }
+
 
     return (
         <Grid container component="main" className={classes.root}>
@@ -54,7 +74,7 @@ const RegistrationForm = () =>
                     <Typography component="h1" variant="h5">
                         Sign up
                     </Typography>
-                    <form className={classes.form} noValidate>
+                    <form className={classes.form} noValidate onSubmit={handleCredentialsOnSubmit}>
                         <TextField
                             error={false}
                             helperText={''}
@@ -67,7 +87,10 @@ const RegistrationForm = () =>
                             name="name"
                             autoComplete="name"
                             autoFocus
+                            value={credentials.name}
+                            onChange={handleCredentialsOnChange}
                         />
+
                         <TextField
                             error={false}
                             helperText={''}
@@ -80,7 +103,10 @@ const RegistrationForm = () =>
                             name="email"
                             autoComplete="email"
                             autoFocus
+                            value={credentials.email}
+                            onChange={handleCredentialsOnChange}
                         />
+
                         <TextField
                             error={false}
                             helperText={''}
@@ -93,7 +119,10 @@ const RegistrationForm = () =>
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            value={credentials.password}
+                            onChange={handleCredentialsOnChange}
                         />
+
                         <TextField
                             error={false}
                             helperText={''}
@@ -105,9 +134,18 @@ const RegistrationForm = () =>
                             type="password"
                             id="password_confirmation"
                             autoComplete="current-password"
+                            value={credentials.password_confirmation}
+                            onChange={handleCredentialsOnChange}
                         />
                         <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
+                            control={
+                                <Checkbox 
+                                    name='remember_me'
+                                    value={rememberMe} 
+                                    onChange={handleOnChangeCheckbox}
+                                    checked={rememberMe}
+                                    color="primary" 
+                            />}
                             label="Remember me"
                         />
                         <Button

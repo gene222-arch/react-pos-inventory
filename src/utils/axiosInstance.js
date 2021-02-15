@@ -4,46 +4,39 @@ import * as Cookie from './cookies'
 
 export default (history = null, redirectPath = null) => 
 {
-    const BASEURL = process.env.REACT_APP_BASE_URL;
-
     let headers = {};
 
-    if (Cookie.has('accessToken'))
+    if (Cookie.has('access_token'))
     {
-        headers.Authorization = `Bearer ${ Cookie.getItem('accessToken') }`;
+        headers.Authorization = `Bearer ${ Cookie.getItem('access_token') }`;
     }
 
     const axiosInstance = Axios.create({
-        baseURL: BASEURL,
+        baseURL: process.env.REACT_APP_BASE_URL,
         headers
     });
 
-
     axiosInstance.interceptors.response.use(
-        // on Success
-        response => new Promise.resolve(response),
-
-        // on Error
-        error => 
+        (response) => new Promise((resolve, reject) =>  resolve(response)),
+        (error) => 
         {
-            // Error is not from the server
             if (!error.response)
             {
                 return new Promise.reject(error);
             }
 
-            // Unauthorized response code
-            if (error.response.status !== 401) 
+            if (error.response.status === 401 || error.response.status === 403)
             {
-                return new Promise.reject(error);
-            }
-            else 
-            {
-                Cookie.removeItem('accessToken');
+                Cookie.removeItem('access_token');
   
-                if (history !== null && redirectPath !== null)
+                if (!Cookie.has('access_token'))
                 {
-                    history.push(redirectPath)
+                    if (redirectPath !== null)
+                    {
+                        history.push(redirectPath)
+                    }
+
+                    history.push('/auth/login')
                 }
             }
         }

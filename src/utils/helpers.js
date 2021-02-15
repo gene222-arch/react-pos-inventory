@@ -7,7 +7,7 @@ import * as Cookie from './cookies'
  * @param {method} string
  */
 
-export const toFormData = (object = {}, method = null) =>
+export const prepareToFormData = (object = {}, method = null) =>
 {
     let formData = new FormData;
 
@@ -15,8 +15,16 @@ export const toFormData = (object = {}, method = null) =>
     {
         if (object.hasOwnProperty(key))
         {
-            formData.append(key, object[key])
+            if (Array.isArray(object[key]))
+            {
+                formData.append(key, JSON.stringify(object[key]))
+            }
+            else 
+            {
+                formData.append(key, object[key])
+            }
         }
+
     }
 
     /**
@@ -28,6 +36,7 @@ export const toFormData = (object = {}, method = null) =>
     {
         formData.delete('image');
     }
+
     if (method)
     {
         formData.append('_method', method);
@@ -38,8 +47,8 @@ export const toFormData = (object = {}, method = null) =>
 
 
 
-export const determineIsAuthenticated = () => {
-    console.log(Cookie.has('access_token'));
+export const determineIsAuthenticated = () => 
+{
     return Cookie.has('access_token');
 };
 

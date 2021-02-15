@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useState} from 'react';
+import {sendResetLinkEmailAsync} from '../../../services/auth/forgot-password/forgotPassword'
 import {NavLink} from 'react-router-dom'
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -16,6 +17,19 @@ import { Paper } from '@material-ui/core';
 const ForgotPassword = () => 
 {
     const classes = forgotResetPasswordUseStyles();
+    
+    const [email, setEmail] = useState('');
+
+    const handleEmailOnChange = (e) => setEmail(e.target.value);
+
+    const handleOnSubmitEmail = async (e) => 
+    {   
+        e.preventDefault();
+
+        const result = await sendResetLinkEmailAsync({email});
+        
+        console.log(result);
+    }
 
     return (
         <Container component="main" maxWidth="sm" component={Paper}>
@@ -27,7 +41,7 @@ const ForgotPassword = () =>
                 <Typography component="h1" variant="h5" className={classes.title} gutterBottom>
                     Forgot Password?
                 </Typography>
-                <form className={classes.form} noValidate>
+                <form className={classes.form} noValidate onSubmit={handleOnSubmitEmail}>
                     <TextField
                         margin="normal"
                         required
@@ -37,6 +51,8 @@ const ForgotPassword = () =>
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        value={email}
+                        onChange={handleEmailOnChange}
                     />
 
                     <Button

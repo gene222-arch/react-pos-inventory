@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useState} from 'react';
+import {resetPasswordAsync} from '../../../services/auth/forgot-password/forgotPassword'
 import {NavLink} from 'react-router-dom'
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -17,6 +18,25 @@ const ResetPassword = () =>
 {
     const classes = forgotResetPasswordUseStyles();
 
+    const [passwords, setPasswords] = useState({
+        password: '',
+        password_confirmation: '',
+    });
+
+    const handlePasswordsOnChange = (e) => 
+    {
+        const {name, value} = e.target;
+        setPasswords({...passwords, [name]: value})
+    }
+
+    const handlePasswordReset = (e) => 
+    {
+        e.preventDefault();
+
+        const result = resetPasswordAsync(passwords);
+        console.log(result);
+    }
+
     return (
         <Container component="main" maxWidth="sm" component={Paper}>
             <CssBaseline />
@@ -27,7 +47,7 @@ const ResetPassword = () =>
                 <Typography component="h1" variant="h5" className={classes.title} gutterBottom>
                     Reset Password
                 </Typography>
-                <form className={classes.form} noValidate>
+                <form className={classes.form} noValidate onSubmit={handlePasswordReset}>
                     <TextField
                         margin="normal"
                         required
@@ -38,6 +58,8 @@ const ResetPassword = () =>
                         autoComplete="password"
                         autoFocus
                         type='password'
+                        value={passwords.password}
+                        onChange={handlePasswordsOnChange}
                     />
 
                     <TextField
@@ -50,6 +72,8 @@ const ResetPassword = () =>
                         autoComplete="confirm_password"
                         autoFocus
                         type='password'
+                        value={passwords.password_confirmation}
+                        onChange={handlePasswordsOnChange}
                     />
 
                     <Button
