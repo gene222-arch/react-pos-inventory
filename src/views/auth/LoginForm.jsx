@@ -61,17 +61,18 @@ const LoginForm = () =>
     {
         e.preventDefault();
 
-        const result = await loginAsync(credentials);
-        console.log(result);
-        // if (true) 
-        // {
-        //     Cookie.setItem('access_token', 'token');
+        // const result = await loginAsync(credentials);
+        // console.log(result);
+        
+        if (true) 
+        {
+            Cookie.setItem('access_token', 'token');
 
-        //     if (Cookie.has('access_token'))
-        //     {
-        //         history.push('/');
-        //     }
-        // }
+            if (Cookie.has('access_token'))
+            {
+                history.push('/');
+            }
+        }
     }
 
 
