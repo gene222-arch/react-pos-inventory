@@ -46,6 +46,21 @@ export const prepareToFormData = (object = {}, method = null) =>
 };
 
 
+export const prepareStringifyFormData = (object, method = null) => 
+{
+    let formData = new FormData();
+
+    // for (const key in object) {
+    //     formData.append(key, JSON.stringify(object[key]));
+    // }
+    formData.append('data', JSON.stringify(object));
+    if (method)
+    {
+        formData.append('_method', method);
+    }
+    return formData;
+}
+
 
 export const determineIsAuthenticated = () => 
 {

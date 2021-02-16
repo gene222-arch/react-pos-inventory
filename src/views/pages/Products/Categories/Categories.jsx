@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
+import * as ProductCategories from '../../../../services/products/categories'
 import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
@@ -7,21 +8,33 @@ import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 
 
-const columns = [
-    { field: 'name', headerName: 'Name', width: 270 },
-    { field: 'products', headerName: 'Products', width: 270 }
+const Categories = () => 
+{
+    const [categories, setCategories] = useState([]);
 
-];
+    const columns = [
+        { field: 'id', hide: true },
+        { field: 'name', headerName: 'Name', width: 270 },
+    ];
+    
 
-const rows = [
-  { id: 1, name: 'Snow', products: 2},
-  { id: 2, name: 'Snow', products: 2},
-  { id: 3, name: 'Snow', products: 2},
-  { id: 4, name: 'Snow', products: 2},
-];
+    const fetchCategories = async () => 
+    {
+        const result = await ProductCategories.fetchAllAsync();
+
+        if (result.status === 'Success')
+        {
+            setCategories(result.data);
+        }
+    }
 
 
-const Categories = () => {
+    useEffect(() => 
+    {
+        fetchCategories();
+
+        return () =>  fetchCategories();
+    }, []);
 
     const classes = dataGridUseStyles();
     const history = useHistory();
@@ -52,7 +65,7 @@ const Categories = () => {
                         Toolbar: GridToolbar,
                     }}
                     onRowClick={(params) => history.push(`/products/categories/${params.row.id}/edit`)}
-                    rows={rows} 
+                    rows={categories} 
                     columns={columns} 
                     pageSize={5} 
                     checkboxSelection 

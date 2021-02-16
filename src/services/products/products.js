@@ -20,7 +20,8 @@ export const fetchAsync = async (payload) =>
 {
     try {
         
-        const result = await axiosInstance().post('/products', Helpers.prepareToFormData(payload));
+        const result = await axiosInstance()
+            .post('/products/details', Helpers.prepareToFormData(payload));
 
         return result.data;
 
@@ -49,7 +50,21 @@ export const updateAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .post('/products', Helpers.prepareToFormData(payload, 'PUT'));
+            .post('/products', JSON.stringify({
+                product: {
+                    product_id: 19,
+                    data: {
+                        name: "Nike"
+                    }
+                },
+                stock: {
+                    data: {
+                        supplier_id: 3
+                    }
+                }
+            }), {
+                '_method': 'PUT'
+            });
 
         return result.data;
 
@@ -64,7 +79,7 @@ export const destroyAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .delete('/products', Helpers.prepareToFormData(payload));
+            .delete('/products', JSON.stringify(payload));
 
         return result.data;
 

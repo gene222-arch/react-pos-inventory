@@ -348,6 +348,12 @@ export const registrationFormUseStyles = makeStyles((theme) => ({
 }));
 
 export const dataGridUseStyles = makeStyles((theme) => ({
+    root: {
+        '& .super-app.negative' : {
+            color: '#FFF',
+            backgroundColor: red[400]
+        }
+    },
     addBtn: {
         margin: theme.spacing(1),
         backgroundColor: '#4caf50',
@@ -666,10 +672,6 @@ export const createSalesReturnsUseStyles = makeStyles((theme) => ({
 export const createProductUseStyles = makeStyles((theme) => ({
     formControl: {
         width: '100%',
-    },
-    selectEmpty: {
-        marginTop: theme.spacing(2),
-        width: '20rem'
     },
     addBtn: {
         margin: theme.spacing(1),

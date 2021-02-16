@@ -1,4 +1,5 @@
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
+import clsx from 'clsx'
 import * as Product from '../../../../services/products/products'
 import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
@@ -8,41 +9,48 @@ import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 
 
-const columns = [
-    { field: 'product_description', headerName: 'Product name', width: 367 },
-    { field: 'category', headerName: 'Category', width: 250 },
-    { field: 'price', headerName: 'Price', width: 130 },
-    { field: 'cost', headerName: 'Cost', width: 130 },
-    { field: 'margin', headerName: 'Margin', width: 130 },
-    { field: 'in_stock', headerName: 'In stock', width: 130 },
-
-];
-
-const rows = [
-  { id: 1, product_description: 'Snow', category: '2021', price: '2021', cost: 12,  margin: '35%', in_stock: 100 },
-  { id: 2, product_description: 'Lannister', category: '2021', price: '2021', cost: 12,  margin: '42%', in_stock: 100 },
-  { id: 3, product_description: 'Lannister', category: '2021', price: '2021', cost: 12,  margin: '45%', in_stock: 100 },
-  { id: 4, product_description: 'Stark', category: '2021', price: '2021', cost: 12,  margin: '16%', in_stock: 100 },
-  { id: 5, product_description: 'Targaryen', category: '2021', price: '2021', cost: 12,  margin: null, in_stock: 100 },
-];
-
-
 const ProductList = () => 
 {
-
     const classes = dataGridUseStyles();
     const history = useHistory();
+
+    const [rows, setRows] = useState([]);
+
+    const columns = [
+        { field: 'id', hide:true },
+        { field: 'barcode', headerName: 'Barcode', width: 150 },
+        { field: 'name', headerName: 'Product description', width: 205 },
+        { field: 'category', headerName: 'Category', width: 200 },
+        { field: 'price', headerName: 'Price', width: 130 },
+        { field: 'cost', headerName: 'Cost', width: 130 },
+        { field: 'margin', headerName: 'Margin', width: 130 },
+        { field: 'in_stock', headerName: 'In stock', width: 130,
+            cellClassName: (params) =>  clsx('super-app', {
+                negative: params.value < params.row.minimum_reorder_level 
+              })
+        },
+        { field: 'minimum_reorder_level', headerName: 'Min stock', width: 130},
+    
+    ];
 
     const fetchProducts = async () => 
     {
         const result = await Product.fetchAllAsync();
 
-        console.log(result);
+        if (result.status = 'Success')
+        {
+            setRows(result.data);
+        }
     }
 
 
     useEffect(() => {
         fetchProducts();
+
+        return () => {
+            fetchProducts();
+            setRows([]);
+        };
     }, []);
 
 
@@ -75,6 +83,7 @@ const ProductList = () =>
             </Card>
             <div style={{ height: 450, width: '100%' }}>
                 <DataGrid 
+                    className={classes.root}
                     showToolbar
                     components={{
                         Toolbar: GridToolbar,

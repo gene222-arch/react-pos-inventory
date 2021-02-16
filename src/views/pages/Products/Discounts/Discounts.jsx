@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
+import * as ProductDiscounts from '../../../../services/products/discounts'
 import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
@@ -7,24 +8,39 @@ import AddIcon from '@material-ui/icons/Add';
 import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 
 
-const columns = [
-    { field: 'name', headerName: 'Name', width: 300 },
-    { field: 'value', headerName: 'Value', width: 270 }
 
-];
-
-const rows = [
-  { id: 1, name: 'Snow', value: '2%'},
-  { id: 2, name: 'Snow', value: '2%'},
-  { id: 3, name: 'Snow', value: '2%'},
-  { id: 4, name: 'Snow', value: '2%'},
-];
-
-
-const Discounts = () => {
+const Discounts = () => 
+{
 
     const classes = dataGridUseStyles();
     const history = useHistory();
+
+    const [discounts, setDiscounts] = useState([]);
+
+    const columns = [
+        { field: 'name', headerName: 'Percentage', width: 300 },
+        { field: 'percentage', headerName: 'Percentage', width: 270 }
+    ];
+
+
+    
+    const fetchDiscounts = async () => 
+    {
+        const result = await ProductDiscounts.fetchAllAsync();
+
+        if (result.status === 'Success')
+        {
+            setDiscounts(result.data);
+        }
+    }
+
+
+    useEffect(() => {
+        fetchDiscounts();
+
+        return () => fetchDiscounts();
+    }, []);
+
 
     return (
         <>
@@ -52,7 +68,7 @@ const Discounts = () => {
                         Toolbar: GridToolbar,
                     }}
                     onRowClick={(params) => history.push(`/products/discounts/${params.row.id}/edit`)}
-                    rows={rows} 
+                    rows={discounts} 
                     columns={columns} 
                     pageSize={5} 
                     checkboxSelection 
