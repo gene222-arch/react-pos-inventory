@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
+import * as Employees_ from '../../../../services/employees/employees'
 import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
@@ -7,25 +8,40 @@ import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 
 
-const columns = [
-    { field: 'name', headerName: 'Name', width: 270 },
-    { field: 'email', headerName: 'Email', width: 250 },
-    { field: 'role', headerName: 'Role', width: 200 },
-
-];
-
-const rows = [
-  { id: 1, name: 'Snow', email: 'test@yahoo.com', role: 'Administrator' },
-  { id: 2, name: 'Snow', email: 'test@yahoo.com', role: 'Cashier' },
-  { id: 3, name: 'Snow', email: 'test@yahoo.com', role: 'Administrator' },
-  { id: 4, name: 'Snow', email: 'test@yahoo.com', role: 'Administrator' },
-];
-
-
-const EmployeeList = () => {
+const EmployeeList = () => 
+{
 
     const classes = dataGridUseStyles();
     const history = useHistory();
+
+    const [employees, setEmployees] = useState([]);
+
+    const columns = [
+        { field: 'id', hide: true },
+        { field: 'name', headerName: 'Name', width: 270 },
+        { field: 'email', headerName: 'Email', width: 250 },
+        { field: 'phone', headerName: 'Phone', width: 250 },
+        { field: 'role', headerName: 'Role', width: 200 },
+    ];
+
+
+    const fetchEmployees = async () => 
+    {
+        const result = await Employees_.fetchAllAsync();
+
+        if (result.status === 'Success')
+        {
+            setEmployees(result.data);
+        }
+    }
+
+
+
+    useEffect(() => {
+        fetchEmployees();
+
+        return () => fetchEmployees();
+    }, []);
 
     return (
         <>
@@ -54,7 +70,7 @@ const EmployeeList = () => {
                         Toolbar: GridToolbar,
                     }}
                     onRowClick={(params) => history.push(`/employees/${params.row.id}/edit`)}
-                    rows={rows} 
+                    rows={employees} 
                     columns={columns} 
                     pageSize={5} 
                     checkboxSelection 
