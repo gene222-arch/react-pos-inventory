@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
+import * as Customers_ from '../../../services/customers/customers'
 import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
@@ -7,27 +8,42 @@ import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import { dataGridUseStyles } from '../../../assets/material-styles/styles'
 
 
-const columns = [
-    { field: 'customer', headerName: 'Customer', width: 335 },
-    { field: 'first_visit', headerName: 'First visit', width: 200 },
-    { field: 'last_visit', headerName: 'Last visit', width: 200 },
-    { field: 'total_visits', headerName: 'Total visits', width: 200 },
-    { field: 'total_spent', headerName: 'Total spent', width: 200 },
-];
-
-const rows = [
-  { id: 1, customer: 'Snow', first_visit: '2021', last_visit: '2021', total_visits: 12,  total_spent: 35 },
-  { id: 2, customer: 'Lannister', first_visit: '2021', last_visit: '2021', total_visits: 12,  total_spent: 42 },
-  { id: 3, customer: 'Lannister', first_visit: '2021', last_visit: '2021', total_visits: 12,  total_spent: 45 },
-  { id: 4, customer: 'Stark', first_visit: '2021', last_visit: '2021', total_visits: 12,  total_spent: 16 },
-  { id: 5, customer: 'Targaryen', first_visit: '2021', last_visit: '2021', total_visits: 12,  total_spent: null },
-];
-
-
-const Customers = () => {
+const Customers = () => 
+{
 
     const classes = dataGridUseStyles();
     const history = useHistory();
+
+    const [customers, setCustomers] = useState([]);
+
+    const columns = [
+        { field: 'id', hide: true },
+        { field: 'customer', headerName: 'Customer', width: 335 },
+        { field: 'first_visit', headerName: 'First visit', width: 200 },
+        { field: 'last_visit', headerName: 'Last visit', width: 200 },
+        { field: 'total_visits', headerName: 'Total visits', width: 200 },
+        { field: 'total_spent', headerName: 'Total spent', width: 200,
+            valueFormatter: (params) => `P ${params.value}`,
+        },
+    ];
+
+        
+    const fetchCustomers = async () => 
+    {
+        const result = await Customers_.fetchAllAsync();
+
+        if (result.status === 'Success')
+        {
+            setCustomers(result.data);
+        }
+    }
+
+
+    useEffect(() => {
+        fetchCustomers();
+
+        return () => fetchCustomers();
+    }, [])
 
     return (
         <>
@@ -48,7 +64,6 @@ const Customers = () => {
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="text" className={classes.btn}> Import </Button>
                                     <Button variant="text" className={classes.btn}> Export </Button>
                                 </Grid>
                             </Grid>
@@ -63,7 +78,7 @@ const Customers = () => {
                         Toolbar: GridToolbar,
                     }}
                     onRowClick={ (param) => history.push(`/customers/${param.row.id}/edit`)}
-                    rows={rows} 
+                    rows={customers} 
                     columns={columns} 
                     pageSize={5} 
                     checkboxSelection 
