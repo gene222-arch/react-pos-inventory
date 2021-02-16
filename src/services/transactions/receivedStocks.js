@@ -1,8 +1,7 @@
 import axiosInstance from '../../utils/axiosInstance'
-import * as Helpers from '../../utils/helpers'
 
 
-export const fetchReceivedStocks = async () => 
+export const fetchAllAsync = async () => 
 {
     try {
         const result = await axiosInstance().get('/transactions/received-stocks');

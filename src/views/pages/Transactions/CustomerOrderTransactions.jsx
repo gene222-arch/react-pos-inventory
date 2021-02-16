@@ -1,4 +1,5 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
+import * as CustomerOrderTransactions_ from '../../../services/transactions/customerOrders'
 import {useHistory} from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { dataGridUseStyles } from '../../../assets/material-styles/styles'
@@ -10,6 +11,8 @@ const CustomerOrderTransactions = () =>
     const classes = dataGridUseStyles();
     const history = useHistory();
 
+    const [customerOrders, setCustomerOrders] = useState([]);
+
     const columns = [
         { field: 'id', headerName: 'Order #', width: 115 },
         { field: 'ordered_at', headerName: 'Date', width: 210 },
@@ -18,11 +21,24 @@ const CustomerOrderTransactions = () =>
         { field: 'number_of_items', headerName: 'Number of items', width: 170 },
     
     ];
+
+
+    const fetchCustomerOrdersTransac= async () => 
+    {
+        const result = await CustomerOrderTransactions_.fetchAllAsync();
+
+        if (result.status === 'Success')
+        {
+            setCustomerOrders(result.data);
+        }
+    }
+
     
-    const rows = [
-      { id: 1, ordered_at: 'January 12, 2020 11:10 P.M', customer: 'Customer sample name', customer_address: '134 Daisy St. Brgy. Lingga Calamba City Laguna, 4027, Philippines', number_of_items: 12 },
-      { id: 1, ordered_at: 'January 12, 2020 11:10 P.M', customer: 'Customer sample name', customer_address: '134 Daisy St. Brgy. Lingga Calamba City Laguna, 4027, Philippines', number_of_items: 12 },
-    ];
+    useEffect(() => {
+        fetchCustomerOrdersTransac();
+
+        return () => fetchCustomerOrdersTransac();
+    }, []);
 
     
     return (
@@ -33,7 +49,7 @@ const CustomerOrderTransactions = () =>
                     components={{
                         Toolbar: GridToolbar,
                     }}
-                    rows={rows} 
+                    rows={customerOrders} 
                     columns={columns} 
                     pageSize={5} 
                     checkboxSelection 

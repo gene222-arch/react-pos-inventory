@@ -1,4 +1,5 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
+import * as POTransactions_ from '../../../services/transactions/purchaseOrders'
 import {useHistory} from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { dataGridUseStyles } from '../../../assets/material-styles/styles'
@@ -9,6 +10,8 @@ const PurchaseOrderTransactions = () =>
 {
     const classes = dataGridUseStyles();
     const history = useHistory();
+
+    const [po, setPo] = useState([]);
 
     const columns = [
         { field: 'id', headerName: 'Order #', width: 115 },
@@ -22,11 +25,24 @@ const PurchaseOrderTransactions = () =>
     
     ];
     
-    const rows = [
-      { id: 1, purchase_date: 'January 12, 2020 11:10 P.M', status: 'Partially Receive', supplier: 'Customer sample name', received: 120, ordered: 200, expected_on: 'January 2021, 2010', total: 12 },
-      { id: 2, purchase_date: 'January 12, 2020 11:10 P.M', status: 'Partially Receive', supplier: 'Customer sample name', received: 120, ordered: 200, expected_on: 'January 2021, 2010', total: 12 },
-    ];
 
+    const purchaseOrderTransac = async () => 
+    {
+        const result = await POTransactions_.fetchAllAsync();
+
+        if (result.status === 'Success')
+        {
+            setPo(result.data);
+        }
+    }
+
+    
+    useEffect(() => {
+        purchaseOrderTransac();
+
+        return () => purchaseOrderTransac();
+    }, []);
+    
     
     return (
         <>
@@ -37,7 +53,7 @@ const PurchaseOrderTransactions = () =>
                         Toolbar: GridToolbar,
                     }}
                     onRowClick={(params) => history.push(`/products/${params.row.id}/edit`)}
-                    rows={rows} 
+                    rows={po} 
                     columns={columns} 
                     pageSize={5} 
                     checkboxSelection 
