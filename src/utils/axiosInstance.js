@@ -24,8 +24,12 @@ export default (history = null, redirectPath = null) =>
             switch(error.response.status) 
             {
                 case 401: 
-                    alert('Unauthenticated Access, please login!')
                     Cookie.removeItem('access_token');
+
+                    if (!Cookie.has('access_token'))
+                    {
+                        history.push('/auth/login')
+                    }
                     break;
                 
                 case 403: 

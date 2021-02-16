@@ -1,6 +1,7 @@
   
 import React, { useState } from 'react';
-import loginAsync from '../../services/auth/login/login'
+import {loginAsync} from '../../services/auth/login/login'
+import {prepareSetErrorMessages} from '../../utils/errorMessages'
 import { NavLink, useHistory } from 'react-router-dom'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -39,41 +40,47 @@ const LoginForm = () =>
 
     const [credentials, setCredentials] = useState({
         email: '',
-        password: ''
+        password: '',
+        remember_me: false,
     });
-
-
-    const [rememberMe, setRememberMe] = useState(false);
+    const [errorMessages, setErrorMessages] = useState({
+        email: '',
+        password: '',
+    });
 
     
     const handleCredentialsOnChange = (e) => 
-    {
-        const {name, value} = e.target;
-        console.log(`${name} = ${value}`)
-
-        setCredentials({...credentials, [name]: value});
-    }
-
-
-    const handleOnChangeCheckbox = (e) => setRememberMe(e.target.checked)
-
+    {   
+        const {name, value, checked} = e.target;
+        if (name === 'remember_me')
+        {
+            setCredentials({...credentials, remember_me: checked})
+        }
+        else 
+        {
+            setCredentials({...credentials, [name]: value})
+        }
+    };
 
     const handleOnClickLogin = async (e) => 
     {
         e.preventDefault();
 
         const result = await loginAsync(credentials);
-        console.log(result);
+   
+        if (result.status === 'Success') 
+        {
+            Cookie.setItem('access_token', result.data.access_token);
 
-        // if (true) 
-        // {
-        //     Cookie.setItem('access_token', 'token');
-
-        //     if (Cookie.has('access_token'))
-        //     {
-        //         history.push('/');
-        //     }
-        // }
+            if (Cookie.has('access_token'))
+            {
+                history.push('/');
+            }
+        }
+        else 
+        {
+            setErrorMessages(prepareSetErrorMessages(result.errors, errorMessages));
+        }
     }
 
 
@@ -92,8 +99,8 @@ const LoginForm = () =>
                     </Typography>
                     <form className={classes.form} noValidate onSubmit={handleOnClickLogin}>
                         <TextField
-                            error={false}
-                            helperText={''}
+                            error={errorMessages.email !== ''}
+                            helperText={errorMessages.email}
                             variant="outlined"
                             margin="normal"
                             required
@@ -107,8 +114,8 @@ const LoginForm = () =>
                             onChange={handleCredentialsOnChange}
                         />
                         <TextField
-                            error={false}
-                            helperText={''}
+                            error={errorMessages.password !== ''}
+                            helperText={errorMessages.password}
                             variant="outlined"
                             margin="normal"
                             required
@@ -125,9 +132,9 @@ const LoginForm = () =>
                             control={
                                 <Checkbox 
                                     name='remember_me'
-                                    value={rememberMe} 
-                                    onChange={handleOnChangeCheckbox}
-                                    checked={rememberMe}
+                                    value={credentials.remember_me} 
+                                    onChange={handleCredentialsOnChange}
+                                    checked={credentials.remember_me}
                                     color="primary" 
                             />}
                             label="Remember me"

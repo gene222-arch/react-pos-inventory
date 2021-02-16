@@ -2,7 +2,7 @@ import axiosInstance from '../../../utils/axiosInstance'
 import * as Helpers from '../../../utils/helpers'
 
 
-const loginAsync = async (payload) => 
+export const loginAsync = async (payload) => 
 {
     try {
 
@@ -17,4 +17,14 @@ const loginAsync = async (payload) =>
 }
 
 
-export default loginAsync
+export const logoutAsync = async () => 
+{
+    try {
+
+        const result = await axiosInstance().post('/logout');
+
+        return result.data;
+    } catch (error) {
+        return error.response.data
+    }
+}

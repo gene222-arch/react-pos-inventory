@@ -1,13 +1,13 @@
   
 import React, {useState} from 'react';
 import registerAsync from '../../../services/auth/register/register'
-import { NavLink } from 'react-router-dom'
+import {prepareSetErrorMessages} from '../../../utils/errorMessages.js'
+import * as Cookie from '../../../utils/cookies'
+import { NavLink, useHistory } from 'react-router-dom'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
@@ -35,6 +35,7 @@ const Copyright = () => {
 const RegistrationForm = () => 
 {
     const classes = registrationFormUseStyles();
+    const history = useHistory();
 
     const [ credentials, setCredentials ] = useState({
         name: '',
@@ -43,23 +44,37 @@ const RegistrationForm = () =>
         password_confirmation: '',
         role: 'cashier'
     });
-    const [rememberMe, setRememberMe] = useState(false);
+    const [ errorMessages, setErrorMessages ] = useState({
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+    });
 
+    const handleCredentialsOnChange = (e) => setCredentials({...credentials, [e.target.name]: e.target.value})
 
-    const handleCredentialsOnChange = (e) => 
-    {
-        const {name, value} = e.target;
-        setCredentials({...credentials, [name]: value});
-    }
-
-    const handleOnChangeCheckbox = (e) => setRememberMe(e.target.checked);
 
 
     const handleCredentialsOnSubmit = async (e) => 
     {
         e.preventDefault();
+
         const result = await registerAsync(credentials);
-        console.log(result)
+        
+        if (result.status === 'Success')
+        {
+            Cookie.setItem('access_token', result.data.access_token);
+
+            if (Cookie.has('access_token'))
+            {
+                history.push('/');
+            }
+        }
+        else 
+        {
+            setErrorMessages(prepareSetErrorMessages(result.errors, errorMessages))
+        }
+
     }
 
 
@@ -76,8 +91,8 @@ const RegistrationForm = () =>
                     </Typography>
                     <form className={classes.form} noValidate onSubmit={handleCredentialsOnSubmit}>
                         <TextField
-                            error={false}
-                            helperText={''}
+                            error={errorMessages.name !== ''}
+                            helperText={errorMessages.name}
                             variant="outlined"
                             margin="normal"
                             
@@ -92,8 +107,8 @@ const RegistrationForm = () =>
                         />
 
                         <TextField
-                            error={false}
-                            helperText={''}
+                            error={errorMessages.email !== ''}
+                            helperText={errorMessages.email}
                             variant="outlined"
                             margin="normal"
                         
@@ -108,8 +123,8 @@ const RegistrationForm = () =>
                         />
 
                         <TextField
-                            error={false}
-                            helperText={''}
+                            error={errorMessages.password !== ''}
+                            helperText={errorMessages.password}
                             variant="outlined"
                             margin="normal"
                             
@@ -124,8 +139,8 @@ const RegistrationForm = () =>
                         />
 
                         <TextField
-                            error={false}
-                            helperText={''}
+                            error={errorMessages.password_confirmation !== ''}
+                            helperText={errorMessages.password_confirmation}
                             variant="outlined"
                             margin="normal"
                             fullWidth
@@ -136,17 +151,6 @@ const RegistrationForm = () =>
                             autoComplete="current-password"
                             value={credentials.password_confirmation}
                             onChange={handleCredentialsOnChange}
-                        />
-                        <FormControlLabel
-                            control={
-                                <Checkbox 
-                                    name='remember_me'
-                                    value={rememberMe} 
-                                    onChange={handleOnChangeCheckbox}
-                                    checked={rememberMe}
-                                    color="primary" 
-                            />}
-                            label="Remember me"
                         />
                         <Button
                             type="submit"

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import {logoutAsync} from '../../services/auth/login/login'
 import { NavLink, Redirect, useHistory } from 'react-router-dom'
 import clsx from 'clsx';
 import { useTheme } from '@material-ui/core/styles';
@@ -49,7 +50,7 @@ const MainLayout = ({children}) =>
 
 // Buttons
     const [open, setOpen] = useState(false);
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
     const openAccountMenu = Boolean(anchorEl);
     const [openReport, setOpenReport] = useState(false);
     const [openInventoryMngmt, setOpenInventoryMngmt] = useState(false);
@@ -62,21 +63,10 @@ const MainLayout = ({children}) =>
 // 
     const [auth, setAuth] = useState(true);
 
-    const handleDrawerOpen = () => {
-        setOpen(true);
-    };
-
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
-
-    const handleMenu = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+    const handleDrawerOpen = () => setOpen(true);
+    const handleDrawerClose = () =>  setOpen(false);
+    const handleMenu = (event) => setAnchorEl(event.currentTarget);
+    const handleClose = () => setAnchorEl(null);
 
     const handleOpenReportDropdown = (path) => 
     {
@@ -154,35 +144,18 @@ const MainLayout = ({children}) =>
         }
     }
 
-
-    const openDropdown = (path) => 
+    const logout = async () => 
     {
-        switch (path) {
-            case 'Report':
-                setOpenReport(true);
-                break;
-            case 'Product': 
-                setOpenProduct(true);
-                break;
-            case 'Inventory Management':
-                setOpenInventoryMngmt(true);
-                break;
-            case 'Employees':
-                setOpenEmployees(true);
-                break;
-            default:                
-                
-        }
-    }
+        const result = await logoutAsync();
 
-
-    const logout = () => 
-    {
-        Cookie.removeItem('access_token');
-
-        if (!Cookie.has('access_token'))
+        if (result.status = 'Success')
         {
-            history.push('/auth/login');
+            Cookie.removeItem('access_token');
+
+            if (!Cookie.has('access_token'))
+            {
+                history.push('/auth/login')
+            }
         }
     }
 

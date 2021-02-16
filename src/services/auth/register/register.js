@@ -12,7 +12,7 @@ const registerAsync = async(payload) =>
         return result.data;
 
     } catch (error) {
-        return error.response
+        return error.response.data
     }
 
 }
