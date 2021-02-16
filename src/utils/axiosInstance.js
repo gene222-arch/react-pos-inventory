@@ -16,25 +16,27 @@ export default (history = null, redirectPath = null) =>
         headers
     });
 
-    axiosInstance.interceptors.response.use((response) => {
-        return response
-      },
-        (error) => 
-        {
-            if (error.response.status === 401 || error.response.status === 403)
+    axiosInstance.interceptors.response.use(
+        (response) => {
+            return Promise.resolve(response)
+        },
+        (error) => {
+            switch(error.response.status) 
             {
-                Cookie.removeItem('access_token');
-  
-                if (!Cookie.has('access_token'))
-                {
-                    if (redirectPath !== null)
-                    {
-                        history.push(redirectPath)
-                    }
-
-                    history.push('/auth/login')
-                }
-            }
+                case 401: 
+                    alert('Unauthenticated Access, please login!')
+                    Cookie.removeItem('access_token');
+                    break;
+                
+                case 403: 
+                    alert('Forbidden Access!');
+                    break;
+                
+                case 500: 
+                    alert('Something went wrong')
+                    console.log(error.response.data)
+                    break;
+            }           
 
             return Promise.reject(error);
         }
