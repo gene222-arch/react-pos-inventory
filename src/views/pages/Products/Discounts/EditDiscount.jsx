@@ -1,30 +1,77 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
+import Loading from '../../../../components/Loading'
+import * as Discount_ from '../../../../services/products/discounts'
 import { useHistory } from 'react-router-dom'
 import { 
-    FormHelperText , 
     Card, 
     CardContent, 
     Grid, 
     TextField, 
     Button, 
-    InputLabel, 
-    Avatar, 
     CardHeader,
-    Divider, IconButton
     } from '@material-ui/core';
 import LoyaltyIcon from '@material-ui/icons/Loyalty';
 import { createDiscountUseStyles } from '../../../../assets/material-styles/styles'
-import { MoreVert as MoreVertIcon } from '@material-ui/icons'
 
 
 const CreateDiscount = ({match}) => 
 {
     const classes = createDiscountUseStyles();
     const history = useHistory();
+    const [loading, setLoading] = useState(true);
 
     const {discountId} = match.params; 
 
-    return (
+    const [discount, setDiscount] = useState({
+        discount_id: discountId,
+        name: '',
+        percentage: ''    
+    });
+
+    
+    const handleOnChangeDiscount = (e) => setDiscount({...discount, [e.target.name]: e.target.value});
+
+
+    const fetchDiscount = async () => 
+    {
+        const result = await Discount_.fetchAsync({discount_id: discountId});
+
+        if (result.status === 'Success')
+        {
+            const {name, percentage} = result.data;
+
+            setDiscount({
+                ...discount, 
+                name: name,
+                percentage: percentage
+            });
+            setLoading(false)
+        }
+    }
+
+    const editDiscount = async () => 
+    {
+        setLoading(true);
+        const result = await Discount_.updateAsync(discount);
+
+        if (result.status === 'Success')
+        {
+            history.push('/products/discounts')
+        }
+    }
+
+
+    useEffect(() => {
+        fetchDiscount();
+
+        return () => {
+            setDiscount({});
+        };
+    }, []);
+
+    return loading 
+        ? <Loading />
+        : (
         <>
             <Card className={classes.createDiscountCard}>
                 <Grid container justify='center'>
@@ -34,21 +81,30 @@ const CreateDiscount = ({match}) =>
                                 <LoyaltyIcon className={classes.discountIcon}
                                 />
                             }
-                            title={`Discount id #${discountId}`}
                         />
                     </Grid>
                 </Grid>
                 <CardContent>
-                    <TextField
-                        id=""
-                        label="Name"
-                        fullWidth
-                    />
-                    <TextField
-                        id=""
-                        label="Percent Value"
-                        fullWidth
-                    />
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <TextField
+                                name="name"
+                                label="Name"
+                                fullWidth
+                                value={discount.name}
+                                onChange={handleOnChangeDiscount}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <TextField
+                                name="percentage"
+                                label="%"
+                                fullWidth
+                                value={discount.percentage}
+                                onChange={handleOnChangeDiscount}
+                            />
+                        </Grid>
+                    </Grid>
                 </CardContent>
                 <Grid container justify='flex-end' className={classes.btnContainer}>
                     <Grid item>
@@ -62,8 +118,13 @@ const CreateDiscount = ({match}) =>
                         </Button>
                     </Grid>
                     <Grid item>
-                        <Button variant='contained' color="default" className={classes.addBtn}>
-                            Create
+                        <Button 
+                            variant='contained' 
+                            color="default" 
+                            className={classes.addBtn}
+                            onClick={editDiscount}
+                        >
+                            Update
                         </Button>
                     </Grid>
                 </Grid>

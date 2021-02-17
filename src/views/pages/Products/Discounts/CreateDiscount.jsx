@@ -1,4 +1,6 @@
-import React from 'react'
+import React, {useState} from 'react'
+import * as Discount_ from '../../../../services/products/discounts'
+import Loading from '../../../../components/Loading'
 import { useHistory } from 'react-router-dom'
 import { 
     FormHelperText , 
@@ -20,9 +22,36 @@ const CreateDiscount = () =>
 {
     const classes = createDiscountUseStyles();
     const history = useHistory();
+    const [loading, setLoading] = useState(false);
 
-    return (
-        <>
+    const [discount, setDiscount] = useState({
+        name: '',
+        percentage: '',
+    });
+
+
+    const handleOnChangeDiscount = (e) => setDiscount({...discount, [e.target.name]: e.target.value});
+
+    const createDiscount = async () => 
+    {
+        setLoading(true);
+        const result = await Discount_.storeAsync(discount);
+
+        if (result.status === 'Success')
+        {
+            history.push('/products/discounts');
+        }
+        else 
+        {
+            setLoading(false);
+        }
+    }
+
+
+    return loading 
+        ? <Loading />
+        : (
+            <>
             <Card className={classes.createDiscountCard}>
                 <Grid container justify='center'>
                     <Grid item>
@@ -34,16 +63,26 @@ const CreateDiscount = () =>
                     </Grid>
                 </Grid>
                 <CardContent>
-                    <TextField
-                        id=""
-                        label="Name"
-                        fullWidth
-                    />
-                    <TextField
-                        id=""
-                        label="Percent Value"
-                        fullWidth
-                    />
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <TextField
+                                name="name"
+                                label="Name"
+                                fullWidth
+                                value={discount.name}
+                                onChange={handleOnChangeDiscount}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <TextField
+                                name="percentage"
+                                label="%"
+                                fullWidth
+                                value={discount.percentage}
+                                onChange={handleOnChangeDiscount}
+                            />
+                        </Grid>
+                    </Grid>
                 </CardContent>
                 <Grid container justify='flex-end' className={classes.btnContainer}>
                     <Grid item>
@@ -57,7 +96,12 @@ const CreateDiscount = () =>
                         </Button>
                     </Grid>
                     <Grid item>
-                        <Button variant='contained' color="default" className={classes.addBtn}>
+                        <Button 
+                            variant='contained' 
+                            color="default" 
+                            className={classes.addBtn}
+                            onClick={createDiscount}
+                        >
                             Create
                         </Button>
                     </Grid>

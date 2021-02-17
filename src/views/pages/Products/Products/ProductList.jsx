@@ -7,7 +7,7 @@ import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 
@@ -18,7 +18,7 @@ const ProductList = () =>
     const history = useHistory();
 
     const [open, setOpen] = useState(false);
-    const [rows, setRows] = useState([]);
+    const [products, setProducts] = useState([]);
     const [rowIds, setRowIds] = useState([]);
 
     const columns = [
@@ -57,7 +57,7 @@ const ProductList = () =>
 
         if (result.status = 'Success')
         {
-            setRows(result.data);
+            setProducts(result.data);
         }
     }
 
@@ -65,7 +65,18 @@ const ProductList = () =>
     {
         const result = await Product_.destroyAsync({product_ids: rowIds});
 
-        console.log(result)
+        if (result.status === 'Success')
+        {
+            let _products = [...products];
+
+            rowIds.forEach(rowId => {
+                _products = _products.filter(product => product.id !== parseInt(rowId) )
+            });
+
+            setProducts(_products);
+            setOpen(false);
+            setRowIds([]);
+        }
     }
 
     const handleExcelExport = async () => 
@@ -82,7 +93,7 @@ const ProductList = () =>
         fetchProducts();
 
         return () => {
-            setRows([]);
+            setProducts([]);
         };
     }, []);
 
@@ -106,7 +117,7 @@ const ProductList = () =>
                                         variant="contained"
                                         color='primary' 
                                         className={classes.addBtn}
-                                        startIcon={<PersonAddIcon />}
+                                        startIcon={<AddIcon />}
                                         onClick={() => history.push('/create-product')}
                                     >
                                         Add Product
@@ -151,7 +162,7 @@ const ProductList = () =>
                         Toolbar: GridToolbar,
                     }}
                     autoHeight
-                    rows={rows} 
+                    rows={products} 
                     columns={columns} 
                     pageSize={5}
                     rowsPerPageOptions={[5, 10, 20]}

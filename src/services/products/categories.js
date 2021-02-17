@@ -20,7 +20,8 @@ export const fetchAsync = async (payload) =>
 {
     try {
         
-        const result = await axiosInstance().post('/categories', Helpers.prepareToFormData(payload));
+        const result = await axiosInstance()
+            .post('/categories/details', Helpers.prepareToFormData(payload));
 
         return result.data;
 
@@ -64,7 +65,9 @@ export const destroyAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .delete('/categories', Helpers.prepareToFormData(payload));
+            .delete('/categories', {
+                data: payload
+            });
 
         return result.data;
 
