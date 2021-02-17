@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import * as Dashboard_ from '../../../services/dashboard/dashboard'
 import Highcharts from 'highcharts'
 import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsReact from 'highcharts-react-official'
@@ -24,6 +25,7 @@ const Dashboard = () =>
     const classes = dashboardUseStyles();
     const [ salesType, setSalesType ] = useState('Monthly');
     const [componentKey, setComponentKey] = useState((new Date()).toISOString());
+    const [dashboardData, setDashboardData] = useState([]);
 
     const salesChartOptions = {
         chart: {
@@ -62,11 +64,28 @@ const Dashboard = () =>
         }]
     };
     
+
+    const fetchDashboardData = async () => 
+    {
+        const result = await Dashboard_.fetchAllAsync();
+
+        if (result.status === 'Success')
+        {
+            setDashboardData(result.data);
+        }
+        console.log(result);
+    }
+
+
     useEffect(() => {
+        fetchDashboardData();
         window.addEventListener('resize', () => {
             setComponentKey((new Date()).toISOString());
         });
+
+        return () => fetchDashboardData();
     }, []);
+
 
     return (    
         <div className={classes.root}> 

@@ -86,19 +86,43 @@ const EditProduct = ({match}) =>
     {
         e.preventDefault();
 
-        delete product.stock
+        const result = await Product.updateAsync(validatedData());
+        
+        if (result.status === 'Success')
+        {
+            history.push('/products');
+        }
+    }
 
-        const data = {
+
+    const validatedData = () => 
+    {
+        return {
             product: {
                 product_id: productId,
-                data: product
+                data: {
+                    sku: product.sku,
+                    barcode: product.barcode,
+                    name: product.name,
+                    category: product.category,
+                    sold_by: product.sold_by,
+                    price: product.price,
+                    cost: product.cost,
+                }
             },
             stock: {
-                data: stock
+                data: {
+                    supplier_id: stock.supplier_id,
+                    in_stock: stock.in_stock,
+                    stock_in: stock.stock_in,
+                    stock_out: stock.stock_out,
+                    minimum_reorder_level: stock.minimum_reorder_level,
+                    default_purchase_costs: stock.default_purchase_costs,
+                }
             }
-        }
-
+        };
     }
+
 
     useEffect(() => 
     {
@@ -107,9 +131,10 @@ const EditProduct = ({match}) =>
         fetchSuppliers();
 
         return () => {
-            fetchProduct();
-            fetchCategories();
-            fetchSuppliers();
+            setProduct('');
+            setCategories('');
+            setSuppliers('');
+            setStock('');
         }
     }, []);
    

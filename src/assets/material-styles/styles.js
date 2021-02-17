@@ -369,6 +369,11 @@ export const dataGridUseStyles = makeStyles((theme) => ({
             backgroundColor: '#dc3545'
         }
     },
+    deleteBtn: {
+        '&:hover':{
+            color: red[400]
+        }
+    },
     btn: {
         margin: theme.spacing(1),
     },

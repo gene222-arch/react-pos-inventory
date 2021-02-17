@@ -1,5 +1,10 @@
-import React, { useState } from 'react';
-import { NavLink, useHistory } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
+import Loading from '../../../../components/Loading'
+import * as Product from '../../../../services/products/products'
+import * as Categories from '../../../../services/products/categories'
+import * as Suppliers from '../../../../services/inventory-management/suppliers'
+import { useHistory } from 'react-router-dom'
 import { createProductUseStyles } from '../../../../assets/material-styles/styles'
 import { 
     FormHelperText , 
@@ -8,11 +13,9 @@ import {
     Grid, TextField, 
     Button, 
     InputLabel, 
-    Avatar, 
     CardHeader,
-    Divider
     } from '@material-ui/core';
-import Select from '@material-ui/core/Select';
+import {Select} from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import Radio from '@material-ui/core/Radio';
@@ -20,26 +23,94 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import productDefaultImg from '../../../../assets/storage/images/default_img/product_default_img.svg'
 
 
-const CreateProduct = () => 
+const EditProduct = () => 
 {
     const classes = createProductUseStyles();
     const history = useHistory();
-    const [soldBy, setSoldBy] = React.useState('');
+
+
+    const [product, setProduct] = useState({
+        sku: '',
+        barcode: '',
+        name: '',
+        category: '',
+        sold_by: '',
+        price: '',
+        cost: '',
+    });
+    const [categories, setCategories] = useState([]);
+    const [suppliers, setSuppliers] = useState([]);
+    const [stock, setStock] = useState({
+        supplier_id: '',
+        in_stock: '',
+        minimum_reorder_level: '',
+        default_purchase_costs: '',
+    });
+
+
     const [isForSale, setIsForSale] = React.useState(false);
 
-    const handleForSaleChange = (event) => {
-      setIsForSale(event.target.checked);
-    };
-    const handleChange = (event) => {
-      setSoldBy(event.target.value);
-    };
+    const fetchCategories = async () => 
+    {
+        const result = await Categories.fetchAllAsync();
+
+        if (result.status === 'Success')
+        {
+            setCategories(result.data);
+        }
+    }
+    
+    const fetchSuppliers= async () => 
+    {
+        const result = await Suppliers.fetchAllAsync();
+
+        if (result.status === 'Success')
+        {
+            setSuppliers(result.data);
+        }
+    }
+
+    const handleForSaleChange = (event) => setIsForSale(event.target.checked);
+
+    const handleOnChangeProduct = (e) => setProduct({...product, [e.target.name]: e.target.value});
+    const handleOnChangeStock = (e) =>  setStock({...stock, [e.target.name]: e.target.value});
+
+    const handleOnSubmit = async (e) => 
+    {
+        e.preventDefault();
+
+        const data = {
+            product: product,
+            stock: stock
+        };
+
+        const result = await Product.storeAsync(data);
+        
+        if (result.status === 'Success')
+        {
+            history.push('/products');
+        }
+    }
+
+
+    useEffect(() => 
+    {
+        fetchCategories();
+        fetchSuppliers();
+
+        return () => {
+            setProduct('');
+            setCategories('');
+            setSuppliers('');
+            setStock('');
+        }
+    }, []);
    
     return (
         <>
@@ -50,14 +121,15 @@ const CreateProduct = () =>
                     }
                     titleTypographyProps={{variant:'h4' }}
                     title="Product"
-                    subheader=""
                 />
                 <CardContent>
                     <Grid container spacing={3} justify='space-between'>
                         <Grid item xs={12} sm={12} md={5} lg={5}>
                             <TextField
-                                id=""
+                                name='name'
                                 label="Name"
+                                value={product.name}
+                                onChange={handleOnChangeProduct}
                                 fullWidth
                             />
                         </Grid>
@@ -65,15 +137,24 @@ const CreateProduct = () =>
                             <FormControl className={classes.formControl}>
                                 <InputLabel id="demo-simple-select-label">Category</InputLabel>
                                 <Select
+                                    name='category'
                                     displayEmpty
                                     className={classes.selectEmpty}
                                     inputProps={{ 'aria-label': 'Without label' }}
                                     fullWidth
+                                    value={product.category}
+                                    onChange={handleOnChangeProduct}
                                 >
-                                    <MenuItem value="">Supplier</MenuItem>
-                                    <MenuItem value={10}>Robots</MenuItem>
-                                    <MenuItem value={20}>MOA</MenuItem>
-                                    <MenuItem value={30}>CCC</MenuItem>
+                                    {
+                                        categories.map((category) => (
+                                            <MenuItem 
+                                                key={category.id}
+                                                value={category.id}
+                                            >{category.name}
+                                            </MenuItem>
+                                        ))
+                                    }
+                                
                                 </Select>
                             </FormControl>
                         </Grid>
@@ -91,13 +172,26 @@ const CreateProduct = () =>
                         <Grid item xs={12} sm={12} md={10} lg={10}>
                             <FormControl component="fieldset">
                                 <FormLabel component="legend">Sold by</FormLabel>
-                                <RadioGroup aria-label="gender" name="gender1" value={soldBy} onChange={handleChange}>
+                                <RadioGroup 
+                                    aria-label="gender" 
+                                    name="sold_by" 
+                                    value={product.sold_by} 
+                                    onChange={handleOnChangeProduct}
+                                >
                                     <Grid container spacing={1}>
                                         <Grid item>
-                                            <FormControlLabel value="Each" control={<Radio />} label="Each" />
+                                            <FormControlLabel 
+                                                value="each" 
+                                                control={<Radio />} 
+                                                label="Each" 
+                                            />
                                         </Grid>
                                         <Grid item>
-                                            <FormControlLabel value="Volume/Weight" control={<Radio />} label="Volume or Weight" />
+                                            <FormControlLabel 
+                                                value="volume/weight" 
+                                                control={<Radio />} 
+                                                label="Volume or Weight" 
+                                            />
                                         </Grid>
                                     </Grid>
                                 </RadioGroup>
@@ -107,15 +201,21 @@ const CreateProduct = () =>
                     <Grid container spacing={3} justify='space-between'>
                         <Grid item xs={12} sm={12} md={5} lg={5}>
                             <TextField
-                                id=""
+                                
+                                name='price'
                                 label="Price"
+                                value={product.price}
+                                onChange={handleOnChangeProduct}
                                 fullWidth
                             />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6} lg={6}>
                             <TextField
-                                id=""
+                                
+                                name='cost'
                                 label="Cost"
+                                value={product.cost}
+                                onChange={handleOnChangeProduct}
                                 fullWidth
                             />
                         </Grid>
@@ -123,16 +223,22 @@ const CreateProduct = () =>
                     <Grid container spacing={3} justify='space-between'>
                         <Grid item xs={12} sm={12} md={5} lg={5}>
                             <TextField
-                                id=""
+                                
+                                name='sku'
                                 label="SKU"
                                 fullWidth
+                                value={product.sku}
+                                onChange={handleOnChangeProduct}
                             />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6} lg={6}>
                             <TextField
-                                id=""
+                                
+                                name='barcode'
                                 label="Barcode"
                                 fullWidth
+                                value={product.barcode}
+                                onChange={handleOnChangeProduct}
                             />
                         </Grid>
                     </Grid>
@@ -150,16 +256,20 @@ const CreateProduct = () =>
                 />
                 <CardContent>
                     <Grid container spacing={3} justify='space-between'>
-                        <Grid item xs={12} sm={12} md={5} lg={5}>
+                        <Grid item xs={12} sm={12} md={6} lg={6}>
                             <TextField
-                                id=""
+                                name='in_stock'
+                                value={stock.in_stock}
+                                onChange={handleOnChangeStock}
                                 label="In stock"
                                 fullWidth
                             />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6} lg={6}>
                             <TextField
-                                id=""
+                                name='minimum_reorder_level'
+                                value={stock.minimum_reorder_level}
+                                onChange={handleOnChangeStock}
                                 label="Low stock"
                                 fullWidth
                             />
@@ -167,16 +277,37 @@ const CreateProduct = () =>
                         </Grid>
                     </Grid>
                     <Grid container spacing={3} justify='space-between'>
-                        <Grid item xs={12} sm={12} md={5} lg={5}>
-                            <TextField
-                                id=""
-                                label="Primary supplier"
-                                fullWidth
-                            />
+                        <Grid item xs={12} sm={12} md={6} lg={6}>
+                            <FormControl className={classes.formControl}>
+                                <InputLabel id="demo-simple-select-label">Supplier</InputLabel>
+                                <Select
+                                    name='supplier_id'
+                                    displayEmpty
+                                    className={classes.selectEmpty}
+                                    inputProps={{ 'aria-label': 'Without label' }}
+                                    fullWidth
+                                    value={stock.supplier_id}
+                                    onChange={handleOnChangeStock}
+                                >
+                                    {
+                                        suppliers.map((supplier) => (
+                                            <MenuItem 
+                                                key={supplier.id}
+                                                value={supplier.id}
+                                            >
+                                                {supplier.name}
+                                            </MenuItem>
+                                        ))
+                                    }
+                                
+                                </Select>
+                            </FormControl>
                         </Grid>
                         <Grid item xs={12} sm={12} md={6} lg={6}>
                             <TextField
-                                id=""
+                                name='default_purchase_costs'
+                                value={stock.default_purchase_costs}
+                                onChange={handleOnChangeStock}
                                 label="Default purchase cost"
                                 fullWidth
                             />
@@ -218,7 +349,6 @@ const CreateProduct = () =>
                     </Grid>
                 </CardContent>
             </Card>  
-
             <Grid container justify='flex-end' className={classes.btnContainer}>
                 <Grid item>
                     <Button 
@@ -231,8 +361,13 @@ const CreateProduct = () =>
                     </Button>
                 </Grid>
                 <Grid item>
-                    <Button variant='contained' color="default" className={classes.addBtn}>
-                        Create
+                    <Button 
+                        variant='contained' 
+                        color="default" 
+                        className={classes.addBtn}
+                        onClick={handleOnSubmit}
+                    >
+                        Save
                     </Button>
                 </Grid>
             </Grid>
@@ -240,4 +375,4 @@ const CreateProduct = () =>
     );
 }
 
-export default CreateProduct
+export default EditProduct

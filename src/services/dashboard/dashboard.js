@@ -1,7 +1,7 @@
 import axiosInstance from '../../utils/axiosInstance'
 
 
-export const fetchGeneralAnalytics = async () => 
+export const fetchAllAsync = async () => 
 {
     try {
         const result = await axiosInstance().get('/reports/general');

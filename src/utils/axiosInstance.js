@@ -38,7 +38,6 @@ export default (history = null, redirectPath = null) =>
                 
                 case 500: 
                     alert('Something went wrong')
-                    console.log(error.response.data)
                     break;
             }           
 

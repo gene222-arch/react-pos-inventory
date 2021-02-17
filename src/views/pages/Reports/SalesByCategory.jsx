@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import * as SalesByCategory_ from '../../../services/reports/salesByCategory'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent } from '@material-ui/core'
 import { Button } from '@material-ui/core'
@@ -10,30 +11,42 @@ import * as DateHelper from '../../../utils/dates'
 
 const SalesByCategory = () => 
 {
-    const [purchaseOrderDate, setPurchaseOrderDate] = useState(DateHelper.currentDate);
-    const [expectedDate, setExpectedDate] = useState(DateHelper.currentDate);
+    const [startDate, setStartDate] = useState(DateHelper.currentDate);
+    const [endDate, setEndDate] = useState(DateHelper.currentDate);
+
+    const [salesByCategory, setSalesByCategory] = useState([]);
 
     const columns = [
-        { field: 'item', headerName: 'Item', width: 320 },
+        { field: 'id', hide: true },
+        { field: 'category', headerName: 'Category', width: 320 },
         { field: 'items_sold', headerName: 'Items sold', width: 217 },
-        { field: 'net_sales', headerName: 'Net sales', width: 217 },
-        { field: 'cost_of_goods', headerName: 'Cost of goods', width: 217 },
+        { field: 'sales', headerName: 'Sales', width: 217 },
+        { field: 'cost_of_goods_sold', headerName: 'Cost of goods sold', width: 217 },
         { field: 'gross_profit', headerName: 'Gross profit', width: 217 },
+        { field: 'net_sales', headerName: 'Net sales', width: 217 },
     ];
 
-    const rows = [
-    { id: 1, item: 'Snow', items_sold: 10, net_sales: 200.50, cost_of_goods: 150.00, gross_profit: 50.50},
-    { id: 2, item: 'Nike', items_sold: 10, net_sales: 200.50, cost_of_goods: 150.00, gross_profit: 50.50},
-    { id: 3, item: 'Adidas', items_sold: 10, net_sales: 200.50, cost_of_goods: 150.00, gross_profit: 50.50},
-    ];
+    const handleStartDate = (dataParam) => setStartDate(dataParam);
+    const handleEndDate = (dataParam) => setEndDate(dataParam);
 
-     const handlePurchaseOrderDate = (date) => {
-        setPurchaseOrderDate(date);
-    };
+    const fetchSalesByCategory = async () => 
+    {
+        const result = await SalesByCategory_.fetchAllAsync({
+            startDate,
+            endDate
+        });
 
-    const handleExpectedDate = (date) => {
-        setExpectedDate(date);
-    };
+        if (result.status === 'Success')
+        {
+            console.log(result)
+        }
+    }
+
+
+    useEffect(() => {
+        fetchSalesByCategory();
+        return () => fetchSalesByCategory();
+    }, []);
 
     return (
         <>
@@ -52,8 +65,8 @@ const SalesByCategory = () =>
                                                     id="From"
                                                     label="From"
                                                     format="MM/dd/yyyy"
-                                                    value={purchaseOrderDate}
-                                                    onChange={handlePurchaseOrderDate}
+                                                    value={startDate}
+                                                    onChange={handleStartDate}
                                                     KeyboardButtonProps={{
                                                         'aria-label': 'change date',
                                                     }}
@@ -66,15 +79,15 @@ const SalesByCategory = () =>
                                                     id="to"
                                                     label="To"
                                                     format="MM/dd/yyyy"
-                                                    value={expectedDate}
-                                                    onChange={handleExpectedDate}
+                                                    value={endDate}
+                                                    onChange={handleEndDate}
                                                     KeyboardButtonProps={{
                                                         'aria-label': 'change date',
                                                     }}
                                                 />
                                             </Grid>
                                             <Grid item xs={12} sm={4} md={3} lg={3}>
-                                                <Button variant="contained" color="primary">
+                                                <Button variant="contained" color="primary" onClick={fetchSalesByCategory}>
                                                     Apply
                                                 </Button>
                                             </Grid>
@@ -94,7 +107,7 @@ const SalesByCategory = () =>
                             components={{
                                 Toolbar: GridToolbar,
                             }}
-                            rows={rows} 
+                            rows={salesByCategory} 
                             columns={columns} 
                             pageSize={5} 
                         />
