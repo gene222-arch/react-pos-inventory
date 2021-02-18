@@ -3,7 +3,7 @@ import * as Helpers from '../../utils/helpers'
 
 
 
-export const fetchSalesByEmployee= async (payload = null) => 
+export const fetchReports = async (payload = null) => 
 {
     try {
         const result = await axiosInstance()

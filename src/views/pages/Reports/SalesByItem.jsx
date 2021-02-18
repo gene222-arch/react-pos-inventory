@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
+import {CURRENCY} from '../../../config/currency'
+import Loading from '../../../components/Loading'
 import * as SalesByItem_ from '../../../services/reports/salesByItem'
-import * as TopFiveSalesByItem_ from '../../../services/reports/topFiveSalesByItem'
 import Highcharts from 'highcharts'
 import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsReact from 'highcharts-react-official'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
-import { Card, CardContent } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core'
-import { yellow } from '@material-ui/core/colors'
-import { List, ListItem, ListItemText, Avatar, CardHeader, IconButton, Button } from '@material-ui/core'
+import { Card, CardContent, ListItemSecondaryAction } from '@material-ui/core'
+import { List, ListItem, ListItemText, Avatar, CardHeader, Button, Typography, TextField } from '@material-ui/core'
+import {Select, FormControl, Divider, InputLabel, MenuItem} from '@material-ui/core';
 import Grid from '@material-ui/core/Grid'
 import StarIcon from '@material-ui/icons/Star';
 import DateFnsUtils from '@date-io/date-fns';
@@ -21,29 +21,34 @@ HighchartsExporting(Highcharts)
 const SalesByItem = () => 
 {
     const classes = salesByUseStyles();
-    const [ salesType, setSalesType ] = useState('Monthly');
+    const [loading, setLoading] = useState(true);
     const [componentKey, setComponentKey] = useState((new Date()).toISOString());
+    const [chartType, setChartType] = useState('line')
 
-    const [purchaseOrderDate, setPurchaseOrderDate] = useState(DateHelper.currentDate);
-    const [expectedDate, setExpectedDate] = useState(DateHelper.currentDate);
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+    const [salesByItem, setSalesByItem] = useState({
+        tableData: [],
+        chartData: []
+    });
+    const [chartXLabel, setChartXLabel] = useState([]);
 
     const columns = [
-        { field: 'item', headerName: 'Item', width: 270 },
-        { field: 'category', headerName: 'Category', width: 222 },
+        { field: 'id', hide: true },
+        { field: 'product_description', headerName: 'Item', width: 270 },
+        { field: 'category', headerName: 'Category', width: 270 },
         { field: 'items_sold', headerName: 'Items sold', width: 170 },
+        { field: 'sales', headerName: 'Sales', width: 170 },
         { field: 'net_sales', headerName: 'Net sales', width: 170 },
-        { field: 'cost_of_goods', headerName: 'Cost of goods', width: 170 },
-        { field: 'gross_profit', headerName: 'Gross profit', width: 170 },
-    ];
-
-    const rows = [
-    { id: 1, item: 'Snow', category: 'Bag', items_sold: 10, net_sales: 200.50, cost_of_goods: 150.00, gross_profit: 50.50},
-    { id: 2, item: 'Nike', category: 'Shoes', items_sold: 10, net_sales: 200.50, cost_of_goods: 150.00, gross_profit: 50.50},
-    { id: 3, item: 'Adidas', category: 'Shoes', items_sold: 10, net_sales: 200.50, cost_of_goods: 150.00, gross_profit: 50.50},
+        { field: 'cost_of_goods_sold', headerName: 'Cost of goods sold', width: 200 },
+        { field: 'gross_profit', headerName: 'Gross profit', width: 170,
+            valueFormatter: params => params.value.toFixed(2)
+        },
     ];
 
     const salesByItemChartOptions = {
         chart: {
+            type: chartType,
             style: {
                 fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
             }
@@ -64,7 +69,7 @@ const SalesByItem = () =>
             }]  
         },
         title: {
-            text: `${salesType} Sales`
+            text: `Sales`
         },
         yAxis: {
             title: {
@@ -72,71 +77,183 @@ const SalesByItem = () =>
             }
         },
         xAxis: {
-            categories: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+            categories: chartXLabel
+        },
+        tooltip: {
+            formatter: function() {
+                return `Sales in <strong>${this.x}:</strong> ${CURRENCY}${this.y}`
+            }
         },
         series: [{
-            data: [100, 200, 300, 400, 500, 600, 100, 200, 300, 400, 500, 600]
-        }]
+            name: 'Sales',
+            data: salesByItem.chartData
+        }],
+        responsive: {
+            rules: [{
+                condition: {
+                    maxWidth: 500
+                },
+                chartOptions: {
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'center',
+                        verticalAlign: 'bottom'
+                    }
+                }
+            }]
+        }
     };
 
-     const handlePurchaseOrderDate = (date) => {
-        setPurchaseOrderDate(date);
-    };
+    const handleStartDate = (date) => setStartDate(DateHelper.prepareExtractCurDate(date));
+    const handleEndDate = (date) => setEndDate(DateHelper.prepareExtractCurDate(date));
+    const handleRemoveDate = () => {
+        setStartDate(null);
+        setEndDate(null);
+        fetchSalesByItemReports();
+    }
 
-    const handleExpectedDate = (date) => {
-        setExpectedDate(date);
-    };
+    const fetchSalesByItemReports = async () => 
+    {
+        const result = await SalesByItem_.fetchReports();
+
+        console.log(result);
+        if (result.status === 'Success')
+        {
+            setSalesByItem(result.data);
+            handleChartXLabel(result.data);
+            setLoading(false);
+        }
+    }   
 
 
-    useEffect(() => {
+    const fetchSalesByItemReportsWithDate = async () => 
+    {
+        const result = await SalesByItem_.fetchReports({
+            startDate: startDate,
+            endDate: endDate
+        });
+
+        console.log(result);
+        if (result.status === 'Success')
+        {
+            setSalesByItem(result.data);
+            handleChartXLabel(result.data);
+            setLoading(false);
+        }
+    }   
+
+
+    const handleChartXLabel = (data) => 
+    {
+        const xAxis = [];
+        data.tableData.map(item => {
+            xAxis.push(item.product_description)
+        })
+
+        setChartXLabel(xAxis);
+    }
+
+
+    useEffect(() => 
+    {
+        fetchSalesByItemReports();
+
         window.addEventListener('resize', () => {
             setComponentKey((new Date()).toISOString());
         });
+
+        return () => {
+            setSalesByItem([]);
+            setChartXLabel([]);
+        }
     }, []);
 
     
-    return (
+    return loading 
+        ? <Loading />
+        : (
         <>
             <Grid container spacing={1}>
                 <Grid item xs={12} sm={12} md={12} lg={12}>
                     <Card>
                         <CardContent>
                             <Grid container spacing={1}>
-                            <Grid item xs={12} sm={12} md={10} lg={10}>
+                            <Grid item xs={12} sm={12} md={12} lg={12}>
                                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                         <Grid container spacing={1} justify='flex-start' alignItems='center'>
-                                            <Grid item xs={12} sm={5} md={4} lg={4}>
+                                            <Grid item xs={12} sm={5} md={4} lg={3}>
                                                 <KeyboardDatePicker
                                                     fullWidth
                                                     margin="normal"
                                                     id="From"
                                                     label="From"
                                                     format="MM/dd/yyyy"
-                                                    value={purchaseOrderDate}
-                                                    onChange={handlePurchaseOrderDate}
+                                                    value={startDate}
+                                                    onChange={handleStartDate}
                                                     KeyboardButtonProps={{
                                                         'aria-label': 'change date',
                                                     }}
                                                 />
                                             </Grid>
-                                            <Grid item xs={12} sm={5} md={4} lg={4}>
+                                            <Grid item xs={12} sm={5} md={4} lg={3}>
                                                 <KeyboardDatePicker
                                                     fullWidth
                                                     margin="normal"
                                                     id="to"
                                                     label="To"
                                                     format="MM/dd/yyyy"
-                                                    value={expectedDate}
-                                                    onChange={handleExpectedDate}
+                                                    value={endDate}
+                                                    onChange={handleEndDate}
                                                     KeyboardButtonProps={{
                                                         'aria-label': 'change date',
                                                     }}
                                                 />
                                             </Grid>
-                                            <Grid item xs={12} sm={4} md={3} lg={3}>
-                                                <Button variant="contained" color="primary">
+                                            <Grid item>
+                                                <Button 
+                                                    variant="contained" 
+                                                    color="primary"
+                                                    onClick={fetchSalesByItemReportsWithDate}
+                                                >
                                                     Apply
                                                 </Button>
+                                            </Grid>
+                                            {
+                                                (startDate !== null || endDate !== null) && (
+                                                    <Grid item>
+                                                        <Button 
+                                                            variant='contained'
+                                                            className={classes.resetDateBtn}
+                                                            onClick={handleRemoveDate}>
+                                                            Reset
+                                                        </Button>
+                                                    </Grid>
+                                                )
+                                            }
+                                            <Grid item xs={12} sm={4} md={3} lg={3} className={classes.gridFlexGrow}>
+                                                <FormControl className={classes.formControl}>
+                                                    <InputLabel id="demo-simple-select-label">Type</InputLabel>
+                                                    <Select
+                                                        name='supplier_id'
+                                                        displayEmpty
+                                                        inputProps={{ 'aria-label': 'Without label' }}
+                                                        fullWidth
+                                                        value={chartType}
+                                                        onChange={(e) => setChartType(e.target.value)}
+                                                    >
+                                                        {
+                                                            ['line', 'column', 'bar'].map((type, index) => (
+                                                                <MenuItem 
+                                                                    key={index}
+                                                                    value={type}
+                                                                >
+                                                                    {type}
+                                                                </MenuItem>
+                                                            ))
+                                                        }
+                                                    
+                                                    </Select>
+                                                </FormControl>
                                             </Grid>
                                         </Grid>
                                     </MuiPickersUtilsProvider>
@@ -156,7 +273,7 @@ const SalesByItem = () =>
                                             <StarIcon className={classes.topFiveItemIcon}/>
                                         </Avatar>
                                     }
-                                    title="Top 5 items"
+                                    title="Top 5 item's net sales"
                                     subheader=''
                                     titleTypographyProps={{ 
                                         variant: 'h5'
@@ -165,13 +282,20 @@ const SalesByItem = () =>
                                 <CardContent>
                                     <Grid item>
                                         <List>
-                                            {[
-                                                'Banana', 'Apple', 'Orange', 'Kiwi', 'Strawberry'
-                                            ].map((fruit, index) => (
-                                                <ListItem key={index}>
-                                                    <ListItemText primary="Photos" secondary="Jan 9, 2014" />
-                                                </ListItem>
-                                            ))}
+                                            {
+                                                salesByItem.tableData.map((item, index) => (
+                                                    <ListItem key={index}>
+                                                        <ListItemText 
+                                                            primary={`${item.product_description}`}
+                                                        />
+                                                        <ListItemSecondaryAction>
+                                                            <Typography variant="h5" color="initial">
+                                                                {`${CURRENCY}${item.net_sales}`}
+                                                            </Typography>
+                                                        </ListItemSecondaryAction>
+                                                    </ListItem>
+                                                ))
+                                            }
                                         </List>
                                     </Grid>
                                 </CardContent>    
@@ -201,9 +325,11 @@ const SalesByItem = () =>
                             components={{
                                 Toolbar: GridToolbar,
                             }}
-                            rows={rows} 
+                            pageSize={5}
+                            rowsPerPageOptions={[5, 10, 20]}
+                            rows={salesByItem.tableData} 
                             columns={columns} 
-                            pageSize={5} 
+                            className={classes.dataGrid}
                         />
                     </div>  
                 </Grid>

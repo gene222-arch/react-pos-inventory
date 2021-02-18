@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import * as SalesByPaymentType_ from '../../../services/reports/salesByPaymentType'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent } from '@material-ui/core'
 import { Button } from '@material-ui/core'
@@ -12,30 +13,58 @@ import * as DateHelper from '../../../utils/dates'
 const SalesByPaymentType = () => 
 {
     const classes = salesByUseStyles();
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
 
-    const [purchaseOrderDate, setPurchaseOrderDate] = useState(DateHelper.currentDate);
-    const [expectedDate, setExpectedDate] = useState(DateHelper.currentDate);
-
+    const [salesByPaymentType, setSalesByPaymentType] = useState([]);
     const columns = [
         { field: 'payment_type', headerName: 'Payment type', width: 320 },
-        { field: 'gross_sales', headerName: 'Gross sales', width: 289 },
-        { field: 'discounts', headerName: 'Discounts', width: 289 },
-        { field: 'net_sales', headerName: 'Net sales', width: 289 },
+        { field: 'gross_sales', headerName: 'Gross sales', width: 310 },
+        { field: 'discounts', headerName: 'Discounts', width: 310 },
+        { field: 'net_sales', headerName: 'Net sales', width: 310 },
     ];
 
-    const rows = [
-    { id: 1, payment_type: 'Snow', gross_sales: 10, discounts: 120.00, net_sales: 200.50, },
-    { id: 2, payment_type: 'Nike', gross_sales: 10, discounts: 120.00, net_sales: 200.50, },
-    { id: 3, payment_type: 'Adidas', gross_sales: 10, discounts: 120.00, net_sales: 200.50, },
-    ];
+    const handleStartDate = (date) => setStartDate(DateHelper.prepareExtractCurDate(date));
+    const handleEndDate = (date) => setEndDate(DateHelper.prepareExtractCurDate(date));
 
-     const handlePurchaseOrderDate = (date) => {
-        setPurchaseOrderDate(date);
-    };
+    const handleRemoveDate = () => {
+        fetchSalesByPaymentType();
+        setStartDate(null);
+        setEndDate(null);
+    }
 
-    const handleExpectedDate = (date) => {
-        setExpectedDate(date);
-    };
+    const fetchSalesByPaymentType = async () => 
+    {
+        const result = await SalesByPaymentType_.fetchReports();
+
+        if (result.status === 'Success')
+        {
+            setSalesByPaymentType(result.data);
+        }
+    }
+
+
+    const fetchSalesByPaymentTypeWithDate = async () => 
+    {
+        const result = await SalesByPaymentType_.fetchReports({
+            startDate: startDate,
+            endDate: endDate
+        });
+
+        if (result.status === 'Success')
+        {
+            setSalesByPaymentType(result.data);
+        }
+    }
+
+    useEffect(() => {
+        fetchSalesByPaymentType();
+
+        return () => {
+            setSalesByPaymentType([]);
+        };
+    }, []);
+
 
     return (
         <>
@@ -44,42 +73,58 @@ const SalesByPaymentType = () =>
                     <Card>
                         <CardContent>
                             <Grid container spacing={1}>
-                                <Grid item xs={12} sm={12} md={10} lg={10}>
+                                <Grid item xs={12} sm={12} md={12} lg={12}>
                                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                         <Grid container spacing={1} justify='flex-start' alignItems='center'>
-                                            <Grid item xs={12} sm={5} md={4} lg={4}>
+                                            <Grid item xs={12} sm={6} md={4} lg={3}>
                                                 <KeyboardDatePicker
                                                     fullWidth
                                                     margin="normal"
                                                     id="From"
                                                     label="From"
                                                     format="MM/dd/yyyy"
-                                                    value={purchaseOrderDate}
-                                                    onChange={handlePurchaseOrderDate}
+                                                    value={startDate}
+                                                    onChange={handleStartDate}
                                                     KeyboardButtonProps={{
                                                         'aria-label': 'change date',
                                                     }}
                                                 />
                                             </Grid>
-                                            <Grid item xs={12} sm={5} md={4} lg={4}>
+                                            <Grid item xs={12} sm={6} md={4} lg={3}>
                                                 <KeyboardDatePicker
                                                     fullWidth
                                                     margin="normal"
                                                     id="to"
                                                     label="To"
                                                     format="MM/dd/yyyy"
-                                                    value={expectedDate}
-                                                    onChange={handleExpectedDate}
+                                                    value={endDate}
+                                                    onChange={handleEndDate}
                                                     KeyboardButtonProps={{
                                                         'aria-label': 'change date',
                                                     }}
                                                 />
                                             </Grid>
-                                            <Grid item xs={12} sm={4} md={3} lg={3}>
-                                                <Button variant="contained" color="primary">
+                                            <Grid item>
+                                                <Button 
+                                                    variant="contained" 
+                                                    color="primary"
+                                                    onClick={fetchSalesByPaymentTypeWithDate}
+                                                >
                                                     Apply
                                                 </Button>
                                             </Grid>
+                                            {
+                                                (startDate !== null || endDate !== null) && (
+                                                    <Grid item>
+                                                        <Button 
+                                                            variant='contained'
+                                                            className={classes.resetDateBtn}
+                                                            onClick={handleRemoveDate}>
+                                                            Reset
+                                                        </Button>
+                                                    </Grid>
+                                                )
+                                            }
                                         </Grid>
                                     </MuiPickersUtilsProvider>
                                 </Grid>
@@ -95,9 +140,11 @@ const SalesByPaymentType = () =>
                             components={{
                                 Toolbar: GridToolbar,
                             }}
-                            rows={rows} 
+                            rows={salesByPaymentType} 
                             columns={columns} 
+                            rowsPerPageOptions={[5, 10, 20]}
                             pageSize={5} 
+                            className={classes.dataGrid}
                         />
                     </div>  
                 </Grid>

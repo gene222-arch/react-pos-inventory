@@ -92,6 +92,19 @@ export const salesByUseStyles = makeStyles((theme) => ({
     },
     topFiveItemIcon: {
         color: yellow[500]
+    },
+    formControl: {
+        width: '100%'
+    },
+    dataGrid: {
+        backgroundColor: '#FFF'
+    },
+    resetDateBtn: {
+        color: '#FFF',
+        backgroundColor: green[400],
+        '&:hover': {
+            backgroundColor: green[300],
+        }
     }
 }));
 

@@ -2,7 +2,7 @@ import axiosInstance from '../../utils/axiosInstance'
 import * as Helpers from '../../utils/helpers'
 
 
-export const fetchSalesByPaymentType= async (payload = null) => 
+export const fetchReports = async (payload = null) => 
 {
     try {
         const result = await axiosInstance()
