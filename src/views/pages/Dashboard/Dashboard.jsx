@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import Loading from '../../../components/Loading'
+import * as CURRENCY from '../../../config/currency'
 import * as Dashboard_ from '../../../services/dashboard/dashboard'
 import Highcharts from 'highcharts'
 import HighchartsExporting from 'highcharts/modules/exporting'
@@ -17,15 +19,18 @@ import NetSalesIcon from '@material-ui/icons/MultilineChart';
 import InvoiceIcon from '@material-ui/icons/Receipt';
 import PurchaseOrdersIcon from '@material-ui/icons/AddShoppingCart';
 import { dashboardUseStyles } from '../../../assets/material-styles/styles'
+import NO_DATA_IMG from '../../../assets/storage/images/dashboard/no_data.svg'
 
 HighchartsExporting(Highcharts)
 
 const Dashboard = () => 
 {
     const classes = dashboardUseStyles();
+    const [loading, setLoading] = useState(true);
+
     const [ salesType, setSalesType ] = useState('Monthly');
     const [componentKey, setComponentKey] = useState((new Date()).toISOString());
-    const [dashboardData, setDashboardData] = useState([]);
+    const [dashboardData, setDashboardData] = useState({});
 
     const salesChartOptions = {
         chart: {
@@ -49,7 +54,7 @@ const Dashboard = () =>
             }]  
         },
         title: {
-            text: `${salesType} Sales`
+            text: `${(new Date()).getFullYear()} ${salesType} Sales`
         },
         yAxis: {
             title: {
@@ -59,36 +64,48 @@ const Dashboard = () =>
         xAxis: {
             categories: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
         },
+        tooltip: {
+            formatter: function() {
+                return `Sales in <strong>${this.x}:</strong> ${CURRENCY.CURRENCY} ${this.y}`
+            }
+        },
         series: [{
-            data: [100, 200, 300, 400, 500, 600, 100, 200, 300, 400, 500, 600]
+            name: 'Sales',
+            data: dashboardData.monthlySales
         }]
     };
     
 
     const fetchDashboardData = async () => 
     {
-        const result = await Dashboard_.fetchAllAsync();
+        const result = await Dashboard_.fetchDashboardData();
 
+        console.log(result)
         if (result.status === 'Success')
         {
             setDashboardData(result.data);
+            setLoading(false);
         }
-        console.log(result);
     }
 
 
-    useEffect(() => {
+    useEffect(() => 
+    {
         fetchDashboardData();
         window.addEventListener('resize', () => {
             setComponentKey((new Date()).toISOString());
         });
 
-        return () => fetchDashboardData();
+        return () => {
+            setDashboardData({});
+        };
     }, []);
 
 
-    return (    
-        <div className={classes.root}> 
+    return loading
+        ? <Loading />
+        : (    
+            <div className={classes.root}> 
             <Grid container spacing={4} justify='center'>
                 <Grid item xs={12} sm={12} md={6} lg={3} className={classes.reportCardContainer}>
                     <Card>
@@ -100,7 +117,7 @@ const Dashboard = () =>
                                     <RevenueIcon className={classes.salesReportIcons}/>
                                 </Avatar>
                             }
-                            title="$100.00"
+                            title={`${CURRENCY.CURRENCY} ${dashboardData.salesSummary.gross_sales}`}
                             subheader="Revenue"
                             titleTypographyProps={{ 
                                 variant: 'h4',
@@ -131,7 +148,7 @@ const Dashboard = () =>
                                     <GrossProfitIcon className={classes.salesReportIcons}/>
                                 </Avatar>
                             }
-                            title="$100.00"
+                            title={`${CURRENCY.CURRENCY} ${dashboardData.salesSummary.gross_profit}`}
                             subheader="Gross profit"
                             titleTypographyProps={{ 
                                 variant: 'h4',
@@ -162,7 +179,7 @@ const Dashboard = () =>
                                     <SalesReturnIcon className={classes.salesReportIcons}/>
                                 </Avatar>
                             }
-                            title="$100.00"
+                            title={`${CURRENCY.CURRENCY} ${dashboardData.salesSummary.sales_return}`}
                             subheader="Sales return"
                             titleTypographyProps={{ 
                                 variant: 'h4',
@@ -193,7 +210,7 @@ const Dashboard = () =>
                                     <NetSalesIcon className={classes.salesReportIcons}/>
                                 </Avatar>
                             }
-                            title="$100.00"
+                            title={`${CURRENCY.CURRENCY} ${dashboardData.salesSummary.net_sales}`}
                             subheader="Net sales"
                             titleTypographyProps={{ 
                                 variant: 'h4',
@@ -214,7 +231,7 @@ const Dashboard = () =>
                     </Card>
                 </Grid>                
             
-                <Grid item xs={11} sm={11} md={11} lg={11}>
+                <Grid item xs={12} sm={12} md={12} lg={12}>
                     <Card className={classes.chartContainer}>
                         <CardContent className={classes.chartContainer}>
                             <HighchartsReact
@@ -246,23 +263,29 @@ const Dashboard = () =>
                     <Divider />
                         <CardContent>
                             <List>
-                                {[
-                                    'Gene Phillip Artista',
-                                    'John Cedrick Artista',
-                                    'James Chadwick Decena'
-                                    ].map((invoice, index) => (
-                                    <ListItem 
-                                        key={index}
-                                        button
-                                    >
-                                        <ListItemAvatar>
-                                            <Avatar />
-                                        </ListItemAvatar>
-                                        <ListItemText 
-                                            primary='Jan 9, 2014' 
-                                            secondary={`by ${invoice}`} />
-                                    </ListItem>
-                                ))}
+                                {
+                                    dashboardData.pendingInvoices.length > 0 
+                                    ? dashboardData.pendingInvoices.map((invoice, index) => (
+                                        <ListItem 
+                                            key={index}
+                                            button
+                                        >
+                                            <ListItemAvatar>
+                                                <Avatar />
+                                            </ListItemAvatar>
+                                            <ListItemText 
+                                                primary={`${invoice.invoice_date}`} 
+                                                secondary={`name: ${invoice.name}`} />
+                                        </ListItem>
+                                    ))
+                                    : (
+                                        <Grid container justify='center'>
+                                            <Grid item xs={12} sm={12} md={3} lg={3}>
+                                                <img src={NO_DATA_IMG} className={classes.noDataImg}/>
+                                            </Grid>
+                                        </Grid>
+                                    )
+                                }
                             </List>
                         </CardContent>
                     </Card>
@@ -285,23 +308,30 @@ const Dashboard = () =>
                     <Divider />
                         <CardContent>
                             <List>
-                                {[
-                                    'Gene Phillip Artista',
-                                    'John Cedrick Artista',
-                                    'James Chadwick Decena'
-                                    ].map((invoice, index) => (
-                                    <ListItem 
-                                        key={index}
-                                        button
-                                    >
-                                        <ListItemAvatar>
-                                            <Avatar />
-                                        </ListItemAvatar>
-                                        <ListItemText 
-                                            primary='Jan 9, 2014' 
-                                            secondary={`by ${invoice}`} />
-                                    </ListItem>
-                                ))}
+                                {
+                                    dashboardData.inProcessPurchaseOrders.length > 0 
+                                    ? dashboardData.inProcessPurchaseOrders.map((purchaseOrders, index) => (
+                                        <ListItem 
+                                            key={index}
+                                            button
+                                        >
+                                            <ListItemAvatar>
+                                                <Avatar />
+                                            </ListItemAvatar>
+                                            <ListItemText 
+                                                primary={`${purchaseOrders.po_date}`}
+                                                secondary={`supplier: ${purchaseOrders.supplier}`} />
+                                        </ListItem>
+                                    ))
+                                    : (
+                                        <Grid container justify='center'>
+                                            <Grid item xs={12} sm={12} md={3} lg={3}>
+                                                <img src={NO_DATA_IMG} className={classes.noDataImg}/>
+                                            </Grid>
+                                        </Grid>
+                                    )
+                                    
+                                }
                             </List>
                         </CardContent>
                     </Card>
@@ -309,7 +339,7 @@ const Dashboard = () =>
             </Grid>
         
         </div>
-    );
+        );
 }
 
 

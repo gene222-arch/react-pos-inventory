@@ -1,10 +1,10 @@
 import axiosInstance from '../../utils/axiosInstance'
 
 
-export const fetchAllAsync = async () => 
+export const fetchDashboardData = async () => 
 {
     try {
-        const result = await axiosInstance().get('/reports/general');
+        const result = await axiosInstance().get('/dashboard');
 
         return result.data;
     } catch (error) {

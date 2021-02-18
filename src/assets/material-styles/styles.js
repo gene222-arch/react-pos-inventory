@@ -267,6 +267,9 @@ export const dashboardUseStyles = makeStyles( theme => ({
     pendingOrdersIcon: {
         backgroundColor: blue[500]
     },
+    noDataImg: {
+        width: '100%'
+    }
 }));
 
 
