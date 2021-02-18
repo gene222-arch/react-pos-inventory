@@ -3,10 +3,11 @@ import * as Helpers from '../../utils/helpers'
 
 
 
-export const fetchCartDetails = async (payload = null) => 
+export const fetchCartDetails = async (payload) => 
 {
     try {
-        const result = await axiosInstance().get('/pos/cart-details');
+        const result = await axiosInstance()
+            .post('/pos/cart-details', Helpers.prepareToFormData(payload));
 
         return result.data;
     } catch (error) {
@@ -140,7 +141,9 @@ export const removeItemsAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .delete('/pos/items', Helpers.prepareToFormData(payload));
+            .delete('/pos/items', {
+                data: payload
+            });
 
         return result.data;
 

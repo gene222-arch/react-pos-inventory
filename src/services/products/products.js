@@ -31,6 +31,21 @@ export const fetchAsync = async (payload) =>
 }
 
 
+export const fetchByCategoryAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/products/category', Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
 export const storeAsync = async (payload) => 
 {
     try {

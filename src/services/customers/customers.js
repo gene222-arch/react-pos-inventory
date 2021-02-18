@@ -50,7 +50,7 @@ export const updateAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .post('/customers', Helpers.prepareToFormData(payload, 'PUT'));
+            .put('/customers', payload);
 
         return result.data;
 
@@ -65,7 +65,9 @@ export const destroyAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .delete('/customers', Helpers.prepareToFormData(payload));
+            .delete('/customers', {
+                data: payload
+            });
 
         return result.data;
 

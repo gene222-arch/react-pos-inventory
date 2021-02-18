@@ -23,7 +23,7 @@ const RenderDiscountColumn = ({params}) =>
                 </Grid>
                 <Grid item>
                     { 
-                        params.row.discounts !== 0.00 
+                        params.row.discounts 
                             ? <DiscountIcon className={classes.discountIcon}/>
                             : ''
                     }

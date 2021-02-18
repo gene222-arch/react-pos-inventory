@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Loading from '../../../components/Loading'
+import * as Customers_ from '../../../services/customers/customers'
 import { useHistory } from 'react-router-dom'
-import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider, Avatar, IconButton } from '@material-ui/core';
+import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider } from '@material-ui/core';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -8,7 +10,6 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
-import { MoreVert as MoreVertIcon } from '@material-ui/icons'
 import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
 import RoomIcon from '@material-ui/icons/Home';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
@@ -16,19 +17,76 @@ import { createPageUseStyles } from '../../../assets/material-styles/styles'
 import * as Helper from '../../../utils/helpers'
 
 
-const EditCustomer = ({match}) => {
+const DEFAULT = {
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    postal_code: '',
+    country: '',
+    province: ''
+};
 
+
+
+const EditCustomer = ({match}) => 
+{
+    
     const classes = createPageUseStyles();
     const history = useHistory();
+    const [loading, setLoading] = useState(true);
 
-    const {customerId} = match.params;
 
-    const [country, setCountry] = useState('');
+    const customerId = match.params.customerId;
+    const [customer, setCustomer] = useState(DEFAULT);
 
-    const handleChange = (event) => {
-      setCountry(event.target.value);
-    };
-    return (
+    const handleCustomerOnChange = (e) => setCustomer({...customer, [e.target.name]: e.target.value});
+
+
+    const fetchCustomer = async () => 
+    {
+        const result = await Customers_.fetchAsync({customer_id: customerId});
+
+        if (result.status === 'Success')
+        {
+            setCustomer(result.data);
+            setLoading(false);
+        }
+    }
+
+    const EditCustomer = async () => 
+    {
+        delete customer.created_at;
+        delete customer.updated_at;
+
+        const data = {
+            customer_id: customerId,
+            customer_data: customer
+        };
+
+        console.log(data);
+        const result = await Customers_.updateAsync(data);
+
+        if (result.status === 'Success')
+        {
+            history.push('/customers');
+        }
+    }
+
+
+    useEffect(() => 
+    {
+        fetchCustomer();
+
+        return () => {
+            setCustomer(DEFAULT)
+        }
+    }, [])
+
+    return loading 
+        ? <Loading />
+        : (
         <>
             <Card className={classes.cardContainer}>
                 <Grid container spacing={1} justify='center'>
@@ -36,18 +94,21 @@ const EditCustomer = ({match}) => {
                         avatar={
                             <AccountCircleIcon className={classes.headerIcon}/>
                         }
-                        subheader={`Customer id: #${ customerId }`}
                     />
                 </Grid>
                 <CardContent className={classes.cardContent}>
                     <TextField
-                        id=""
+                        name="name"
+                        value={customer.name}
+                        onChange={handleCustomerOnChange}
                         label="Name"
                         fullWidth
                         margin='normal'
                     />
                     <TextField
-                        id=""
+                        name="email"
+                        value={customer.email}
+                        onChange={handleCustomerOnChange}
                         label="Email"
                         fullWidth
                         margin='normal'
@@ -60,7 +121,9 @@ const EditCustomer = ({match}) => {
                         }}
                     />
                     <TextField
-                        id=""
+                        name="phone"
+                        value={customer.phone}
+                        onChange={handleCustomerOnChange}
                         label="Phone"
                         fullWidth
                         margin='normal'
@@ -73,7 +136,9 @@ const EditCustomer = ({match}) => {
                         }}
                     />
                     <TextField
-                        id=""
+                        name="address"
+                        value={customer.address}
+                        onChange={handleCustomerOnChange}
                         label="Address"
                         fullWidth
                         margin='normal'
@@ -88,7 +153,9 @@ const EditCustomer = ({match}) => {
                     <Grid container justify='space-between'>
                         <Grid item xs={6} sm={6} md={5} lg={5}>
                             <TextField
-                                id=""
+                                name="city"
+                                value={customer.city}
+                                onChange={handleCustomerOnChange}
                                 label="City"
                                 fullWidth
                                 margin='normal'
@@ -96,7 +163,9 @@ const EditCustomer = ({match}) => {
                         </Grid>
                         <Grid item xs={6} sm={6} md={5} lg={5}>
                             <TextField
-                                id=""
+                                name="postal_code"
+                                value={customer.postal_code}
+                                onChange={handleCustomerOnChange}
                                 label="Postal/zip code"
                                 fullWidth
                                 margin='normal'
@@ -107,10 +176,11 @@ const EditCustomer = ({match}) => {
                         <FormControl className={classes.formControl}>
                             <InputLabel id="demo-simple-select-label">Country</InputLabel>
                             <Select
+                                name="country"
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                value={country}
-                                onChange={handleChange}
+                                value={customer.country}
+                                onChange={handleCustomerOnChange}
                                 fullWidth
                                 margin='normal'
                             >
@@ -127,7 +197,9 @@ const EditCustomer = ({match}) => {
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                         <TextField
-                            id=""
+                            name="province"
+                            value={customer.province}
+                            onChange={handleCustomerOnChange}
                             label="Region/State/Province"
                             margin='normal'
                             fullWidth
@@ -147,7 +219,12 @@ const EditCustomer = ({match}) => {
                         </Button>
                     </Grid>
                     <Grid item>
-                        <Button variant='contained' color="default" className={classes.addBtn}>
+                        <Button 
+                            variant='contained' 
+                            color="default" 
+                            className={classes.addBtn}
+                            onClick={EditCustomer}
+                        >
                             Update
                         </Button>
                     </Grid>

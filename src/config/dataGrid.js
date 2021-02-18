@@ -4,6 +4,10 @@ import RenderDiscountColumn from '../components/POS/RenderDiscountColumn'
  * POS Datagrid config
  */
 export const POS_DATAGRID_COLUMNS = [
+    {
+        field: 'id',
+        hide: true,
+    },
     { 
         field: 'pos_details_id', 
         hide: true

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import * as Customers_ from '../../../services/customers/customers'
 import { useHistory } from 'react-router-dom'
 import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider } from '@material-ui/core';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
@@ -19,11 +20,30 @@ const CreateCustomer = () => {
 
     const classes = createPageUseStyles();
     const history = useHistory();
-    const [country, setCountry] = useState('');
+    const [customer, setCustomer] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+        city: '',
+        postal_code: '',
+        country: '',
+        province: ''
+    });
 
-    const handleChange = (event) => {
-      setCountry(event.target.value);
-    };
+    const handleCustomerOnChange = (e) => setCustomer({...customer, [e.target.name]: e.target.value});
+
+
+    const createCustomer = async () => 
+    {
+        const result = await Customers_.storeAsync(customer);
+
+        if (result.status === 'Success')
+        {
+            history.push('/customers');
+        }
+    }
+
     return (
         <>
             <Card className={classes.cardContainer}>
@@ -36,13 +56,17 @@ const CreateCustomer = () => {
                 </Grid>
                 <CardContent className={classes.cardContent}>
                     <TextField
-                        id=""
+                        name="name"
+                        value={customer.name}
+                        onChange={handleCustomerOnChange}
                         label="Name"
                         fullWidth
                         margin='normal'
                     />
                     <TextField
-                        id=""
+                        name="email"
+                        value={customer.email}
+                        onChange={handleCustomerOnChange}
                         label="Email"
                         fullWidth
                         margin='normal'
@@ -55,7 +79,9 @@ const CreateCustomer = () => {
                         }}
                     />
                     <TextField
-                        id=""
+                        name="phone"
+                        value={customer.phone}
+                        onChange={handleCustomerOnChange}
                         label="Phone"
                         fullWidth
                         margin='normal'
@@ -68,7 +94,9 @@ const CreateCustomer = () => {
                         }}
                     />
                     <TextField
-                        id=""
+                        name="address"
+                        value={customer.address}
+                        onChange={handleCustomerOnChange}
                         label="Address"
                         fullWidth
                         margin='normal'
@@ -83,7 +111,9 @@ const CreateCustomer = () => {
                     <Grid container justify='space-between'>
                         <Grid item xs={6} sm={6} md={5} lg={5}>
                             <TextField
-                                id=""
+                                name="city"
+                                value={customer.city}
+                                onChange={handleCustomerOnChange}
                                 label="City"
                                 fullWidth
                                 margin='normal'
@@ -91,7 +121,9 @@ const CreateCustomer = () => {
                         </Grid>
                         <Grid item xs={6} sm={6} md={5} lg={5}>
                             <TextField
-                                id=""
+                                name="postal_code"
+                                value={customer.postal_code}
+                                onChange={handleCustomerOnChange}
                                 label="Postal/zip code"
                                 fullWidth
                                 margin='normal'
@@ -102,10 +134,11 @@ const CreateCustomer = () => {
                         <FormControl className={classes.formControl}>
                             <InputLabel id="demo-simple-select-label">Country</InputLabel>
                             <Select
+                                name="country"
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                value={country}
-                                onChange={handleChange}
+                                value={customer.country}
+                                onChange={handleCustomerOnChange}
                                 fullWidth
                                 margin='normal'
                             >
@@ -122,7 +155,9 @@ const CreateCustomer = () => {
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                         <TextField
-                            id=""
+                            name="province"
+                            value={customer.province}
+                            onChange={handleCustomerOnChange}
                             label="Region/State/Province"
                             margin='normal'
                             fullWidth
@@ -142,7 +177,12 @@ const CreateCustomer = () => {
                         </Button>
                     </Grid>
                     <Grid item>
-                        <Button variant='contained' color="default" className={classes.addBtn}>
+                        <Button 
+                            variant='contained' 
+                            color="default" 
+                            className={classes.addBtn}
+                            onClick={createCustomer}
+                        >
                             Create
                         </Button>
                     </Grid>
