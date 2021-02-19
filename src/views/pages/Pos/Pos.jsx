@@ -358,7 +358,7 @@ const Pos = () =>
                                             id="input-with-icon-textfield"
                                             label="Scan barcode"
                                             fullWidth
-                                            value={barcode}
+            
                                             
                                         />
                                     </Grid>
