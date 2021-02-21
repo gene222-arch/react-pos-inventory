@@ -31,12 +31,27 @@ export const fetchAsync = async (payload) =>
 }
 
 
-export const fetchByCategoryAsync = async (payload) => 
+export const fetchToPurchaseAsync = async (payload) => 
 {
     try {
         
         const result = await axiosInstance()
-            .post('/products/category', Helpers.prepareToFormData(payload));
+            .post('/products/to-purchase', Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+export const fetchFilteredItemAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/products/filter', Helpers.prepareToFormData(payload));
 
         return result.data;
 

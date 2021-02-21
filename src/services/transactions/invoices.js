@@ -32,7 +32,7 @@ export const updateAsync = async (payload) =>
 {
     try {
         const result = await axiosInstance()
-            .post('/invoices', Helpers.prepareToFormData(payload, 'PUT'));
+            .put('/invoices', payload);
 
         return result.data;
     } catch (error) {
@@ -42,11 +42,15 @@ export const updateAsync = async (payload) =>
 
 
 
+
+
 export const destroyAsync = async (payload) => 
 {
     try {
         const result = await axiosInstance()
-            .delete('/invoices', Helpers.prepareToFormData(payload));
+            .delete('/invoices', {
+                data: payload
+            });
 
         return result.data;
     } catch (error) {

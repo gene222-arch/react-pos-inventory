@@ -390,6 +390,11 @@ export const dataGridUseStyles = makeStyles((theme) => ({
             color: red[400]
         }
     },
+    updateBtn: {
+        '&:hover':{
+            color: green[400]
+        }
+    },
     btn: {
         margin: theme.spacing(1),
     },
@@ -436,7 +441,7 @@ export const posUseStyles = makeStyles((theme) => ({
     selectLabel: {
         padding: theme.spacing(0, 1)
     },
-    orderDetails: {
+    orderDetailsContainer: {
         padding: theme.spacing(0, .5)
     },
     dataGrid: {
@@ -598,7 +603,13 @@ export const purchaseOrderDetailsUseStyles = makeStyles((theme) => ({
     links: {
         textDecoration: 'none',
         color: '#3a3a3a'
-    }
+    },
+    dataGrid: {
+        backgroundColor: '#FFF'
+    },
+    purchaseOrderCard: {
+        marginBottom: theme.spacing(1)
+    },
 }));
 
 export const purchaseOrderUseStyles = makeStyles((theme) => ({
@@ -631,6 +642,9 @@ export const purchaseOrderUseStyles = makeStyles((theme) => ({
     },
     purchaseOrderCard: {
         marginBottom: theme.spacing(1)
+    },
+    dataGrid: {
+        backgroundColor: '#FFF'
     }
 }))
 

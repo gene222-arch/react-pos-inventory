@@ -30,7 +30,14 @@ const Dashboard = () =>
 
     const [ salesType, setSalesType ] = useState('Monthly');
     const [componentKey, setComponentKey] = useState((new Date()).toISOString());
-    const [dashboardData, setDashboardData] = useState({});
+    const [dashboardData, setDashboardData] = useState({
+        salesSummary: {
+            gross_sales: 0.00,
+            gross_profit: 0.00,
+            sales_return: 0.00,
+            net_sales: 0.00,
+        }
+    });
 
     const salesChartOptions = {
         chart: {
@@ -80,10 +87,12 @@ const Dashboard = () =>
     {
         const result = await Dashboard_.fetchDashboardData();
 
-        console.log(result)
         if (result.status === 'Success')
         {
-            setDashboardData(result.data);
+            if (result.data)
+            {
+                setDashboardData(result.data);
+            }
             setLoading(false);
         }
     }
@@ -97,7 +106,7 @@ const Dashboard = () =>
         });
 
         return () => {
-            setDashboardData({});
+            fetchDashboardData();
         };
     }, []);
 
@@ -117,7 +126,7 @@ const Dashboard = () =>
                                     <RevenueIcon className={classes.salesReportIcons}/>
                                 </Avatar>
                             }
-                            title={`${CURRENCY.CURRENCY} ${dashboardData.salesSummary.gross_sales}`}
+                            title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.gross_sales).toFixed(2)}`}
                             subheader="Revenue"
                             titleTypographyProps={{ 
                                 variant: 'h4',
@@ -148,7 +157,7 @@ const Dashboard = () =>
                                     <GrossProfitIcon className={classes.salesReportIcons}/>
                                 </Avatar>
                             }
-                            title={`${CURRENCY.CURRENCY} ${dashboardData.salesSummary.gross_profit}`}
+                            title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.gross_profit).toFixed(2)}`}
                             subheader="Gross profit"
                             titleTypographyProps={{ 
                                 variant: 'h4',
@@ -179,7 +188,7 @@ const Dashboard = () =>
                                     <SalesReturnIcon className={classes.salesReportIcons}/>
                                 </Avatar>
                             }
-                            title={`${CURRENCY.CURRENCY} ${dashboardData.salesSummary.sales_return}`}
+                            title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.sales_return).toFixed(2)}`}
                             subheader="Sales return"
                             titleTypographyProps={{ 
                                 variant: 'h4',
@@ -210,7 +219,7 @@ const Dashboard = () =>
                                     <NetSalesIcon className={classes.salesReportIcons}/>
                                 </Avatar>
                             }
-                            title={`${CURRENCY.CURRENCY} ${dashboardData.salesSummary.net_sales}`}
+                            title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.net_sales).toFixed(2)}`}
                             subheader="Net sales"
                             titleTypographyProps={{ 
                                 variant: 'h4',

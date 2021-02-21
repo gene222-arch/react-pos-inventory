@@ -21,7 +21,7 @@ export const fetchAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .post('/purchase-orders/purchase-order-detail', Helpers.prepareToFormData(payload));
+            .post('/purchase-orders/purchase-order-details', Helpers.prepareToFormData(payload));
 
         return result.data;
 
@@ -81,7 +81,7 @@ export const storeAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .post('/purchase-orders', Helpers.prepareToFormData(payload));
+            .post('/purchase-orders', payload);
 
         return result.data;
 
@@ -111,7 +111,7 @@ export const destroyPurchaseProductsAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .delete('/products', Helpers.prepareToFormData(payload));
+            .delete('/products', payload);
 
         return result.data;
 

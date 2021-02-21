@@ -15,13 +15,26 @@ export const fetchAllAsync = async () =>
     }
 }
 
+export const fetchAllRolesAsync = async () => 
+{
+    try {
+        
+        const result = await axiosInstance().get('/roles');
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
 
 export const fetchAsync = async (payload) => 
 {
     try {
         
         const result = await axiosInstance()
-            .post('/employees/details', Helpers.prepareToFormData(payload));
+            .post('/employees/details', payload);
 
         return result.data;
 
@@ -35,7 +48,8 @@ export const storeAsync = async (payload) =>
 {
     try {
         
-        const result = await axiosInstance().post('/employees', Helpers.prepareToFormData(payload));
+        const result = await axiosInstance()
+            .post('/employees', payload);
 
         return result.data;
 
@@ -50,7 +64,7 @@ export const updateAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .post('/employees', Helpers.prepareToFormData(payload, 'PUT'));
+            .put('/employees', payload);
 
         return result.data;
 
@@ -65,7 +79,9 @@ export const destroyAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .delete('/employees', Helpers.prepareToFormData(payload));
+            .delete('/employees', {
+                data: payload
+            });
 
         return result.data;
 

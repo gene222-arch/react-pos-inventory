@@ -1,36 +1,53 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
+import * as PurchaseOrder_ from '../../../../services/inventory-management/purchaseOrders'
 import { NavLink, useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
-import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
+import { Card, CardContent, Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 import AddIcon from '@material-ui/icons/Add';
 
 
-const columns = [
-    { field: 'po_id', headerName: 'Purchase order #', width: 200 },
-    { field: 'po_date', headerName: 'Date', width: 165 },
-    { field: 'supplier', headerName: 'Supplier', width: 150 },
-    { field: 'status', headerName: 'Status', width: 150 },
-    { field: 'received', headerName: 'Received', width: 150 },
-    { field: 'expected_on', headerName: 'Expected on', width: 165 },
-    { field: 'total', headerName: 'Total', width: 150 },
-
-];
-
-const rows = [
-  { id: 1, po_id: 'Snow', po_date: 'January 12, 2021', supplier: '2021', status: 12,  received: '35%', expected_on: 100 },
-  { id: 2, po_id: 'Lannister', po_date: '2021', supplier: '2021', status: 12,  received: '42%', expected_on: 100 },
-  { id: 3, po_id: 'Lannister', po_date: '2021', supplier: '2021', status: 12,  received: '45%', expected_on: 100 },
-  { id: 4, po_id: 'Stark', po_date: '2021', supplier: '2021', status: 12,  received: '16%', expected_on: 100 },
-  { id: 5, po_id: 'Targaryen', po_date: '2021', supplier: '2021', status: 12,  received: null, expected_on: 100 },
-];
 
 
-const PurchaseOrderList = () => {
+const PurchaseOrderList = () => 
+{
 
     const classes = dataGridUseStyles();
     const history = useHistory();
+
+    const [purchaseOrders, setPurchaseOrders] = useState([]);
+
+    const columns = [
+        { field: 'id', headerName: 'Purchase order #', width: 200 },
+        { field: 'purchase_order_date', headerName: 'Date', width: 200 },
+        { field: 'status', headerName: 'Status', width: 163 },
+        { field: 'supplier', headerName: 'Supplier', width: 163 },
+        { field: 'received', headerName: 'Received', width: 163 },
+        { field: 'expected_on', headerName: 'Expected on', width: 200 },
+        { field: 'total_ordered_quantity', headerName: 'Total', width: 163 },
+
+    ];
+
+    const fetchPurchaseOrders = async () => 
+    {
+        const result = await PurchaseOrder_.fetchAllAsync();
+
+        if (result.status === 'Success')
+        {
+            setPurchaseOrders(result.data);
+        }
+    }
+
+
+    useEffect(() => {
+
+        fetchPurchaseOrders();
+
+        return () => {
+            setPurchaseOrders([]);
+        }
+    }, []);
 
     return (
         <>
@@ -59,17 +76,19 @@ const PurchaseOrderList = () => {
                     </Grid>
                 </CardContent>
             </Card>
-            <div style={{ height: 450, width: '100%' }}>
+            <div style={{ width: '100%' }}>
                 <DataGrid 
+                    autoHeight
                     showToolbar
                     components={{
                         Toolbar: GridToolbar,
                     }}
                     onRowClick={(param) => history.push(`/inventory-mngmt/purchase-order-details/${param.row.id}`)}
-                    rows={rows} 
+                    rows={purchaseOrders} 
                     columns={columns} 
                     pageSize={5} 
-                    checkboxSelection 
+                    rowsPerPageOptions={[5, 10, 20]}
+                    className={classes.dataGrid}
                 />
             </div>
         </>

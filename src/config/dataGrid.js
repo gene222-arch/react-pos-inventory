@@ -13,11 +13,23 @@ export const POS_DATAGRID_COLUMNS = [
         hide: true
     },
     { 
+        field: 'product_id', 
+        hide: true
+    },
+    { 
+        field: 'discount_id', 
+        hide: true
+    },
+    { 
         field: 'product_description', 
         headerName: 'Item', 
         width: 150
     },
-    { field: 'quantity', headerName: 'Qty', width: 80 },
+    { 
+        field: 'quantity', 
+        headerName: 'Qty', 
+        width: 80 
+    },
     { 
         field: 'price', 
         headerName: 'Price', 

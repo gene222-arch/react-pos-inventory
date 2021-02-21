@@ -80,7 +80,7 @@ export const applyDiscountToAllAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .put('/pos/discount-all', Helpers.prepareToFormData(payload));
+            .put('/pos/discount-all', payload);
 
         return result.data;
 
@@ -159,7 +159,7 @@ export const cancelOrdersAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .delete('/pos/cancel-orders', Helpers.prepareToFormData(payload));
+            .put('/pos/cancel-orders', payload);
 
         return result.data;
 
