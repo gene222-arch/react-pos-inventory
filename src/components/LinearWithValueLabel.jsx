@@ -8,13 +8,12 @@ const LinearProgressWithLabel = (props) => {
     return (
         <Box display="flex" flexDirection='column' alignItems='flex-start'>
             <Box width="100%" mr={1}>
-            <LinearProgress variant="determinate" {...props} />
+                <LinearProgress variant="determinate" value={props.value} />
             </Box>
             <Box minWidth={35}>
-            <Typography variant="body2" color="textSecondary">
-                {props.label} {`${Math.round(props.value,)} ${props.extension}`} of {props.maxvalue}
-            </Typography>
-
+                <Typography variant="body2" color="textSecondary">
+                    {props.label} {props.progress} of {props.maxValue}
+                </Typography>
             </Box>
         </Box>
     );
@@ -27,12 +26,19 @@ const useStyles = makeStyles({
     },
   });
   
-const LinearWithValueLabel = ({label = 'Label', extension = '', value = 0, maxvalue = 100}) => {
+const LinearWithValueLabel = ({label = 'Label', extension = '', value = 0, progress, minValue, maxValue}) => 
+{
     const classes = useStyles();
+    const normalize = value => ((value - parseInt(minValue)) * 100) / (parseInt(maxValue) - parseInt(minValue));
 
     return (
         <div className={classes.root}>
-            <LinearProgressWithLabel label={label} extension={extension} value={value} maxvalue={maxvalue}/>
+            <LinearProgressWithLabel 
+                label={label} 
+                progress={progress}
+                value={normalize(value)} 
+                minValue={minValue} 
+                maxValue={maxValue}/>
         </div>
     );
 }

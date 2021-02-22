@@ -31,12 +31,42 @@ export const fetchAsync = async (payload) =>
 }
 
 
+export const fetchReceivedStocksAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/purchase-orders/received-stocks-details', Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+export const fetchToReceiveAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/purchase-orders/purchase-order-details/to-receive', Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
 export const mailSupplierAsync = async (payload) => 
 {
     try {
         
         const result = await axiosInstance()
-            .post('/mail-supplier', Helpers.prepareToFormData(payload));
+            .post('/purchase-orders/mail-supplier', Helpers.prepareToFormData(payload));
 
         return result.data;
 
@@ -51,7 +81,7 @@ export const markAllAsReceivedAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .post('/mark-all-as-received', Helpers.prepareToFormData(payload));
+            .put('/purchase-orders/mark-all-as-received', payload);
 
         return result.data;
 
@@ -61,12 +91,12 @@ export const markAllAsReceivedAsync = async (payload) =>
 }
 
 
-export const receivePurchaseOrderAsync = async (payload) => 
+export const receiveAsync = async (payload) => 
 {
     try {
         
         const result = await axiosInstance()
-            .post('/to-receive', Helpers.prepareToFormData(payload));
+            .put('/purchase-orders/to-receive', payload);
 
         return result.data;
 
@@ -91,12 +121,26 @@ export const storeAsync = async (payload) =>
 }
 
 
-export const updateAsync = async (payload) => 
+export const upsertAsync = async (payload) => 
 {
     try {
         
         const result = await axiosInstance()
-            .post('/purchase-orders', Helpers.prepareToFormData(payload, 'PUT'));
+            .put('/purchase-orders', payload);
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+export const cancelOrderAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .put('/purchase-orders/cancel', payload);
 
         return result.data;
 
@@ -111,7 +155,9 @@ export const destroyPurchaseProductsAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .delete('/products', payload);
+            .delete('/products', {
+                data: payload
+            });
 
         return result.data;
 

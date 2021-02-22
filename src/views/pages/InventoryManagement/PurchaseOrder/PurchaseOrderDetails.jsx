@@ -13,7 +13,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import SendMailDialog from '../../../../components/SendMailDialog'
+import SendMailDialog from './SendMailDialog'
 import EditIcon from '@material-ui/icons/Edit';
 
 
@@ -21,7 +21,7 @@ const columns = [
     { field: 'id',  hide: true, },
     { field: 'product_id', hide: true },
     { field: 'product_description', headerName: 'Product', width: 250 },
-    { field: 'quantity', headerName: 'Ordered quantity', width: 250
+    { field: 'ordered_quantity', headerName: 'Ordered quantity', width: 250
     },
     { field: 'purchase_cost', headerName: 'Purchase cost', width: 250,
         valueFormatter: param => param.value.toFixed(2)
@@ -40,6 +40,7 @@ const PurchaseOrderDetails = ({match}) =>
     const [purchaseOrder, setPurchaseOrder] = useState({
         id: 0,
         ordered_by: '',
+        supplier_id: 0,
         supplier: '',
         purchase_order_date: '',
         expected_delivery_date: '',
@@ -48,27 +49,20 @@ const PurchaseOrderDetails = ({match}) =>
     });
     const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([]);
 
+    const [openSendMail, setOpenSendMail] = useState(false);
     const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
     const openMobileMenu = Boolean(mobileAnchorEl);
     const [anchorEl, setAnchorEl] = useState(null);
     const openMenu = Boolean(anchorEl);
     
 
-    const handleClickMenu = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    const handleClickOpen = () => setOpenSendMail(true);
+    const handleClose = () => setOpenSendMail(false);
 
-    const handleClickMobileMenu = (event) => {
-      setMobileAnchorEl(event.currentTarget);
-    };
-  
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleMobileMenuClose = () => {
-        setMobileAnchorEl(null);
-    };
+    const handleClickMenu = (event) => setAnchorEl(event.currentTarget);
+    const handleClickMobileMenu = (event) => setMobileAnchorEl(event.currentTarget);
+    const handleMenuClose = () => setAnchorEl(null);
+    const handleMobileMenuClose = () =>   setMobileAnchorEl(null);
 
 
     const fetchPurchaseOrder = async () => 
@@ -81,6 +75,22 @@ const PurchaseOrderDetails = ({match}) =>
         {
             setPurchaseOrder(result.data.purchaseOrder);
             setPurchaseOrderDetails(result.data.items);
+        }
+    }
+
+
+    const cancelPurchaseOrder = async () => 
+    {
+        const productIds = purchaseOrderDetails.map(pod => pod.product_id);
+
+        const result = await PurchaseOrder_.cancelOrderAsync({
+            purchase_order_id: purchaseOrderId,
+            product_ids: productIds
+        });
+
+        if (result.status === 'Success')
+        {
+            alert('Success')
         }
     }
    
@@ -117,26 +127,41 @@ const PurchaseOrderDetails = ({match}) =>
                         </Grid>
                         <Grid item className={classes.options}>
                             <Grid container>
+                            {
+                                purchaseOrder.total_ordered_quantity !== purchaseOrder.total_received_quantity && (
+                                <>
+                                    <Grid item>
+                                        <Button variant="text" color="default">
+                                            <NavLink 
+                                                to={`/inventory-mngmt/receive-purchase-orders/${purchaseOrderId}`} 
+                                                className={classes.links}
+                                            >
+                                                Receive
+                                            </NavLink>
+                                        </Button>
+                                    </Grid>
+                                    <Grid item>
+                                        <Button 
+                                            variant="text" 
+                                            color="default"
+                                            onClick={
+                                                () => history.push(`/inventory-mngmt/purchase-order/${purchaseOrderId}/edit`)
+                                            }
+                                        >
+                                            <EditIcon />
+                                        </Button>
+                                    </Grid>
+                                </>
+                                )
+                            }
                                 <Grid item>
-                                    <Button variant="text" color="default">
-                                        <NavLink to={'/inventory-mngmt/receive-purchase-orders'} className={classes.links}>
-                                            Receive
-                                        </NavLink>
-                                    </Button>
-                                </Grid>
-                                <Grid item>
-                                    <Button 
-                                        variant="text" 
-                                        color="default"
-                                        onClick={
-                                            () => history.push(`/inventory-mngmt/purchase-order/${purchaseOrderId}/edit`)
-                                        }
-                                    >
-                                        <EditIcon />
-                                    </Button>
-                                </Grid>
-                                <Grid item>
-                                    <SendMailDialog />
+                                    <SendMailDialog 
+                                        open={openSendMail}
+                                        handleClickOpen={handleClickOpen}
+                                        handleClose={handleClose}
+                                        purchaseOrderId={purchaseOrder.id}
+                                        supplierId={purchaseOrder.supplier_id}
+                                    />
                                 </Grid>
                                 {/* Desktop */}
                                 <Grid item>
@@ -162,7 +187,13 @@ const PurchaseOrderDetails = ({match}) =>
                                         >
                                         <MenuItem > Save as PDF </MenuItem>
                                         <MenuItem > Save as CSV </MenuItem>
-                                        <MenuItem > Cancel orders </MenuItem>
+                                        {
+                                            purchaseOrder.total_ordered_quantity !== purchaseOrder.total_received_quantity 
+                                            && (
+                                                <MenuItem onClick={cancelPurchaseOrder}> Cancel orders </MenuItem>
+                                            )
+                                        }
+                                        
                                     </Menu>
                                 </Grid>
                             </Grid>
@@ -189,15 +220,25 @@ const PurchaseOrderDetails = ({match}) =>
                                     },
                                     }}
                                 >
-                                <MenuItem >
-                                    Receive
-                                </MenuItem>
-                                <MenuItem onClick={
-                                    () => history.push(`/inventory-mngmt/purchase-order/${purchaseOrderId}`)
-                                }>
-                                    Edit
-                                </MenuItem>
-                                <MenuItem >
+                                {
+                                    purchaseOrder.total_ordered_quantity !== purchaseOrder.total_received_quantity && (
+                                    <>
+                                        <MenuItem button onClick={
+                                            () => history.push(`/inventory-mngmt/receive-purchase-orders/${purchaseOrderId}`)
+                                        }>
+                                            Receive
+                                        </MenuItem>
+                                        <MenuItem onClick={
+                                            () => history.push(`/inventory-mngmt/purchase-order/${purchaseOrderId}`)
+                                        }>
+                                            Edit
+                                        </MenuItem>
+                                    </>)
+                                }
+                                <MenuItem 
+                                    button 
+                                    onClick={handleClickOpen}
+                                >
                                     Send
                                 </MenuItem>
                                 <MenuItem >
@@ -206,9 +247,14 @@ const PurchaseOrderDetails = ({match}) =>
                                 <MenuItem >
                                     Save as CSV
                                 </MenuItem>
-                                <MenuItem >
-                                    Cancel orders
-                                </MenuItem>
+                                {
+                                     purchaseOrder.total_ordered_quantity !== purchaseOrder.total_received_quantity 
+                                     && (
+                                        <MenuItem button onClick={cancelPurchaseOrder}>
+                                            Cancel orders
+                                        </MenuItem>
+                                     )
+                                }
                             </Menu>
                         </Grid>
                     </Grid>
@@ -226,8 +272,10 @@ const PurchaseOrderDetails = ({match}) =>
                             <Typography variant="subtitle1" color="initial">
                                 <LinearWithValueLabel 
                                     label={'Received'}
+                                    progress={purchaseOrder.total_received_quantity}
                                     value={purchaseOrder.total_received_quantity}
-                                    maxvalue={purchaseOrder.total_ordered_quantity}
+                                    minValue={1}
+                                    maxValue={purchaseOrder.total_ordered_quantity}
                                 />
                             </Typography>
                         </Grid>

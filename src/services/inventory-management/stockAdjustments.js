@@ -15,6 +15,21 @@ export const fetchAllAsync = async () =>
     }
 }
 
+export const fetchStockToAdjustAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/stocks/stock-adjustments/stock', Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
 
 export const fetchAsync = async (payload) => 
 {
@@ -36,7 +51,7 @@ export const storeAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .post('/stocks/stock-adjustments', Helpers.prepareToFormData(payload));
+            .post('/stocks/stock-adjustment', payload);
 
         return result.data;
 

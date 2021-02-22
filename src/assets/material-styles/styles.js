@@ -59,6 +59,11 @@ export const createPageUseStyles = makeStyles((theme) => ({
             backgroundColor: '#dc3545'
         }
     },
+    deleteAction: {
+        '&:hover': {
+            color: red[400]
+        }
+    },
     textFieldIcons: {
         color: '#a8a7a7'
     },
@@ -365,9 +370,12 @@ export const registrationFormUseStyles = makeStyles((theme) => ({
 
 export const dataGridUseStyles = makeStyles((theme) => ({
     root: {
+        backgroundColor: '#FFF',
         '& .super-app.negative' : {
-            color: '#FFF',
-            backgroundColor: red[400]
+            color: red[400]
+        },
+        '& .super-app.grey' : {
+            color: '#DDDDDD'
         }
     },
     addBtn: {
@@ -408,6 +416,7 @@ export const dataGridUseStyles = makeStyles((theme) => ({
     dataGrid: {
         backgroundColor: '#FFF'
     },
+
 }));
 
 export const posUseStyles = makeStyles((theme) => ({
@@ -823,6 +832,10 @@ export const receivePOTextFieldUseStyles = makeStyles((theme) => ({
         textDecoration: 'none',
         color: '#3a3a3a',
         fontSize: '1rem'
+    },
+    dataGrid: {
+        marginTop: '.5rem',
+        backgroundColor: '#FFF'
     },
 }));
 

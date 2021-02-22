@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
+import * as StockAdjustment_ from '../../../../services/inventory-management/stockAdjustments'
 import { useHistory, NavLink } from 'react-router-dom'
 import { columnsReducer } from '../../../../hooks/useReducer/reducerHooks'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
@@ -9,55 +10,48 @@ import Button from '@material-ui/core/Button';
 import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 
 
-const StockAdjustmentDetails = ({match}) => {
-
+const StockAdjustmentDetails = ({match}) => 
+{
     const classes = dataGridUseStyles();
     const history = useHistory();
 
-    const [columnsState, dispatchColumnsState] = useReducer(columnsReducer,
-        [
-            {
-                field: '',
-                headerName: '',
-                width: ''
-            }
-        ]
-    );
-    const [stockAdjustments, setStockAdjustments] = useState({
-        id: 1,
-        reason: 'Received items',
-        adjusted_by: 'Admin',
-        stockAdjustmentDetails: [
-            {
-                id: 1,
-                stock_adjustment_id: 1,
-                stock_id: 1,
-                product_description: 'Bag',
-                in_stock: 100,
-                added_stock: 0,
-                removed_stock: 0,
-                counted_stock: 0,
-                stock_after: 0,
-            },
-            {
-                id: 2,
-                stock_adjustment_id: 1,
-                stock_id: 2,
-                product_description: 'Shoes',
-                in_stock: 100,
-                added_stock: 0,
-                removed_stock: 0,
-                counted_stock: 0,
-                stock_after: 0,
-            }
-        ]
+    const {stockAdjustmentId, stockAdjustmentReason} = match.params;
+    const [stockAdjustmentState, dispatchStockAdjustmentState] = useReducer(columnsReducer, []);
+    
+    const [stockAdjustment, setStockAdjustments] = useState({
+        stockAdjustment: {
+            id: 0,
+            reason: '',
+            adjusted_by: '',
+            adjusted_at: ''
+        },
+        stockAdjustmentDetails: []
     });
-    const {stockAdjustmentId} = match.params;
+
+
+    const fetchStockAdjustmentDetails = async () => 
+    {
+        const result = await StockAdjustment_.fetchAsync({
+            stock_adjustment_id: stockAdjustmentId
+        });
+
+        if (result.status === 'Success')
+        {
+            setStockAdjustments(result.data);
+        }
+    }
 
 
     useEffect(() => {
-        dispatchColumnsState({ type: stockAdjustments.reason })
+        fetchStockAdjustmentDetails();
+        dispatchStockAdjustmentState({ type: stockAdjustmentReason })
+
+        return () => {
+            setStockAdjustments({});
+        }
     }, []);
+
+
 
     return (
         <>
@@ -86,13 +80,13 @@ const StockAdjustmentDetails = ({match}) => {
                         </Grid>
                         <Grid item>
                             <Typography variant="subtitle2" color="initial">
-                                <strong>Date:</strong> {'January 12, 2021'}
+                                <strong>Date:</strong> {stockAdjustment.stockAdjustment.adjusted_at}
                             </Typography>
                             <Typography variant="subtitle2" color="initial">
-                                <strong>Reason:</strong> {'Received items'}
+                                <strong>Reason:</strong> {stockAdjustment.stockAdjustment.reason}
                             </Typography>
                             <Typography variant="subtitle2" color="initial">
-                                <strong>Adjusted by:</strong> {'Gene Phillip'}
+                                <strong>Adjusted by:</strong> {stockAdjustment.stockAdjustment.adjusted_by}
                             </Typography>
                         </Grid>
                     </Grid>
@@ -107,8 +101,9 @@ const StockAdjustmentDetails = ({match}) => {
                             components={{
                                 Toolbar: GridToolbar,
                             }}
-                            rows={stockAdjustments.stockAdjustmentDetails} 
-                            columns={columnsState} 
+                            rows={stockAdjustment.stockAdjustmentDetails} 
+                            columns={stockAdjustmentState} 
+                            rowsPerPageOptions={[5, 10, 20]}
                             pageSize={5} 
                         />
                     </div>

@@ -1,4 +1,6 @@
 import React, {useState, useEffect} from 'react';
+import LinearWithValueLabel from '../../../../components/LinearWithValueLabel'
+import clsx from 'clsx'
 import * as PurchaseOrder_ from '../../../../services/inventory-management/purchaseOrders'
 import { NavLink, useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
@@ -6,6 +8,7 @@ import { Card, CardContent, Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 import AddIcon from '@material-ui/icons/Add';
+import * as DateHelper from '../../../../utils/dates'
 
 
 
@@ -19,12 +22,30 @@ const PurchaseOrderList = () =>
     const [purchaseOrders, setPurchaseOrders] = useState([]);
 
     const columns = [
-        { field: 'id', headerName: 'Purchase order #', width: 200 },
+        { field: 'id', headerName: 'Purchase order #', width: 163 },
         { field: 'purchase_order_date', headerName: 'Date', width: 200 },
-        { field: 'status', headerName: 'Status', width: 163 },
+        { field: 'status', headerName: 'Status', width: 163,
+            cellClassName: (params) =>  clsx('super-app', {
+                grey: params.value === 'Closed',
+            })
+        },
         { field: 'supplier', headerName: 'Supplier', width: 163 },
-        { field: 'received', headerName: 'Received', width: 163 },
-        { field: 'expected_on', headerName: 'Expected on', width: 200 },
+        { field: 'received', headerName: 'Received', width: 200, 
+            renderCell: (param) => (
+                <LinearWithValueLabel 
+                    label={'Received'}
+                    progress={parseInt(param.value)}
+                    value={parseInt(param.value)}
+                    minValue={1}
+                    maxValue={param.row.total_ordered_quantity}
+                />
+            )
+        },
+        { field: 'expected_on', headerName: 'Expected on', width: 200,
+            cellClassName: (params) =>  clsx('super-app', {
+                negative: params.value == DateHelper.currentDateWithFormat('mdy'),
+            })
+        },
         { field: 'total_ordered_quantity', headerName: 'Total', width: 163 },
 
     ];
@@ -51,7 +72,7 @@ const PurchaseOrderList = () =>
 
     return (
         <>
-            <Card>
+            <Card className={classes.card}>
                 <CardContent>
                     <Grid container>
                         <Grid item xs={12} sm={12} md={8} lg={8}>
@@ -88,7 +109,7 @@ const PurchaseOrderList = () =>
                     columns={columns} 
                     pageSize={5} 
                     rowsPerPageOptions={[5, 10, 20]}
-                    className={classes.dataGrid}
+                    className={classes.root}
                 />
             </div>
         </>

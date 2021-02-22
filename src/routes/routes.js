@@ -252,7 +252,7 @@ export const adminRoutes = {
             restricted: true 
         },
         {
-            path: '/inventory-mngmt/receive-purchase-orders',
+            path: '/inventory-mngmt/receive-purchase-orders/:purchaseOrderId',
             name: 'PurchaseOrderReceive',
             icon: '',
             exact: true,
@@ -324,7 +324,7 @@ export const adminRoutes = {
             restricted: true 
         },
         {
-            path: '/inventory-mngmt/stock-adjustments/:stockAdjustmentId',
+            path: '/inventory-mngmt/stock-adjustments/:stockAdjustmentId/:stockAdjustmentReason',
             name: 'StockAdjustmentDetails',
             icon: '',
             exact: true,

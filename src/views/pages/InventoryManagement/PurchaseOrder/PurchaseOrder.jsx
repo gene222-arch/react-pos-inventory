@@ -48,7 +48,8 @@ const PurchaseOrder = () =>
                     ? {
                         ...purchaseOrderDetail, 
                         ordered_quantity: value, 
-                        amount: (value * parseFloat(purchaseOrderDetail.purchase_cost))}
+                        amount: (value * parseFloat(purchaseOrderDetail.purchase_cost))
+                    }
                     : purchaseOrderDetail
             );
         
@@ -76,19 +77,28 @@ const PurchaseOrder = () =>
     };
 
 
-    const handleOnRemovePurchaseOrder = async (poId) => 
+    const handleOnRemovePurchaseOrder = async (productId, poId) => 
     {
         const po = purchaseOrderDetails
             .filter(purchaseOrderDetail => (purchaseOrderDetail.id !== poId));
         
         setPurchaseOrderDetails(po);
-
-        const result = await PurchaseOrder_.destroyPurchaseProductsAsync({
-            purchase_order_detail_id: poId
-        });
     };
 
-    const handleOnChangePurchaseOrder = (e) => setPurchaseOrder({...purchaseOrder, [e.target.name]: e.target.value});
+    const handleOnChangeSupplier = (e) => setPurchaseOrder({
+        ...purchaseOrder, 
+        supplier_id: e.target.value
+    });
+
+    const handleOnPurchaseOrderDateChange = (date) => setPurchaseOrder({
+        ...purchaseOrder, 
+        purchase_order_date: DateHelper.prepareExtractCurDate(date)
+    })
+
+    const handleOnExpectedDeliveryDateChange = (date) => setPurchaseOrder({
+        ...purchaseOrder, 
+        expected_delivery_date: DateHelper.prepareExtractCurDate(date)
+    })
 
 
     const columns = [
@@ -144,7 +154,7 @@ const PurchaseOrder = () =>
                     className={classes.deleteAction} 
                     variant="text" 
                     color="default" 
-                    onClick={() => handleOnRemovePurchaseOrder(params.row.id)}
+                    onClick={() => handleOnRemovePurchaseOrder(params.row.product_id, params.row.id)}
                 >
                     <DeleteForeverIcon />
                 </Button>
@@ -155,25 +165,29 @@ const PurchaseOrder = () =>
 
     const createPurchaseOrder = async () => 
     {
-        purchaseOrderDetails.map(purchaseOrderDetail => {
-            delete purchaseOrderDetail.id
-            delete purchaseOrderDetail.incoming 
-            delete purchaseOrderDetail.in_stock 
-            delete purchaseOrderDetail.product_description 
-        });
-
-        const data = {
-            ...purchaseOrder,
-            items: purchaseOrderDetails
-        };
-
-        console.log(data);
-        const result = await PurchaseOrder_.storeAsync(data);
+        const result = await PurchaseOrder_.storeAsync(validateData());
 
         if (result.status === 'Success')
         {
             history.push('/inventory-mngmt/purchase-orders')
         }
+    }
+
+
+    const validateData = () => 
+    {
+        const filterPurchaseOrderDetails = purchaseOrderDetails.map(purchaseOrderDetail => ({
+            product_id: purchaseOrderDetail.product_id,
+            ordered_quantity: purchaseOrderDetail.ordered_quantity, 
+            remaining_ordered_quantity: purchaseOrderDetail.ordered_quantity,
+            purchase_cost: purchaseOrderDetail.purchase_cost, 
+            amount: purchaseOrderDetail.amount
+        }));
+
+        return {
+            ...purchaseOrder,
+            items: filterPurchaseOrderDetails
+        };
     }
 
 
@@ -186,7 +200,7 @@ const PurchaseOrder = () =>
         if (result.status === 'Success')
         {
             const po = purchaseOrderDetails.find(purchaseOrderDetail => purchaseOrderDetail.id === result.data.id);
-
+            console.log(result.data)
             if (po)
             {
                 alert('Same product exists');
@@ -245,7 +259,7 @@ const PurchaseOrder = () =>
                                 <Select
                                     name='supplier_id'
                                     value={purchaseOrder.supplier_id}
-                                    onChange={handleOnChangePurchaseOrder}
+                                    onChange={handleOnChangeSupplier}
                                     displayEmpty
                                     className={classes.selectEmpty}
                                     inputProps={{ 'aria-label': 'Without label' }}
@@ -276,7 +290,7 @@ const PurchaseOrder = () =>
                                             format="MM/dd/yyyy"
                                             maxDate={purchaseOrder.expected_delivery_date}
                                             value={purchaseOrder.purchase_order_date}
-                                            onChange={handleOnChangePurchaseOrder}
+                                            onChange={handleOnPurchaseOrderDateChange}
                                             KeyboardButtonProps={{
                                                 'aria-label': 'change date',
                                             }}
@@ -291,7 +305,7 @@ const PurchaseOrder = () =>
                                             format="MM/dd/yyyy"
                                             minDate={purchaseOrder.purchase_order_date}
                                             value={purchaseOrder.expected_delivery_date}
-                                            onChange={handleOnChangePurchaseOrder}
+                                            onChange={handleOnExpectedDeliveryDateChange}
                                             KeyboardButtonProps={{
                                                 'aria-label': 'change date',
                                             }}
@@ -341,6 +355,7 @@ const PurchaseOrder = () =>
                             </Button>
                         </Grid>
                     </Grid>
+                
                 </CardContent>
             </Card>
             <div style={{ width: '100%' }}>
