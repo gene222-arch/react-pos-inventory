@@ -683,6 +683,12 @@ export const createBadOrdersUseStyles = makeStyles((theme) => ({
             backgroundColor: '#dc3545'
         }
     },
+    emptyPurchaseOrdersMessage: {
+        textAlign: 'center'
+    },
+    dataGrid:{
+        backgroundColor: '#FFF'
+    }
 }));
 
 export const createSalesReturnsUseStyles = makeStyles((theme) => ({

@@ -150,7 +150,7 @@ const PurchaseOrderReceive = ({match}) =>
         <>
             <EditDialog 
                 open={open}
-                handleClickOpen={handleClickOpen}
+                handleClose={handleClose}
                 handleAction={handleOnClickMarkAllReceived}
                 title={'Mark all purchase as received'}
                 dialogContentText={'Are you sure to mark items as received?'}

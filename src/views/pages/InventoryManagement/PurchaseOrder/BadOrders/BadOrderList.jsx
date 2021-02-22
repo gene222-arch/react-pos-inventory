@@ -1,34 +1,45 @@
-import React from 'react';
-import { NavLink, useHistory } from 'react-router-dom'
+import React, {useState, useEffect} from 'react';
+import * as BadOrder_ from '../../../../../services/inventory-management/badOrders'
+import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
-import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
+import { Card, CardContent, Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { dataGridUseStyles } from '../../../../../assets/material-styles/styles'
 import AddIcon from '@material-ui/icons/Add';
 
 
-const columns = [
-    { field: 'bo_id', hide: true},
-    { field: 'supplier', headerName: 'Supplier', width: 300 },
-    { field: 'purchase_return', headerName: 'Purchase return', width: 300 },
-    { field: 'no_of_items', headerName: 'Number of items', width: 240 },
-    { field: 'po_date', headerName: 'Purchase order date', width: 300 },
-];
-
-const rows = [
-  { id: 1, bo_id: 'Snow', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January 12, 2021' },
-  { id: 2, bo_id: 'Lannister', supplier: 12, purchase_return: '2021', no_of_items: 12, po_date: 'January, 12 2021' },
-  { id: 3, bo_id: 'Lannister', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January, 12 2021' },
-  { id: 4, bo_id: 'Stark', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January, 12 2021' },
-  { id: 5, bo_id: 'Targaryen', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January, 12 2021' },
-
-];
-
-
-const BadOrderList = () => {
-
+const BadOrderList = () => 
+{
     const classes = dataGridUseStyles();
     const history = useHistory();
+
+    const [badOrders, setBadOrders] = useState([]);
+
+    const columns = [
+        { field: 'id', headerName: 'Bad order #', width: 173},
+        { field: 'created_by', headerName: 'Created by', width: 230},
+        { field: 'supplier', headerName: 'Supplier', width: 230 },
+        { field: 'purchase_return', headerName: 'Purchase return', width: 210 },
+        { field: 'no_of_items', headerName: 'Number of items', width: 210 },
+        { field: 'purchase_order_date', headerName: 'Purchase order date', width: 200 },
+    ];
+
+
+    const fetchAllBadOrders = async () => 
+    {
+        const result = await BadOrder_.fetchAllAsync();
+
+        if (result.status === 'Success')
+        {
+            setBadOrders(result.data);
+        }
+    }
+
+
+    useEffect(() => {
+        fetchAllBadOrders();
+    }, []);
+
 
     return (
         <>
@@ -64,10 +75,11 @@ const BadOrderList = () => {
                         Toolbar: GridToolbar,
                     }}
                     onRowClick={(param) => history.push(`/inventory-mngmt/bad-order-details/${param.row.id}`)}
-                    rows={rows} 
+                    rows={badOrders} 
                     columns={columns} 
                     pageSize={5} 
-                    checkboxSelection 
+                    rowsPerPageOptions={[5, 10, 20]}
+                    className={classes.dataGrid}
                 />
             </div>
         </>

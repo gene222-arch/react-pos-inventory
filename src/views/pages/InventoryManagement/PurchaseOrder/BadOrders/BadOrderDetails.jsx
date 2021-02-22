@@ -1,39 +1,74 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
+import Loading from '../../../../../components/Loading'
+import * as BadOrder_ from '../../../../../services/inventory-management/badOrders'
 import { NavLink, useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
-import { Card, CardContent, Grid, makeStyles, TextField, Typography, Divider } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
+import { Card, CardContent, Grid, Typography, Divider } from '@material-ui/core';
 import { dataGridUseStyles } from '../../../../../assets/material-styles/styles'
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
-import AddIcon from '@material-ui/icons/Add';
 
 
-const columns = [
-    { field: 'bo_id', hide: true},
-    { field: 'supplier', headerName: 'Supplier', width: 300 },
-    { field: 'purchase_return', headerName: 'Purchase return', width: 300 },
-    { field: 'no_of_items', headerName: 'Number of items', width: 240 },
-    { field: 'po_date', headerName: 'Purchase order date', width: 300 },
-];
-
-const rows = [
-  { id: 1, bo_id: 'Snow', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January 12, 2021' },
-  { id: 2, bo_id: 'Lannister', supplier: 12, purchase_return: '2021', no_of_items: 12, po_date: 'January, 12 2021' },
-  { id: 3, bo_id: 'Lannister', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January, 12 2021' },
-  { id: 4, bo_id: 'Stark', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January, 12 2021' },
-  { id: 5, bo_id: 'Targaryen', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January, 12 2021' },
-
-];
-
-
-const BadOrderDetails = ({match}) => {
-
+const BadOrderDetails = ({match}) => 
+{
     const classes = dataGridUseStyles();
-    const history = useHistory();
+    const [loading, setLoading] = useState(true);
 
     const {badOrderId} = match.params;
+    const [badOrderDetails, setBadOrderDetails] = useState({
+        badOrder: {
+            id: 0,
+            created_by: '',
+            status: '',
+            purchase_order_date: '',
+            created_at: '',
+        },
+        details: []
+    });
 
-    return (
+    const columns = [
+        { field: 'id', hide: true},
+        { field: 'product_description', headerName: 'Product', width: 300 },
+        { field: 'defect', headerName: 'Cause of return', width: 300 },
+        { field: 'purchase_return', headerName: 'Purchase return', width: 300 },
+        { field: 'number_of_items', headerName: 'Number of items', width: 240 },
+    ];
+    
+
+    const fetchBadOrderDetails = async () => 
+    {
+        const result = await BadOrder_.fetchAsync({
+            bad_order_id: badOrderId
+        });
+
+        if (result.status === 'Success')
+        {
+            setBadOrderDetails(result.data);
+            setLoading(false);
+        }
+    }
+
+
+    useEffect(() => {
+        fetchBadOrderDetails();
+
+        return () => {
+            setBadOrderDetails({
+                badOrder: {
+                    id: 0,
+                    created_by: '',
+                    status: '',
+                    purchase_order_date: '',
+                    created_at: '',
+                },
+                details: []
+            });
+        }
+    }, []);
+
+
+    return loading 
+        ? <Loading />
+        :(
         <>
             <Card className={classes.card}>
                 <CardContent>
@@ -60,10 +95,13 @@ const BadOrderDetails = ({match}) => {
                                 </Grid>
                                 <Grid item>
                                     <Typography variant="subtitle2" color="initial">
-                                        <strong>Created by:</strong> {'Gene Phillip'}
+                                        <strong>Created by:</strong> {badOrderDetails.badOrder.created_by}
                                     </Typography>
                                     <Typography variant="subtitle2" color="initial">
-                                        <strong>Date created:</strong> {'January 12, 2021'}
+                                        <strong>Date of purchase:</strong> {badOrderDetails.badOrder.purchase_order_date}
+                                    </Typography>
+                                    <Typography variant="subtitle2" color="initial">
+                                        <strong>Date created:</strong> {badOrderDetails.badOrder.created_at}
                                     </Typography>
                                 </Grid>
                             </Grid>
@@ -78,10 +116,11 @@ const BadOrderDetails = ({match}) => {
                     components={{
                         Toolbar: GridToolbar,
                     }}
-                    rows={rows} 
+                    rows={badOrderDetails.details} 
                     columns={columns} 
                     pageSize={5} 
-                    checkboxSelection 
+                    rowsPerPageOptions={[5, 10, 20]}
+                    className={classes.dataGrid}
                 />
             </div>
         </>

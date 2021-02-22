@@ -35,7 +35,7 @@ export const storeAsync = async (payload) =>
 {
     try {
         
-        const result = await axiosInstance().post('/bad-orders', Helpers.prepareToFormData(payload));
+        const result = await axiosInstance().post('/bad-orders', payload);
 
         return result.data;
 

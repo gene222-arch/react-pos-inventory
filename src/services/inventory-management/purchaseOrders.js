@@ -16,6 +16,21 @@ export const fetchAllAsync = async () =>
 }
 
 
+export const fetchAllFilteredAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance().post('/purchase-orders/filtered',
+            payload);
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
 export const fetchAsync = async (payload) => 
 {
     try {
@@ -30,13 +45,28 @@ export const fetchAsync = async (payload) =>
     }
 }
 
-
 export const fetchReceivedStocksAsync = async (payload) => 
 {
     try {
         
         const result = await axiosInstance()
             .post('/purchase-orders/received-stocks-details', Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+export const fetchToBadOrderAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/purchase-orders/purchase-order-details/to-bad-orders', 
+                Helpers.prepareToFormData(payload));
 
         return result.data;
 
