@@ -149,9 +149,9 @@ const CreateBadOrders = () =>
     
     const handleOnRemoveProduct = (poId) => 
     {
-        const newPo = purchaseOrderDetails
+        const newPo = purchaseOrderDetails.items
             .filter(purchaseOrderDetail => purchaseOrderDetail.id !== poId );
-        setPurchaseOrderDetails(newPo);
+        setPurchaseOrderDetails({...purchaseOrderDetails, items: newPo});
     }
 
     const fetchPurchaseOrders = async () => 
@@ -235,7 +235,7 @@ const CreateBadOrders = () =>
                             {purchaseOrders.length > 0 
                                 ? (
                                     <FormControl className={classes.formControl}>
-                                        <InputLabel id="demo-simple-select-label">Purchase order id</InputLabel>
+                                        <InputLabel id="demo-simple-select-label">Purchase order #</InputLabel>
                                             <Select
                                                 displayEmpty
                                                 className={classes.selectEmpty}

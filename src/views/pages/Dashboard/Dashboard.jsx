@@ -23,6 +23,15 @@ import NO_DATA_IMG from '../../../assets/storage/images/dashboard/no_data.svg'
 
 HighchartsExporting(Highcharts)
 
+const DASHBOARD_DEFAULT_PROPS = {
+    salesSummary: {
+        gross_sales: 0.00,
+        gross_profit: 0.00,
+        sales_return: 0.00,
+        net_sales: 0.00,
+    }
+}
+
 const Dashboard = () => 
 {
     const classes = dashboardUseStyles();
@@ -30,14 +39,7 @@ const Dashboard = () =>
 
     const [ salesType, setSalesType ] = useState('Monthly');
     const [componentKey, setComponentKey] = useState((new Date()).toISOString());
-    const [dashboardData, setDashboardData] = useState({
-        salesSummary: {
-            gross_sales: 0.00,
-            gross_profit: 0.00,
-            sales_return: 0.00,
-            net_sales: 0.00,
-        }
-    });
+    const [dashboardData, setDashboardData] = useState(DASHBOARD_DEFAULT_PROPS);
 
     const salesChartOptions = {
         chart: {
@@ -106,7 +108,7 @@ const Dashboard = () =>
         });
 
         return () => {
-            fetchDashboardData();
+            setDashboardData(DASHBOARD_DEFAULT_PROPS);
         };
     }, []);
 

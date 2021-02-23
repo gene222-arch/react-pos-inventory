@@ -3,6 +3,7 @@ import * as Helpers from '../../utils/helpers'
 
 
 
+
 export const fetchCartDetails = async (payload) => 
 {
     try {
@@ -14,6 +15,39 @@ export const fetchCartDetails = async (payload) =>
         return error.response.data
     }
 }
+
+
+export const fetchAllFilteredAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance().post('/pos/order-lists/filtered',
+            payload);
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+
+export const fetchToSalesReturnAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/pos/customer-orders/to-sales-return', Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
 
 
 export const addToCartAsync = async (payload) => 
@@ -50,7 +84,7 @@ export const processPaymentAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .post('/pos/process-payment', Helpers.prepareToFormData(payload));
+            .post('/pos/process-payment', payload);
 
         return result.data;
 
@@ -95,7 +129,7 @@ export const applyDiscountAddQuantityAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .put('/pos/discount/item-quantity', Helpers.prepareToFormData(payload));
+            .put('/pos/discount/item-quantity', payload);
 
         return result.data;
 
@@ -126,7 +160,9 @@ export const removeAllDiscountAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .delete('/pos/discount-all', Helpers.prepareToFormData(payload));
+            .delete('/pos/discount-all', {
+                data: payload
+            });
 
         return result.data;
 

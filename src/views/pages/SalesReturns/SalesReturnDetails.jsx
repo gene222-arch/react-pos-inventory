@@ -1,37 +1,60 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
+import * as SalesReturn_ from '../../../services/sales-returns/salesReturn.js'
 import { NavLink, useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
-import { Card, CardContent, Grid, makeStyles, TextField, Typography, Divider } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
+import { Card, CardContent, Grid, Typography, Divider } from '@material-ui/core';
 import { dataGridUseStyles } from '../../../assets/material-styles/styles'
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
-import AddIcon from '@material-ui/icons/Add';
+
+const DEFAULT_PROPS = {
+    salesReturn: {
+        id: 0,
+        created_by: '',
+        purchased_at: '',
+        returned_at: '',
+    },
+    items: []
+};
 
 
-const columns = [
-    { field: 'sales_return_id', hide: true},
-    { field: 'cashier', headerName: 'Cashier', width: 300 },
-    { field: 'sales_return', headerName: 'Sales return', width: 300 },
-    { field: 'no_of_items', headerName: 'Number of items', width: 240 },
-    { field: 'date_ordered', headerName: 'Date ordered', width: 282 },
-];
-
-const rows = [
-  { id: 1, sales_return_id: 'Snow', cashier: 'Admin', sales_return: 100.50, no_of_items: 12, date_ordered: 'January 12, 2021' },
-  { id: 2, sales_return_id: 'Lannister', cashier: 'Admin', sales_return: '2021', no_of_items: 12, date_ordered: 'January, 12 2021' },
-  { id: 3, sales_return_id: 'Lannister', cashier: 'Admin', sales_return: 100.50, no_of_items: 12, date_ordered: 'January, 12 2021' },
-  { id: 4, sales_return_id: 'Stark', cashier: 'Admin', sales_return: 100.50, no_of_items: 12, date_ordered: 'January, 12 2021' },
-  { id: 5, sales_return_id: 'Targaryen', cashier: 'Admin', sales_return: 100.50, no_of_items: 12, date_ordered: 'January, 12 2021' },
-
-];
-
-
-const SalesReturnDetails = ({match}) => {
-
+const SalesReturnDetails = ({match}) => 
+{
     const classes = dataGridUseStyles();
-    const history = useHistory();
 
     const {salesReturnId} = match.params;
+    const [salesReturn, setSalesReturn] = useState(DEFAULT_PROPS);
+
+
+    const columns = [
+        { field: 'id', hide: true},
+        { field: 'product_description', headerName: 'Product', width: 300 },
+        { field: 'defect', headerName: 'Cause of return', width: 300 },
+        { field: 'quantity', headerName: 'Number of items', width: 200 },
+        { field: 'price', headerName: 'Price', width: 225.5 },
+        { field: 'total', headerName: 'Amount', width: 225.5 },
+    ];
+    
+    
+    const fetchSalesReturn = async () => 
+    {
+        const result = await SalesReturn_.fetchAsync({
+            sales_return_id: salesReturnId
+        });
+
+        if (result.status === 'Success')
+        {
+            setSalesReturn(result.data);
+        }
+    }
+
+
+    useEffect(() => {
+        fetchSalesReturn();
+
+        return () => {
+            setSalesReturn(DEFAULT_PROPS);
+        }
+    }, []);
 
     return (
         <>
@@ -60,10 +83,13 @@ const SalesReturnDetails = ({match}) => {
                                 </Grid>
                                 <Grid item>
                                     <Typography variant="subtitle2" color="initial">
-                                        <strong>Created by:</strong> {'Gene Phillip'}
+                                        <strong>Created by:</strong> {salesReturn.salesReturn.created_by}
                                     </Typography>
                                     <Typography variant="subtitle2" color="initial">
-                                        <strong>Date created:</strong> {'January 12, 2021'}
+                                        <strong>Date of purchase:</strong> {salesReturn.salesReturn.purchased_at}
+                                    </Typography>
+                                    <Typography variant="subtitle2" color="initial">
+                                        <strong>Date created:</strong> {salesReturn.salesReturn.returned_at}
                                     </Typography>
                                 </Grid>
                             </Grid>
@@ -78,10 +104,11 @@ const SalesReturnDetails = ({match}) => {
                     components={{
                         Toolbar: GridToolbar,
                     }}
-                    rows={rows} 
+                    rows={salesReturn.items} 
                     columns={columns} 
                     pageSize={5} 
-                    checkboxSelection 
+                    rowsPerPageOptions={[5, 10, 20]}
+                    className={classes.dataGrid}
                 />
             </div>
         </>

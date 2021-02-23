@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
+import * as SalesReturn_ from '../../../services/sales-returns/salesReturn.js'
 import { NavLink, useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
@@ -7,28 +8,41 @@ import { dataGridUseStyles } from '../../../assets/material-styles/styles'
 import AddIcon from '@material-ui/icons/Add';
 
 
-const columns = [
-    { field: 'bo_id', hide: true},
-    { field: 'supplier', headerName: 'Supplier', width: 300 },
-    { field: 'purchase_return', headerName: 'Purchase return', width: 300 },
-    { field: 'no_of_items', headerName: 'Number of items', width: 240 },
-    { field: 'po_date', headerName: 'Purchase order date', width: 300 },
-];
-
-const rows = [
-  { id: 1, bo_id: 'Snow', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January 12, 2021' },
-  { id: 2, bo_id: 'Lannister', supplier: 12, purchase_return: '2021', no_of_items: 12, po_date: 'January, 12 2021' },
-  { id: 3, bo_id: 'Lannister', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January, 12 2021' },
-  { id: 4, bo_id: 'Stark', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January, 12 2021' },
-  { id: 5, bo_id: 'Targaryen', supplier: 12, purchase_return: 100.50, no_of_items: 12, po_date: 'January, 12 2021' },
-
-];
-
-
-const SalesReturnList = () => {
-
+const SalesReturnList = () => 
+{
     const classes = dataGridUseStyles();
     const history = useHistory();
+
+    const [salesReturns, setSalesReturns] = useState([]);
+
+    const columns = [
+        { field: 'id', hide: true},
+        { field: 'customer', headerName: 'Customer', width: 270 },
+        { field: 'purchased_at', headerName: 'Date of purchase', width: 250 },
+        { field: 'no_of_items', headerName: 'Number of items', width: 240 },
+        { field: 'sales_return', headerName: 'Sales return', width: 240 },
+        { field: 'returned_at', headerName: 'Date of return', width: 250 },
+    ];
+
+
+    const fetchSalesReturns = async () => 
+    {
+        const result = await SalesReturn_.fetchAllAsync();
+
+        if (result.status === 'Success')
+        {
+            setSalesReturns(result.data);
+        }
+    }
+
+
+    useEffect(() => {
+        fetchSalesReturns();
+
+        return () => {
+            setSalesReturns([]);
+        }
+    }, []);
 
     return (
         <>
@@ -64,10 +78,11 @@ const SalesReturnList = () => {
                         Toolbar: GridToolbar,
                     }}
                     onRowClick={(param) => history.push(`/sales-return-details/${param.row.id}`)}
-                    rows={rows} 
+                    rows={salesReturns} 
                     columns={columns} 
                     pageSize={5} 
-                    checkboxSelection 
+                    rowsPerPageOptions={[5, 10, 20]}
+                    className={classes.dataGrid}
                 />
             </div>
         </>

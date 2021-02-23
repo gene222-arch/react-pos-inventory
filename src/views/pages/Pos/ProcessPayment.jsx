@@ -1,4 +1,5 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect, useReducer} from 'react'
+import * as Customer_ from '../../../services/customers/customers'
 import Charge from './PaymentMethods/Charge'
 import CardPayment from './PaymentMethods/Card'
 import Invoice from './PaymentMethods/Invoice'
@@ -6,29 +7,209 @@ import {POS_PAYMENT_DATAGRID_COLUMNS} from '../../../config/dataGrid'
 import {CURRENCY} from '../../../config/currency'
 import {processPaymentUseStyles} from '../../../assets/material-styles/styles'
 import { DataGrid } from '@material-ui/data-grid';
-import { makeStyles, Grid, Typography, Divider, Card, CardContent, TextField, Button, Avatar, CardHeader, IconButton } from '@material-ui/core';
-import {red, green, orange} from '@material-ui/core/colors';
-import { ReceiptRounded, CardMembership, Money, ArrowBackIos, Clear } from '@material-ui/icons'
+import { Grid, Typography, Divider, Card, CardContent, TextField, Button, Avatar, CardHeader, IconButton } from '@material-ui/core';
+import { ReceiptRounded, CardMembership, Money, ArrowBackIos, Clear, MoreVert as MoreVertIcon } from '@material-ui/icons'
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
+
+const paymentReducer = (state, action) => 
+{
+    switch (action.type) 
+    {
+        case 'set-payment-type':
+                return {...state, payment_method: action.payload.paymentMethod};
+            break;
+
+        case 'set-email':
+            return {...state, customer_email: action.payload.email};
+        break;
+
+        case 'set-name':
+            return {...state, customer_name: action.payload.name};
+        break;
+
+        case 'set-should-mail':
+            return {...state, should_mail: action.payload.shouldMail};
+        break; 
+
+        case 'set-cash':
+            return {...state, cash: parseFloat(action.payload.cash).toFixed(2)};
+        break;        
+    
+        case 'clear-cash':
+            return {...state, cash: 0.00};
+        break;          
+
+        case 'set-cash':
+            return {...state, number_of_days: action.payload.numberOfDays};
+        break;     
+
+        default:
+            return state;
+            break;
+    }
+}
 
 
-const ProcessPayment = ({handleOnProcessPayment, customerId}) => 
+const CUSTOMER_DEFAULT_PROPS = {
+    name: '',
+    email: ''
+}
+
+
+const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, paymentAmountDetails}) => 
 {
     const classes = processPaymentUseStyles();
 
-    const [amount, setAmount] = useState(0.00);
-    const [paymentMethod, setPaymentMethod] = useState('');
+    const [paymentProcessState, dispatchPaymentProcessState] = useReducer(paymentReducer, {
+        customer_id: customerId,
+        customer_email: '',
+        customer_name: '',
+        payment_method: '',
+        should_mail: false,
+        cash: 0.00,
+        number_of_days: 30,
+    });
 
-    const [orderDetails, setOrderDetails] = useState([
-        { id: 1, product_id: 1, product_description: 'Bag', quantity: 1, price: 12, discounts: 0.00 },
-        { id: 2, product_id: 2, product_description: 'Shoes', quantity: 1, price: 12, discounts: 0.00 },
-        { id: 3, product_id: 3, product_description: 'Wew', quantity: 1, price: 12, discounts: 0.00 },
-        { id: 4, product_id: 4, product_description: 'Shoes', quantity: 1, price: 12, discounts: 1.00 },
-    ]);
+    const [customer, setCustomer] = useState(CUSTOMER_DEFAULT_PROPS);
 
-    const handlePaymentMethod = (paymentMethod) => setPaymentMethod(paymentMethod);
 
-    const handleOnChargeAmount = (amount) => setAmount(amount);
-    const handleOnClearAmount = () => setAmount(0.00);
+    const handlePaymentMethod = (paymentMethod) => dispatchPaymentProcessState({
+        type: 'set-payment-type',
+        payload: {
+            paymentMethod: paymentMethod
+        }
+    });
+
+    const handleOnChargeAmount = (e, amount) => {
+        if (e.target.name === 'input-cash')
+        {
+            dispatchPaymentProcessState({
+                type: 'set-cash',
+                payload: {
+                    cash: e.target.value
+                }
+            });
+        }
+        else 
+        {
+            dispatchPaymentProcessState({
+                type: 'set-cash',
+                payload: {
+                    cash: parseFloat(amount.toFixed(2))
+                }
+            });
+        }
+    }
+
+    const handleOnClearAmount = () => dispatchPaymentProcessState({
+        type: 'clear-cash'
+    });
+
+    const handleMailOnChange = (e) => dispatchPaymentProcessState({
+        type: 'set-should-mail',
+        payload: {
+            shouldMail: e.target.checked
+        }
+    })
+
+    const fetchCustomer = async () => 
+    {
+        const result = await Customer_.fetchAsync({
+            customer_id: customerId
+        });
+
+        if (result.status === 'Success')
+        {
+            setCustomer(result.data)
+        }
+    }
+
+    const validatedData = () => 
+    {
+        if (paymentProcessState.should_mail && customer.email !== 'NULL')
+        {
+            switch (paymentProcessState.payment_method) {
+                case 'cash':
+                        return {
+                            customer_id: paymentProcessState.customer_id,
+                            payment_method: paymentProcessState.payment_method,
+                            cash: parseFloat(paymentProcessState.cash),
+                            should_mail: paymentProcessState.should_mail
+                        }
+                    break;
+        
+                case 'credit':
+                    return {
+                        customer_id: paymentProcessState.customer_id,
+                        payment_method: paymentProcessState.payment_method,
+                        should_mail: paymentProcessState.should_mail
+                    }
+                    break;
+
+                case 'invoice':
+                    return {
+                        customer_id: paymentProcessState.customer_id,
+                        payment_method: paymentProcessState.payment_method,
+                        should_mail: paymentProcessState.should_mail,
+                        number_of_days: paymentProcessState.numberOfDays
+                    }
+                    break;
+                default:
+                    return paymentProcessState;
+                    break;
+            }
+        }
+        else 
+        {
+            switch (paymentProcessState.payment_method) {
+                case 'cash':
+                        return {
+                            customer_id: paymentProcessState.customer_id,
+                            payment_method: paymentProcessState.payment_method,
+                            cash: parseFloat(paymentProcessState.cash),
+                            should_mail: paymentProcessState.should_mail,
+                            customer_name: paymentProcessState.customer_name,
+                            customer_email: paymentProcessState.customer_email
+                        }
+                    break;
+        
+                case 'credit':
+                    return {
+                        customer_id: paymentProcessState.customer_id,
+                        payment_method: paymentProcessState.payment_method,
+                        should_mail: paymentProcessState.should_mail,
+                        customer_name: paymentProcessState.customer_name,
+                        customer_email: paymentProcessState.customer_email
+                    }
+                    break;
+
+                case 'invoice':
+                    return {
+                        customer_id: paymentProcessState.customer_id,
+                        payment_method: paymentProcessState.payment_method,
+                        should_mail: paymentProcessState.should_mail,
+                        number_of_days: paymentProcessState.numberOfDays,
+                        customer_name: paymentProcessState.customer_name,
+                        customer_email: paymentProcessState.customer_email
+                    }
+                    break;
+                default:
+                    return paymentProcessState;
+                    break;
+            }
+        }
+    }
+
+
+    useEffect(() => {
+        fetchCustomer();
+
+        return () => {
+            setCustomer(CUSTOMER_DEFAULT_PROPS);
+        }
+    }, []);
+
 
     return (
         <>
@@ -62,7 +243,7 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                     </Typography>
                                                 </Grid>
                                                 <Grid item>
-                                                    P0.23
+                                                    {paymentAmountDetails.discount}
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -74,7 +255,7 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                     </Typography>
                                                 </Grid>
                                                 <Grid item>
-                                                    P0.23
+                                                    {paymentAmountDetails.tax}
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -88,7 +269,7 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                 </Grid>
                                                 <Grid item>
                                                     <Typography variant="subtitle1" color="initial">
-                                                        <strong>P0.23</strong>
+                                                        <strong>{paymentAmountDetails.total}</strong>
                                                     </Typography>
                                                 </Grid>
                                             </Grid>
@@ -103,19 +284,21 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                     <Card className={classes.paymentMethodTypeContainer}>
                         <CardHeader
                             avatar={
-                                <Avatar aria-label="">
-                                
+                                <Avatar>
+                                    {(customer.name).substr(0, 1)}
                                 </Avatar>
                             }
                             action={
                                 <IconButton aria-label="">
                                     {
-                                        paymentMethod === '' && (
-                                            <ArrowBackIos onClick={handleOnProcessPayment} />
+                                        paymentProcessState.payment_method === '' && (
+                                            <>
+                                                <ArrowBackIos onClick={handleOnProcessPayment} />
+                                            </>
                                         )
                                     }
                                     {
-                                        paymentMethod && (
+                                        paymentProcessState.payment_method && (
                                             <ArrowBackIos onClick={() => handlePaymentMethod('')}/>
                                         )
                                     }
@@ -124,28 +307,56 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                             titleTypographyProps={{ 
                                     variant: 'h3'
                                 }}
-                            title={`${CURRENCY} 120.50`}
+                            title={`${CURRENCY} ${paymentAmountDetails.total}`}
                             subheader="To pay"
                             
                         />
                         <CardContent>
+                            <FormControlLabel
+                                control={
+                                <Switch 
+                                    checked={paymentProcessState.should_mail} 
+                                    onChange={handleMailOnChange} 
+                                />}
+                                label="Mail"
+                            />
                         {
-                            paymentMethod === 'Charge' && (
-                                <Charge customerId={customerId}/>
+                            (   paymentProcessState.payment_method.length > 0 &&
+                                paymentProcessState.payment_method === 'cash') && (
+                                <Charge 
+                                    change={paymentProcessState.cash - paymentAmountDetails.total}
+                                    customer={customer}
+                                    paymentProcessState={paymentProcessState}
+                                    dispatchPaymentProcessState={dispatchPaymentProcessState}
+                                    validatedData={validatedData}
+                                />
+                            )
+                        }
+                        {    paymentProcessState.payment_method.length > 0 && 
+                            (paymentProcessState.payment_method === 'credit') && (
+                                <CardPayment 
+                                    customer={customer}
+                                    total={paymentAmountDetails.total}
+                                    paymentProcessState={paymentProcessState}
+                                    dispatchPaymentProcessState={dispatchPaymentProcessState}
+                                    validatedData={validatedData}
+                                />
                             )
                         }
                         {
-                            paymentMethod === 'Card' && (
-                                <CardPayment customerId={customerId}/>
+                            paymentProcessState.payment_method.length > 0 &&
+                            (paymentProcessState.payment_method === 'invoice') && (
+                                <Invoice 
+                                    customer={customer}
+                                    total={paymentAmountDetails.total}
+                                    paymentProcessState={paymentProcessState}
+                                    dispatchPaymentProcessState={dispatchPaymentProcessState}
+                                    validatedData={validatedData}
+                                />
                             )
                         }
                         {
-                            paymentMethod === 'Invoice' && (
-                                <Invoice customerId={customerId}/>
-                            )
-                        }
-                        {
-                            !paymentMethod &&
+                            !paymentProcessState.payment_method &&
                                 <Grid container spacing={4}>
                                         <Grid item xs={12} sm={12} md={12} lg={12}>
                                             <Grid container spacing={1} justify='center'>
@@ -153,8 +364,9 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                     <TextField
                                                         id=""
                                                         label=""
-                                                        value={amount}
-                                                        onChange={(e) => handleOnChargeAmount(e.target.value)}
+                                                        name='input-cash'
+                                                        value={paymentProcessState.cash}
+                                                        onChange={(e) => handleOnChargeAmount(e, 0)}
                                                         fullWidth
                                                         inputProps={{min: 0, style: { textAlign: 'center' }}}
                                                     />
@@ -178,7 +390,7 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                         variant="text" 
                                                         color="default" 
                                                         className={classes.chargeDefAmount}
-                                                        onClick={() => handleOnChargeAmount(20)}
+                                                        onClick={(e) => handleOnChargeAmount(e, 20)}
                                                     >
                                                         20
                                                     </Button>
@@ -188,7 +400,7 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                         variant="text" 
                                                         color="default" 
                                                         className={classes.chargeDefAmount}
-                                                        onClick={() => handleOnChargeAmount(50)}
+                                                        onClick={(e) => handleOnChargeAmount(e, 50)}
                                                     >
                                                         50
                                                     </Button>
@@ -198,7 +410,7 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                         variant="text" 
                                                         color="default" 
                                                         className={classes.chargeDefAmount}
-                                                        onClick={() => handleOnChargeAmount(100)}
+                                                        onClick={(e) => handleOnChargeAmount(e, 100)}
                                                     >
                                                         100
                                                     </Button>
@@ -208,7 +420,7 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                         variant="text" 
                                                         color="default" 
                                                         className={classes.chargeDefAmount}
-                                                        onClick={() => handleOnChargeAmount(200)}
+                                                        onClick={(e) => handleOnChargeAmount(e, 200)}
                                                     >
                                                         200
                                                     </Button>
@@ -218,7 +430,7 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                         variant="text" 
                                                         color="default" 
                                                         className={classes.chargeDefAmount}
-                                                        onClick={() => handleOnChargeAmount(500)}
+                                                        onClick={(e) => handleOnChargeAmount(e, 500)}
                                                     >
                                                         500
                                                     </Button>
@@ -228,7 +440,7 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                         variant="text" 
                                                         color="default" 
                                                         className={classes.chargeDefAmount}
-                                                        onClick={() => handleOnChargeAmount(1000)}
+                                                        onClick={(e) => handleOnChargeAmount(e, 1000)}
                                                     >
                                                         1000
                                                     </Button>
@@ -240,7 +452,7 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                 variant="contained" 
                                                 color="default" 
                                                 className={`${classes.paymentTypeBtns} ${classes.chargeBtn}`}
-                                                onClick={() => handlePaymentMethod('Charge')}
+                                                onClick={() => handlePaymentMethod('cash')}
                                             >
                                                 <Grid container spacing={1} justify='center'>
                                                     <Grid item xs={1} sm={1} md={1} lg={1}>
@@ -257,8 +469,8 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                 variant="contained" 
                                                 color="primary" 
                                                 className={`${classes.paymentTypeBtns} ${classes.cardBtn}`}
-                                                onClick={() => handlePaymentMethod('Card')}
-                                                disabled={amount}
+                                                onClick={() => handlePaymentMethod('credit')}
+                                                disabled={Boolean(paymentProcessState.cash)}
                                             >
                                                 <Grid container spacing={1} justify='center'>
                                                     <Grid item xs={1} sm={1} md={1} lg={1}>
@@ -275,8 +487,8 @@ const ProcessPayment = ({handleOnProcessPayment, customerId}) =>
                                                 variant="contained" 
                                                 color="default" 
                                                 className={`${classes.paymentTypeBtns} ${classes.invoiceBtn}`}
-                                                onClick={() => handlePaymentMethod('Invoice')}
-                                                disabled={amount}
+                                                onClick={() => handlePaymentMethod('invoice')}
+                                                disabled={Boolean(paymentProcessState.cash)}
                                             >
                                                 <Grid container spacing={1} justify='center'>
                                                     <Grid item xs={1} sm={1} md={1} lg={1}>

@@ -1,5 +1,6 @@
-import React,{useState, useEffect} from 'react'
+import React,{useState, useEffect, useReducer} from 'react'
 import * as Discount from '../../../services/products/discounts'
+import * as POS_ from '../../../services/pos/pos'
 import { posUseStyles } from '../../../assets/material-styles/styles'
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -13,20 +14,94 @@ import DecrementQuantityIcon from '@material-ui/icons/ExposureNeg1';
 import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import CloseIcon from '@material-ui/icons/Close';
-import Radio from '@material-ui/core/Radio';
-import FormControl from '@material-ui/core/FormControl';
-import RadioGroup from '@material-ui/core/RadioGroup';
+
+
+const editOrderReducer = (state, action) => 
+{
+    switch (action.type) {
+        case 'input-quantity':
+            return {
+                ...state, 
+                quantity: action.payload.value
+            };
+            break;
+            
+        case 'increment':
+            return {
+                ...state, 
+                quantity: state.quantity + 1
+            };
+            break;  
+            
+        case 'decrement':
+            if (state.quantity === 1)
+            {
+                return {
+                    ...state, 
+                    quantity: 1
+                };
+            }
+
+            return {
+                ...state, 
+                quantity: state.quantity - 1
+            };
+            break;   
+            
+        case 'add-discount': 
+            return {
+                ...state, 
+                hasDiscount: action.payload.hasDiscount, 
+                discount_id: action.payload.discountId
+            };
+            break;
+        default:
+            return state;
+            break;
+    }
+}
 
 
 
-const EditOrder = ({ payload, openEditProduct, handleClose }) => 
+const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCustomerCart }) => 
 {
     const classes = posUseStyles();
 
-    const [discounts, setDiscounts] = useState([]);
-    const [discountId, setDiscountId] = useState(payload.discount_id || 0);
+    const EDIT_ORDER_INITIAL_STATE = {
+        customer_id: customerId,
+        product_id: payload.product_id,
+        hasDiscount: Boolean(payload.discount_id),
+        discount_id: payload.discount_id,
+        quantity: payload.quantity,
+    };
 
-    const handleDiscountOnChange = (e) => setDiscountId(!e.target.checked)
+    const [discounts, setDiscounts] = useState([]);
+    const [editOrderState, dispatchEditOrderState] = useReducer(editOrderReducer, EDIT_ORDER_INITIAL_STATE);
+ 
+    const handleDiscountOnChange = (e, discount_id) => 
+    {
+        e.target.checked 
+            ? dispatchEditOrderState({type: 'add-discount', payload: {
+                hasDiscount: true,
+                discountId: discount_id
+            }})
+            : dispatchEditOrderState({type: 'add-discount', payload: {
+                hasDiscount: false,
+                discountId: 0
+            }});
+    }
+
+    const handleQuantityOnChange = (e) => {
+        dispatchEditOrderState({
+            type: 'input-quantity', 
+            payload: {
+                value: parseInt(e.target.value) || 0
+        }})
+    };
+
+    const handleIncrementQty = () =>  dispatchEditOrderState({type: 'increment'});
+    const handleDecrementQty = () =>  dispatchEditOrderState({type: 'decrement'});
+
 
     const fetchDiscounts = async () => 
     {
@@ -35,6 +110,28 @@ const EditOrder = ({ payload, openEditProduct, handleClose }) =>
         if (result.status === 'Success')
         {
             setDiscounts(result.data);
+            console.log(result.data)
+        }
+    }
+
+
+    const updateOrderDiscountQty = async () => 
+    {
+        console.log(editOrderState)
+
+        if (!editOrderState.discount_id)
+        {
+            delete editOrderState.discount_id
+        }
+
+        const result = await POS_.applyDiscountAddQuantityAsync(editOrderState);
+
+        if (result.status === 'Success')
+        {
+            alert('Changes applied');
+            fetchCustomerCart();
+            handleClose();
+
         }
     }
 
@@ -69,7 +166,12 @@ const EditOrder = ({ payload, openEditProduct, handleClose }) =>
                             </Typography>
                             <Grid container spacing={3} alignItems='flex-end' justify='flex-start'>
                                 <Grid item>
-                                    <Button variant="contained" color="primary" className={classes.decrementBtn}>
+                                    <Button 
+                                        variant="contained" 
+                                        color="primary" 
+                                        className={classes.decrementBtn}
+                                        onClick={handleDecrementQty}
+                                    >
                                         <DecrementQuantityIcon/>
                                     </Button>
                                 </Grid>
@@ -77,15 +179,19 @@ const EditOrder = ({ payload, openEditProduct, handleClose }) =>
                                     <TextField
                                         autoFocus
                                         margin="dense"
-                                        id="name"
-                                        value={1}
-                                        type="email"
+                                        value={editOrderState.quantity}
                                         fullWidth
+                                        onChange={handleQuantityOnChange}
                                         inputProps={{min: 0, style: { textAlign: 'center' }}}
                                     />
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="contained" color="primary" className={classes.incrementBtn}>
+                                    <Button 
+                                        variant="contained" 
+                                        color="primary" 
+                                        className={classes.incrementBtn}
+                                        onClick={handleIncrementQty}
+                                    >
                                         <IncrementQuantityIcon />
                                     </Button>
                                 </Grid>
@@ -99,14 +205,19 @@ const EditOrder = ({ payload, openEditProduct, handleClose }) =>
                                 <Grid item xs={8} sm={8} md={4} lg={4}>
                                 {
                                     discounts.map(discount => (
-                                        <Switch
+                                        <FormControlLabel
                                             key={discount.id}
-                                            checked={payload.discount_id == discount.id}
-                                            onChange={handleDiscountOnChange}
-                                            color="primary"
-                                            name={discount.name}
-                                            value={discount.id}
-                                            inputProps={{ 'aria-label': 'primary checkbox' }}
+                                            control={
+                                                <Switch
+                                                    checked={editOrderState.discount_id == discount.id}
+                                                    onChange={(e) => handleDiscountOnChange(e, discount.id)}
+                                                    color="primary"
+                                                    name={discount.name}
+                                                    value={editOrderState.hasDiscount}
+                                                    inputProps={{ 'aria-label': 'primary checkbox' }}
+                                                />
+                                            }
+                                            label={discount.name}
                                         />
                                     ))
                                 }
@@ -147,6 +258,7 @@ const EditOrder = ({ payload, openEditProduct, handleClose }) =>
                         onClick={handleClose} 
                         color="default" 
                         className={classes.saveBtn}
+                        onClick={updateOrderDiscountQty}
                     >
                         Save
                     </Button>

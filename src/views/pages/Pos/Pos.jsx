@@ -11,7 +11,12 @@ import ProcessPayment from './ProcessPayment'
 import {posUseStyles} from '../../../assets/material-styles/styles'
 import Grid from '@material-ui/core/Grid'
 
-
+const PAYMENT_DETAILS = {
+    subTotal: 0.00,
+    discount: 0.00,
+    tax: 0.00,
+    total: 0.00
+};
 
 const Pos = () => 
 {
@@ -24,12 +29,7 @@ const Pos = () =>
     const [editOrderPayload, setEditOrderPayload] = useState({});
 
     const [processPayment, setProcessPayment] = useState(false);
-    const [paymentAmountDetails, setPaymentAmountDetails] = useState({
-        subTotal: 0.00,
-        discount: 0.00,
-        tax: 0.00,
-        total: 0.00
-    })
+    const [paymentAmountDetails, setPaymentAmountDetails] = useState(PAYMENT_DETAILS)
 
     const [customerId, setCustomerId] = useState(1);
 
@@ -39,8 +39,8 @@ const Pos = () =>
      */
     const handleClickOpen = (object) => 
     {
-        setOpenEditProduct(true);
         setEditOrderPayload(object);
+        setOpenEditProduct(true);
     };
 
     const handleClose = () => setOpenEditProduct(false);
@@ -55,34 +55,29 @@ const Pos = () =>
     {
         const result = await POS_.fetchCartDetails({customer_id: customerId});
 
-        if (result.status = 'Success')
+        if (result.status === 'Success')
         {
             const {subTotal, discount, tax, total, orderDetails} = result.data;
             
-            if (orderDetails)
-            {
-                console.log(orderDetails)
-                setOrderDetails(orderDetails);
-                setPaymentAmountDetails({
-                    subTotal: subTotal,
-                    discount: discount, 
-                    tax: tax,
-                    total: total
-                });
-            }
-            else 
-            {
-                setOrderDetails([]);
-                setPaymentAmountDetails({
-                    subTotal: 0.00,
-                    discount: 0.00, 
-                    tax: 0.00,
-                    total: 0.00
-                });
-            }
-
-            setLoading(false)
+            setOrderDetails(orderDetails);
+            setPaymentAmountDetails({
+                subTotal: subTotal,
+                discount: discount, 
+                tax: tax,
+                total: total
+            });
         }
+        else 
+        {
+            setOrderDetails([]);
+            setPaymentAmountDetails({
+                subTotal: 0.00,
+                discount: 0.00, 
+                tax: 0.00,
+                total: 0.00
+            });
+        }
+        setLoading(false)
     }
 
     const handleAddToCartOnClick = async (productId) => 
@@ -139,7 +134,7 @@ const Pos = () =>
 
         if (result.status === 'Success')
         {
-            fetchCustomerCart();
+            await fetchCustomerCart();
         }
     }
 
@@ -148,19 +143,32 @@ const Pos = () =>
 
     useEffect(() => {
         fetchCustomerCart();
-    }, [customerId])
+    }, [customerId]);
+
+
 
 
     return loading ? <Loading /> 
         : processPayment && orderDetails.length > 0 
-            ? <ProcessPayment handleOnProcessPayment={handleOnProcessPayment} customerId={customerId}/>
+            ? <ProcessPayment 
+                handleOnProcessPayment={handleOnProcessPayment} 
+                customerId={customerId}
+                orderDetails={orderDetails}
+                paymentAmountDetails={paymentAmountDetails}
+            />
             : (
                 <>
-                    <EditOrder 
-                        payload={editOrderPayload} 
-                        openEditProduct={openEditProduct} 
-                        handleClose={handleClose}
-                    />
+                    {
+                        Object.keys(editOrderPayload).length > 0 && (
+                            <EditOrder 
+                                customerId={customerId}
+                                payload={editOrderPayload} 
+                                openEditProduct={openEditProduct} 
+                                handleClose={handleClose}
+                                fetchCustomerCart={fetchCustomerCart}
+                            />
+                        )
+                    }
                     <Grid container>
                         {/* Item List */}
                         <Grid item xs={12} sm={12} md={8} lg={8}>

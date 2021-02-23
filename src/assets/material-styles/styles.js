@@ -533,6 +533,7 @@ export const posUseStyles = makeStyles((theme) => ({
 }));
 
 export const processPaymentUseStyles = makeStyles((theme) => ({
+
     dataGridContainer: {
         width: '100%',
         height: '66vh'
