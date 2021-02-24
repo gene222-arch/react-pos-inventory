@@ -27,25 +27,30 @@ const Pos = () =>
     const [rowIds, setRowIds] = useState([]);
     const [orderDetails, setOrderDetails] = useState([]);
     const [editOrderPayload, setEditOrderPayload] = useState({});
-
     const [processPayment, setProcessPayment] = useState(false);
     const [paymentAmountDetails, setPaymentAmountDetails] = useState(PAYMENT_DETAILS)
-
     const [customerId, setCustomerId] = useState(1);
+    const [customerIsDiscounted, setCustomerIsDiscounted] = useState(false);
+
+
 
 
     /**
      * Dialog
      */
-    const handleClickOpen = (object) => 
+    const handleClickEditOrder = (object) => 
     {
         setEditOrderPayload(object);
         setOpenEditProduct(true);
     };
 
-    const handleClose = () => setOpenEditProduct(false);
+    const handleCloseEditOrder = () => {
+        setOpenEditProduct(false)
+        setEditOrderPayload({});
+    };
 
     const handleOnChangeCustomerId = (e) => setCustomerId(e.target.value);
+    const handleOnChangeIsCustomerDiscounted = (boolval) => setCustomerIsDiscounted(boolval);
     const handleOnTableSelectionChange = (rowIds) =>  setRowIds(rowIds);
     /**
      * Cart
@@ -66,6 +71,8 @@ const Pos = () =>
                 tax: tax,
                 total: total
             });
+
+            setCustomerIsDiscounted(Boolean(parseFloat(discount) > 0));
         }
         else 
         {
@@ -147,7 +154,6 @@ const Pos = () =>
 
 
 
-
     return loading ? <Loading /> 
         : processPayment && orderDetails.length > 0 
             ? <ProcessPayment 
@@ -164,12 +170,12 @@ const Pos = () =>
                                 customerId={customerId}
                                 payload={editOrderPayload} 
                                 openEditProduct={openEditProduct} 
-                                handleClose={handleClose}
+                                handleClose={handleCloseEditOrder}
                                 fetchCustomerCart={fetchCustomerCart}
                             />
                         )
                     }
-                    <Grid container>
+                    <Grid container spacing={1}>
                         {/* Item List */}
                         <Grid item xs={12} sm={12} md={8} lg={8}>
                             <Grid container>
@@ -182,6 +188,8 @@ const Pos = () =>
                                     orderDetails={orderDetails}
                                     handleOnCancelOrder={handleOnCancelOrder}
                                     fetchCustomerCart={fetchCustomerCart}
+                                    customerIsDiscounted={customerIsDiscounted}
+                                    handleOnChangeIsCustomerDiscounted={handleOnChangeIsCustomerDiscounted}
                                 />
                             </Grid>
                             </Grid>
@@ -190,7 +198,6 @@ const Pos = () =>
                         {/* Order Details */}
                         <Grid item xs={12} sm={12} md={4} lg={4} className={classes.orderDetails}>
                             <Grid container>
-                            
                             {/* Customer selection */}
                                 <CustomerSearchField 
                                     customerId={customerId}
@@ -207,13 +214,15 @@ const Pos = () =>
                                 />
                             </Grid>
                             
-                            <OrderDetails 
-                                handleClickOpen={handleClickOpen}
-                                handleOnTableSelectionChange={handleOnTableSelectionChange}
-                                orderDetails={orderDetails}
-                                paymentAmountDetails={paymentAmountDetails}
-                                handleOnProcessPayment={handleOnProcessPayment}
-                            />
+                            <Grid item xs={12} sm={12} md={12} lg={12}>
+                                <OrderDetails 
+                                    handleClickOpen={handleClickEditOrder}
+                                    handleOnTableSelectionChange={handleOnTableSelectionChange}
+                                    orderDetails={orderDetails}
+                                    paymentAmountDetails={paymentAmountDetails}
+                                    handleOnProcessPayment={handleOnProcessPayment}
+                                />
+                            </Grid> 
                         </Grid>
                     </Grid>
                 </>

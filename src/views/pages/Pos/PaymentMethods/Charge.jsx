@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
+import SyncLoader from '../../../../components/SyncLoader'
 import {useHistory} from 'react-router-dom'
 import * as POS_ from '../../../../services/pos/pos'
 import {CURRENCY} from '../../../../config/currency'
@@ -41,24 +42,26 @@ const Charge = ({change, customer, paymentProcessState, dispatchPaymentProcessSt
 {
     const classes = paymentUseStyles();
     const history = useHistory();
+
+    const [loading, setLoading] = useState(false);
     
     const handleOnChange = (e) => {
         const {name, value} = e.target;
-
+        console.log(`${name} = ${value}`)
         if (name === 'email') {
             dispatchPaymentProcessState({
                 type: 'set-email',
                 payload: {
-                    customer_email: value
+                    email: value
                 }
             })
         }
-        else 
+        if (name === 'name') 
         {
             dispatchPaymentProcessState({
                 type: 'set-name',
                 payload: {
-                    customer_name: value
+                    name: value
                 }
             })
         }
@@ -67,17 +70,20 @@ const Charge = ({change, customer, paymentProcessState, dispatchPaymentProcessSt
 
     const charge = async () => 
     {
-        console.log(validatedData())
+        setLoading(true);
         const result = await POS_.processPaymentAsync(validatedData());
 
         if (result.status === 'Success')
         {
+            setLoading(false);
             history.go(0);
         }
     }
 
 
-    return (
+    return loading
+        ? <SyncLoader /> 
+        : (
         <>
             <Grid container spacing={4} justify='center'>
                 <Grid item xs={12} sm={12} md={12} lg={12}>

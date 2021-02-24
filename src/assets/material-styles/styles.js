@@ -421,7 +421,8 @@ export const dataGridUseStyles = makeStyles((theme) => ({
 
 export const posUseStyles = makeStyles((theme) => ({
     itemListContainer: {
-        height: '64vh'
+        height: '64vh',
+        overflow: 'auto',
     },
     itemListOptionsContainer: {
         width: '100%'
@@ -431,6 +432,16 @@ export const posUseStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'space-evenly',
         fontWeight: '600'
+    },
+    itemClickableContainer: {
+        '&:hover': {
+            boxShadow: theme.shadows[4],
+            cursor: 'pointer'
+        }
+    },
+    cardImg: {
+        width: '100%',
+        padding: '.5rem'
     },
     itemActionArea: {
         color: '#FFF',
@@ -453,6 +464,9 @@ export const posUseStyles = makeStyles((theme) => ({
     orderDetailsContainer: {
         padding: theme.spacing(0, .5)
     },
+    orderOptionsCardCOntainer: {
+        marginTop: '.1px'
+    },
     dataGrid: {
         backgroundColor: '#FFF',
     },
@@ -464,7 +478,7 @@ export const posUseStyles = makeStyles((theme) => ({
         backgroundColor: '#dddddd'
     },
     chargeBtn: {
-        margin: theme.spacing(.3, 0),
+        margin: theme.spacing(.43, 0, .3),
         backgroundColor: '#4caf50',
         color: '#FFF',
         '&:hover': {

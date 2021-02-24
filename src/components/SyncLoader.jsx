@@ -5,7 +5,7 @@ import {css} from '@emotion/react'
 const SyncLoader = ({ isLoading = true }) => 
 {
     const loaderStyled = css`
-        position: fixed; 
+        position: relative; 
         top: 50%; 
         left: 50%; 
         transform: translate(-50%, -50%);

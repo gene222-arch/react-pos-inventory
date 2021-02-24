@@ -453,6 +453,7 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
                                                 color="default" 
                                                 className={`${classes.paymentTypeBtns} ${classes.chargeBtn}`}
                                                 onClick={() => handlePaymentMethod('cash')}
+                                                disabled={!Boolean(paymentProcessState.cash)}
                                             >
                                                 <Grid container spacing={1} justify='center'>
                                                     <Grid item xs={1} sm={1} md={1} lg={1}>

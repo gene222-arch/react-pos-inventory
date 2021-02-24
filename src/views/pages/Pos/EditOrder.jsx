@@ -66,7 +66,7 @@ const editOrderReducer = (state, action) =>
 const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCustomerCart }) => 
 {
     const classes = posUseStyles();
-
+    console.log(payload);
     const EDIT_ORDER_INITIAL_STATE = {
         customer_id: customerId,
         product_id: payload.product_id,
@@ -110,15 +110,12 @@ const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCus
         if (result.status === 'Success')
         {
             setDiscounts(result.data);
-            console.log(result.data)
         }
     }
 
 
     const updateOrderDiscountQty = async () => 
     {
-        console.log(editOrderState)
-
         if (!editOrderState.discount_id)
         {
             delete editOrderState.discount_id
@@ -131,7 +128,6 @@ const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCus
             alert('Changes applied');
             fetchCustomerCart();
             handleClose();
-
         }
     }
 

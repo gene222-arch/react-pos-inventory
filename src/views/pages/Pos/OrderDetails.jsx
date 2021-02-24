@@ -90,6 +90,7 @@ const OrderDetails = ({
                     color="default" 
                     className={classes.chargeBtn}
                     onClick={handleOnProcessPayment}
+                    disabled={(orderDetails.length <= 0)}
                 >
                     Process Payment
                 </Button>

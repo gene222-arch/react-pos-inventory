@@ -58,16 +58,16 @@ const Invoice = ({customer, total, paymentProcessState, dispatchPaymentProcessSt
             dispatchPaymentProcessState({
                 type: 'set-email',
                 payload: {
-                    customer_email: value
+                    email: value
                 }
             })
         }
-        else 
+        if (name === 'name') 
         {
             dispatchPaymentProcessState({
                 type: 'set-name',
                 payload: {
-                    customer_name: value
+                    name: value
                 }
             })
         }

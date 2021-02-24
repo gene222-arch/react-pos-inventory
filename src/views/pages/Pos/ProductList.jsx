@@ -1,16 +1,18 @@
 import React, {useState, useEffect} from 'react'
+import SyncLoader from '../../../components/SyncLoader'
 import ProductSearchField from './ProductSearchField'
 import * as Product from '../../../services/products/products'
 import * as Category from '../../../services/products/categories'
 import {posUseStyles} from '../../../assets/material-styles/styles'
 import {Grid} from '@material-ui/core'
-import {Card, CardContent, CardActionArea, Typography} from '@material-ui/core'
-
+import {Card, CardContent, CardActionArea, CardActions, CardMedia, Typography} from '@material-ui/core'
+import EMPTY_IMAGE from '../../../assets/storage/images/empty_data/no_data.svg'
 
 
 const ProductList = ({handleAddToCartOnClick}) => 
 {
     const classes = posUseStyles();
+    const [loading, setLoading] = useState(true);
 
     const [products, setProducts] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState([]);
@@ -69,6 +71,7 @@ const ProductList = ({handleAddToCartOnClick}) =>
         if (result.status = 'Success')
         {
             setProducts(result.data);
+            setLoading(false);
         }
     }
 
@@ -84,7 +87,7 @@ const ProductList = ({handleAddToCartOnClick}) =>
 
     return (
         <>
-            <Grid item xs={12} sm={12} md={10} lg={10}>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
                 <ProductSearchField 
                     category={selectedCategory}
                     categories={categories}
@@ -93,29 +96,49 @@ const ProductList = ({handleAddToCartOnClick}) =>
                 />
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={12}>
-                <Card className={classes.itemListContainer}>
-                        <CardContent>
-                            <Grid container spacing={1}>
-                                {products.map((product, index) => (
-                                    <Grid 
-                                        onClick={() => handleAddToCartOnClick(product.id)}
-                                        key={index} 
-                                        item xs={6} sm={6} md={3} lg={3}>
-                                        <Card>
-                                            <CardContent>
-
-                                            </CardContent>
-                                            <CardActionArea className={classes.itemActionArea}>
-                                                <Typography variant="subtitle2" color="initial">
-                                                    {product.name}
-                                                </Typography>
-                                            </CardActionArea>
-                                        </Card>
-                                    </Grid>
-                                ))}
-                            </Grid>
-                        </CardContent>
-                    </Card>          
+                <Card 
+                    className={classes.itemListContainer}
+                >
+                    {
+                        loading 
+                        ? <SyncLoader />
+                        : (
+                            <CardContent>
+                                <Grid container spacing={1}>
+                                    {products.map((product, index) => (
+                                        <Grid 
+                                            key={index} 
+                                            item xs={6} sm={6} md={3} lg={3}
+                                        >
+                                            <Card 
+                                                onClick={() => handleAddToCartOnClick(product.id)}
+                                                className={classes.itemClickableContainer}
+                                            >
+                                                <CardActionArea>
+                                                    <CardMedia
+                                                        className={classes.cardImg}
+                                                        image={EMPTY_IMAGE}
+                                                        title="Product has no image yet"
+                                                        component='img'
+                                                    />
+                                                    <CardContent>
+                                                    
+                                                    </CardContent>
+                                                </CardActionArea>
+                                    
+                                                <CardActions className={classes.itemActionArea}>
+                                                    <Typography variant="subtitle2" color="initial">
+                                                        {product.name}
+                                                    </Typography>
+                                                </CardActions>
+                                            </Card>
+                                        </Grid>
+                                    ))}
+                                </Grid>
+                            </CardContent>
+                        )
+                    }
+                </Card>          
             </Grid>
         </>
     )

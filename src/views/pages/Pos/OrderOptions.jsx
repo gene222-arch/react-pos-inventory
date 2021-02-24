@@ -11,17 +11,18 @@ import DiscountIcon from '@material-ui/icons/Loyalty';
 import {RemoveShoppingCart} from '@material-ui/icons'
 import BackspaceIcon from '@material-ui/icons/Backspace';
 
+
 const OrderOptions = ({ 
     customerId, 
     orderDetails, 
     handleOnCancelOrder, 
-    fetchCustomerCart}) => 
+    fetchCustomerCart,
+    customerIsDiscounted,
+    handleOnChangeIsCustomerDiscounted}) => 
 {
     const classes = posUseStyles();
     const [openApplyDiscount, setOpenApplyDiscount] = useState(false);
     const [openRemoveDiscount, setOpenRemoveDiscount] = useState(false);
-
-    const [hasDiscount, setHasDiscount] = useState(false);
     const [discountId, setDiscountId] = useState(0);
     const [discountValue, setDiscountValue] = useState(0);
     const [discounts, setDiscounts] = useState([]);
@@ -53,42 +54,55 @@ const OrderOptions = ({
 
     const handleApplyDiscountOnClick = async (discountId) => 
     {
-        const result = await POS_.applyDiscountToAllAsync({
-            customer_id: customerId,
-            discount_id: discountId
-        });
 
-        if (result.status === 'Success')
+        if (orderDetails.length <= 0)
         {
-            await fetchCustomerCart();
-            setHasDiscount(true);
-            handleCloseApplyDiscount();
+            alert('Can\'t apply discount on empty cart');
+        }
+        else 
+        {
+            const result = await POS_.applyDiscountToAllAsync({
+                customer_id: customerId,
+                discount_id: discountId
+            });
+    
+            if (result.status === 'Success')
+            {
+                fetchCustomerCart();
+                handleOnChangeIsCustomerDiscounted(true);
+                handleCloseApplyDiscount();
+            }
         }
     } 
 
     const handleRemoveDiscountOnClick = async () => 
     {
-        const result = await POS_.removeAllDiscountAsync({
-            customer_id: customerId
-        });
-
-        if (result.status === 'Success')
+        if (orderDetails.length <= 0)
         {
-            await fetchCustomerCart();
-            setHasDiscount(false);
-            handleCloseRemoveDiscount();
+            alert('Can\'t remove discount on empty cart');
+        }
+        else 
+        {
+            const result = await POS_.removeAllDiscountAsync({
+                customer_id: customerId
+            });
+    
+            if (result.status === 'Success')
+            {
+                fetchCustomerCart();
+                handleOnChangeIsCustomerDiscounted(false);
+                handleCloseRemoveDiscount();
+            }
         }
     } 
 
 
     useEffect(() => {
-
         fetchDiscounts();
 
         return () => {
             setDiscounts([]);
         }   
-
     }, [])
 
 
@@ -110,35 +124,35 @@ const OrderOptions = ({
                 dialogContentText={'Are you sure to remove all customer discounts?'}
             />
 
-            <Grid item xs={12} sm={12} md={12} lg={12} >
-                <Card>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+                <Card className={classes.orderOptionsCardCOntainer}>
                     <CardContent>
                         <Grid container>
                             { discounts.length > 0 && (
                                 discounts.map(discount => 
-                                    !hasDiscount
-                                    ? (
-                                        <Grid 
-                                            key={discount.id}
-                                            item xs={12} sm={12} md={3} lg={3}>
-                                            <Button 
-                                                size="contained" 
-                                                color="default" 
-                                                className={classes.itemListOptionsBtn}
-                                                onClick={
-                                                    () => handleClickOpenApplyDiscount(discount.id, discount.percentage)
-                                                }
-                                            >
-                                                {`${discount.percentage} %`} Discount 
-                                                <DiscountIcon className={classes.discountIcon}/>
-                                            </Button>
-                                        </Grid>
+                                    !customerIsDiscounted && (
+                                        (
+                                            <Grid 
+                                                key={discount.id}
+                                                item xs={12} sm={12} md={3} lg={3}>
+                                                <Button 
+                                                    size="contained" 
+                                                    color="default" 
+                                                    className={classes.itemListOptionsBtn}
+                                                    onClick={
+                                                        () => handleClickOpenApplyDiscount(discount.id, discount.percentage)
+                                                    }
+                                                >
+                                                    {`${discount.percentage} %`} Discount 
+                                                    <DiscountIcon className={classes.discountIcon} />
+                                                </Button>
+                                            </Grid>
+                                        )
                                     )
-                                    : ''
                                 )
                             )}
                             {
-                                hasDiscount && (
+                                customerIsDiscounted && (
                                     <Grid 
                                         item xs={12} sm={12} md={3} lg={3}>
                                         <Button 
@@ -155,18 +169,16 @@ const OrderOptions = ({
                             }
                             <Grid item xs={12} sm={12} md={3} lg={3}>
                                 {
-                                    (orderDetails.length > 0 )
-                                        ? (
-                                            <Button 
-                                                size="contained" 
-                                                color="default" 
-                                                className={classes.itemListOptionsBtn}
-                                                onClick={handleOnCancelOrder}
-                                            >
-                                                Cancel Order <RemoveShoppingCart className={classes.cancelOrderIcon}/>
-                                            </Button>
-                                        )
-                                        : ''
+                                    (orderDetails.length > 0 ) && (
+                                        <Button 
+                                            size="contained" 
+                                            color="default" 
+                                            className={classes.itemListOptionsBtn}
+                                            onClick={handleOnCancelOrder}
+                                        >
+                                            Cancel Order <RemoveShoppingCart className={classes.cancelOrderIcon}/>
+                                        </Button>
+                                    )
                                 }
                             </Grid>
                         </Grid>

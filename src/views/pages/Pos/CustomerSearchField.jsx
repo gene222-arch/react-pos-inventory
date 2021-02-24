@@ -38,7 +38,11 @@ const CustomerSearchField = ({customerId, handleOnChangeCustomerId}) =>
                     <InputLabel 
                         id="demo-simple-select-label" 
                         className={classes.selectLabel}>
-                            Customer
+                            {
+                                customers.length <= 0 
+                                    ? 'Loading customer list...'
+                                    : 'Customer'
+                            }
                     </InputLabel>
                     <Select
                         value={customerId}
@@ -49,12 +53,14 @@ const CustomerSearchField = ({customerId, handleOnChangeCustomerId}) =>
                         inputProps={{ 'aria-label': 'Without label' }}
                         fullWidth
                     >
-                        {customers.map(customer => (
-                            <MenuItem key={customer.id} value={customer.id}>
-                                {customer.customer}
-                            </MenuItem>
-                        ))
-
+                        {
+                            customers.length > 0 && (
+                                customers.map(customer => (
+                                    <MenuItem key={customer.id} value={customer.id}>
+                                        {customer.customer}
+                                    </MenuItem>
+                                ))
+                            )
                         }
                     </Select>
                 </FormControl>

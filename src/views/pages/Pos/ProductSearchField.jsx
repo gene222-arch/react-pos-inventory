@@ -15,11 +15,11 @@ const ProductSearchField = ({
 
     return (
         <>
-            <Grid item xs={12} sm={12} md={10} lg={10}>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
                 <Grid container spacing={1}>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
+                    <Grid item xs={12} sm={12} md={7} lg={7}>
                         <TextField
-                            variant='filled'
+                            variant='outlined'
                             id="input-with-icon-textfield"
                             label="Find item"
                             fullWidth
@@ -33,12 +33,16 @@ const ProductSearchField = ({
                             onKeyUp={handleOnChangeProductName}
                         />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
+                    <Grid item xs={12} sm={12} md={5} lg={5}>
                     <FormControl className={classes.formControl}>
                         <InputLabel 
                             id="demo-simple-select-label" 
                             className={classes.selectLabel}>
-                                All items
+                                {
+                                    categories.length <= 0 
+                                        ? 'Loading category list...'
+                                        : 'All items'
+                                }
                         </InputLabel>
                         <Select
                             variant='filled'
@@ -49,13 +53,21 @@ const ProductSearchField = ({
                             value={category}
                             onChange={handleOnChangeCategory}
                         >
-                            <MenuItem key={0} value={0}>All items</MenuItem>
                             {
-                                categories.map(category => (
-                                    <MenuItem  
-                                        key={category.id}
-                                        value={category.id}>{category.name}</MenuItem>
-                                ))
+                                categories.length > 0 && (
+                                    (
+                                        <>
+                                            <MenuItem key={0} value={0}>All items</MenuItem>
+                                            {
+                                                categories.map(category => (
+                                                    <MenuItem  
+                                                        key={category.id}
+                                                        value={category.id}>{category.name}</MenuItem>
+                                                ))
+                                            }
+                                        </>
+                                    )
+                                )
                             }
                         </Select>
                     </FormControl>
