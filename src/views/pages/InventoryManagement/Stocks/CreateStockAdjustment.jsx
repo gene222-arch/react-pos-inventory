@@ -29,6 +29,7 @@ const CreateStockAdjustment = () =>
             columns = [
                 { field: 'id', hide: true },
                 { field: 'stock_id', hide: true },
+                { field: 'product_id', hide: true },
                 { field: 'product_description', headerName: 'Product', width: 200 },
                 { field: 'in_stock', headerName: 'In stock', width: 150 },
                 { 
@@ -74,6 +75,7 @@ const CreateStockAdjustment = () =>
             columns = [
                 { field: 'id', hide: true },
                 { field: 'stock_id', hide: true },
+                { field: 'product_id', hide: true },
                 { field: 'product_description', headerName: 'Product', width: 200 },
                 { field: 'in_stock', headerName: 'In stock', width: 150 },
                 { 
@@ -94,8 +96,7 @@ const CreateStockAdjustment = () =>
                 },
                 { 
                     field: 'stock_after', 
-                    headerName: 'Stock after',
-                    width: 150,
+                    hide: true,
                 },
                 {
                     field: 'delete_action', 
@@ -119,12 +120,13 @@ const CreateStockAdjustment = () =>
             columns = [
                 { field: 'id', hide: true },
                 { field: 'stock_id', hide: true },
+                { field: 'product_id', hide: true },
                 { field: 'product_description', headerName: 'Product', width: 200 },
-                { field: 'in_stock', headerName: 'In stock', width: 150 },
+                { field: 'in_stock', headerName: 'In stock', width: 200 },
                 { 
                     field: 'removed_stock', 
                     headerName: 'Removed stock', 
-                    width: 150,
+                    width: 200,
                     renderCell: (params) => (
                         <TextField
                             id=""
@@ -140,12 +142,12 @@ const CreateStockAdjustment = () =>
                 { 
                     field: 'stock_after', 
                     headerName: 'Stock after',
-                    width: 150,
+                    width: 200,
                 },
                 {
                     field: 'delete_action', 
                     headerName: 'Action',
-                    width: 150,
+                    width: 200,
                     renderCell: (params) => (
                         <Button
                             className={classes.deleteAction} 
@@ -162,8 +164,6 @@ const CreateStockAdjustment = () =>
     }
 
     const handleOnChangeReason = (e) => setReason(e.target.value);
-
-    const handleOnChangeProductId = (e) => setProductId(parseInt(e.target.value));
 
     const handleOnReceivedItems = (e, data) => 
     {
@@ -193,7 +193,7 @@ const CreateStockAdjustment = () =>
         let filterData = ({
             ...data,
             counted_stock: value,
-            stock_after: value + data.in_stock
+            stock_after: value
         });
 
         const newAdjustments = stockAdjustmentDetails.map(stockAdjustmentDetail => {
@@ -242,38 +242,55 @@ const CreateStockAdjustment = () =>
         }
     }
     
-    const fetchStockToAdjust = async () => 
+    const fetchStockToAdjust = async (e) => 
     {
-        const result = await StockAdjustment_.fetchStockToAdjustAsync({
-            product_id: productId
-        });
+        const id = parseInt(e.target.value);
+        setProductId(parseInt(e.target.value));
 
-        if (result.status === 'Success')
+        const isProductInList = stockAdjustmentDetails.find(stockAdjustment => parseInt(stockAdjustment.product_id) === id);
+        console.log(stockAdjustmentDetails)
+        if (isProductInList)
         {
-            setStockAdjustmentDetails([...stockAdjustmentDetails, result.data]);
-            setProductId(0);
+            alert('Product already exist.')
+        }
+        else 
+        {
+            const result = await StockAdjustment_.fetchStockToAdjustAsync({
+                product_id: id
+            });
+    
+            if (result.status === 'Success')
+            {
+                setStockAdjustmentDetails([...stockAdjustmentDetails, result.data]);
+                setProductId(0);
+            }
         }
 
     }
 
     const createStockAdjustment = async () => 
     {
-        stockAdjustmentDetails.map(stock => {
-            delete stock.id
-            delete stock.product_description
-        })
-
-        const data = {
-            reason: reason,
-            stockAdjustmentDetails: stockAdjustmentDetails
-        };
-
-        const result = await StockAdjustment_.storeAsync(data);
+        const result = await StockAdjustment_.storeAsync(validateData());
 
         if (result.status === 'Success')
         {
             history.push('/inventory-mngmt/stock-adjustments')
         }
+    }
+
+
+    const validateData = () => 
+    {
+        stockAdjustmentDetails.map(stock => {
+            delete stock.product_id
+            delete stock.id
+            delete stock.product_description
+        })
+
+        return {
+            reason: reason,
+            stockAdjustmentDetails: stockAdjustmentDetails
+        };
     }
 
 
@@ -323,7 +340,7 @@ const CreateStockAdjustment = () =>
                                             fullWidth
                                             margin='dense'
                                             value={productId}
-                                            onChange={handleOnChangeProductId}
+                                            onChange={fetchStockToAdjust}
                                         >
                                             {
                                                 products.map((product) => (
@@ -335,16 +352,6 @@ const CreateStockAdjustment = () =>
                                             
                                         </Select>
                                     </FormControl>  
-                                </Grid>
-                                <Grid item>
-                                    <Button 
-                                        variant='outlined' 
-                                        color="default" 
-                                        className={classes.addBtn}
-                                        onClick={fetchStockToAdjust}
-                                    >
-                                        <AddIcon />
-                                    </Button>
                                 </Grid>
                             </Grid>
                 

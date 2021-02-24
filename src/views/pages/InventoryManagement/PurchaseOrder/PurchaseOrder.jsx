@@ -13,7 +13,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import DateFnsUtils from '@date-io/date-fns';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers';
-import AddIcon from '@material-ui/icons/Add';
 import * as DateHelper from '../../../../utils/dates'
 
 
@@ -32,10 +31,8 @@ const PurchaseOrder = () =>
 
     const [suppliers, setSuppliers] = useState([]);
     const [products, setProducts] = useState([]);
-    const [productId, setProductId] = useState({});
+    const [productId, setProductId] = useState(0);
 
-
-    const handleOnChangeProductId = (e) => setProductId(e.target.value);
 
     const handleOnChangeQuantity = (e, poId) => 
     {
@@ -56,11 +53,10 @@ const PurchaseOrder = () =>
         setPurchaseOrderDetails(po);
     };
 
-
     const handleOnChangePurchaseCost = (e, poId) => 
     {
         let value = e.target.value;
-        value = parseFloat(value) || 0.00;
+        value = parseFloat(value).toFixed(2) || 0.00;
 
         const po = purchaseOrderDetails
             .map(purchaseOrderDetail => 
@@ -75,7 +71,6 @@ const PurchaseOrder = () =>
         
         setPurchaseOrderDetails(po);
     };
-
 
     const handleOnRemovePurchaseOrder = async (productId, poId) => 
     {
@@ -99,7 +94,6 @@ const PurchaseOrder = () =>
         ...purchaseOrder, 
         expected_delivery_date: DateHelper.prepareExtractCurDate(date)
     })
-
 
     const columns = [
         { field: 'id', hide: true},
@@ -142,7 +136,7 @@ const PurchaseOrder = () =>
         { field: 'amount', headerName: 'Amount', width: 160,
             valueFormatter: (params) => {
                const po = purchaseOrderDetails.find(po => po.id === params.row.id);
-               return po.ordered_quantity * po.purchase_cost;
+               return (po.ordered_quantity * po.purchase_cost).toFixed(2);
             }
         },
         {
@@ -162,7 +156,6 @@ const PurchaseOrder = () =>
         }
     ];
 
-
     const createPurchaseOrder = async () => 
     {
         const result = await PurchaseOrder_.storeAsync(validateData());
@@ -172,7 +165,6 @@ const PurchaseOrder = () =>
             history.push('/inventory-mngmt/purchase-orders')
         }
     }
-
 
     const validateData = () => 
     {
@@ -190,11 +182,13 @@ const PurchaseOrder = () =>
         };
     }
 
-
-    const fetchProductToPurchase = async () => 
+    const fetchProductToPurchase = async (e) => 
     {
+        const id = parseInt(e.target.value);
+        setProductId(id);
+
         const result = await Product_.fetchToPurchaseAsync({
-            product_id: productId
+            product_id: id
         });
 
         if (result.status === 'Success')
@@ -213,7 +207,6 @@ const PurchaseOrder = () =>
         }
     }
 
-
     const fetchProducts = async () => 
     {
         const result = await Product_.fetchAllAsync();
@@ -224,7 +217,6 @@ const PurchaseOrder = () =>
             setProducts(result.data);
         }
     }
-
 
     const fetchSuppliers = async () => 
     {
@@ -249,6 +241,7 @@ const PurchaseOrder = () =>
         }
     }, []);
 
+
     return (
         <>
             <Card className={classes.purchaseOrderCard}>
@@ -256,6 +249,13 @@ const PurchaseOrder = () =>
                     <Grid container spacing={1}>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <FormControl className={classes.formControl}>
+                                <InputLabel id="demo-simple-select-label">
+                                    {
+                                        suppliers.length <= 0 && (
+                                            'Loading supplier list...'
+                                        )
+                                    }
+                                </InputLabel>
                                 <Select
                                     name='supplier_id'
                                     value={purchaseOrder.supplier_id}
@@ -266,12 +266,14 @@ const PurchaseOrder = () =>
                                     fullWidth
                                 >
                                 {
-                                    suppliers.map(supplier => (
-                                        <MenuItem
-                                            key={supplier.id} 
-                                            value={supplier.id}>
-                                            {supplier.name}</MenuItem>
-                                    ))
+                                    suppliers.length > 0 && (
+                                        suppliers.map(supplier => (
+                                            <MenuItem
+                                                key={supplier.id} 
+                                                value={supplier.id}>
+                                                {supplier.name}</MenuItem>
+                                        ))
+                                    )
                                 }
                                 
                                 </Select>
@@ -322,7 +324,13 @@ const PurchaseOrder = () =>
                     <Grid container spacing={1}>
                         <Grid item>
                             <FormControl className={classes.formControl}>
-                                <InputLabel id="demo-simple-select-label">Add product</InputLabel>
+                                <InputLabel id="demo-simple-select-label">
+                                    {
+                                        products.length <= 0 
+                                            ? 'Loading product list...'
+                                            : 'Add product'
+                                    }
+                                </InputLabel>
                                 <Select
                                     name='role'
                                     labelId="demo-simple-select-label"
@@ -331,28 +339,20 @@ const PurchaseOrder = () =>
                                     fullWidth
                                     margin='dense'
                                     value={productId}
-                                    onChange={handleOnChangeProductId}
+                                    onChange={fetchProductToPurchase}
                                 >
                                     {
-                                        products.map((product) => (
-                                            <MenuItem key={product.id} value={product.id}>
-                                                {product.name}
-                                            </MenuItem>
-                                        ))
+                                        products.length > 0 && (
+                                            products.map((product) => (
+                                                <MenuItem key={product.id} value={product.id}>
+                                                    {product.name}
+                                                </MenuItem>
+                                            ))
+                                        )
                                     }
                                     
                                 </Select>
                             </FormControl>  
-                        </Grid>
-                        <Grid item>
-                            <Button 
-                                variant='outlined' 
-                                color="default" 
-                                className={classes.addBtn}
-                                onClick={fetchProductToPurchase}
-                            >
-                                <AddIcon />
-                            </Button>
                         </Grid>
                     </Grid>
                 
