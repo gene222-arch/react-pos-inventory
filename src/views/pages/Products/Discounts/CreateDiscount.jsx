@@ -1,34 +1,33 @@
 import React, {useState} from 'react'
 import * as Discount_ from '../../../../services/products/discounts'
-import Loading from '../../../../components/Loading'
 import { useHistory } from 'react-router-dom'
 import { 
-    FormHelperText , 
     Card, 
     CardContent, 
     Grid, 
     TextField, 
     Button, 
-    InputLabel, 
-    Avatar, 
     CardHeader,
-    Divider, IconButton
     } from '@material-ui/core';
 import LoyaltyIcon from '@material-ui/icons/Loyalty';
-import { createDiscountUseStyles } from '../../../../assets/material-styles/styles'
-import { MoreVert as MoreVertIcon } from '@material-ui/icons'
+import { discountUseStyles } from '../../../../assets/material-styles/styles'
+import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
+
+
+
+const DISCOUNT_DEFAULT = {
+    name: '',
+    percentage: '',
+};
 
 const CreateDiscount = () => 
 {
-    const classes = createDiscountUseStyles();
+    const classes = discountUseStyles();
     const history = useHistory();
     const [loading, setLoading] = useState(false);
 
-    const [discount, setDiscount] = useState({
-        name: '',
-        percentage: '',
-    });
-
+    const [discount, setDiscount] = useState(DISCOUNT_DEFAULT);
+    const [errorMessage, setErrorMessage] = useState(DISCOUNT_DEFAULT);
 
     const handleOnChangeDiscount = (e) => setDiscount({...discount, [e.target.name]: e.target.value});
 
@@ -37,20 +36,15 @@ const CreateDiscount = () =>
         setLoading(true);
         const result = await Discount_.storeAsync(discount);
 
-        if (result.status === 'Success')
-        {
-            history.push('/products/discounts');
-        }
-        else 
-        {
-            setLoading(false);
-        }
+        result.status === 'Error'
+            ?  setErrorMessage(prepareSetErrorMessages(result.message, errorMessage))
+            :  history.push('/products/discounts');
+
+        setLoading(false);
     }
 
 
-    return loading 
-        ? <Loading />
-        : (
+    return (
             <>
             <Card className={classes.createDiscountCard}>
                 <Grid container justify='center'>
@@ -63,9 +57,11 @@ const CreateDiscount = () =>
                     </Grid>
                 </Grid>
                 <CardContent>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} direction='column'>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <TextField
+                                error={errorMessage.name !== ''}
+                                helperText={errorMessage.name}
                                 name="name"
                                 label="Name"
                                 fullWidth
@@ -75,6 +71,8 @@ const CreateDiscount = () =>
                         </Grid>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <TextField
+                                error={errorMessage.percentage !== ''}
+                                helperText={errorMessage.percentage}
                                 name="percentage"
                                 label="%"
                                 fullWidth
@@ -101,6 +99,7 @@ const CreateDiscount = () =>
                             color="default" 
                             className={classes.addBtn}
                             onClick={createDiscount}
+                            disabled={loading}
                         >
                             Create
                         </Button>

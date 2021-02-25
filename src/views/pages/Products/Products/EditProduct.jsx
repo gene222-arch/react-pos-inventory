@@ -29,6 +29,54 @@ import AddBoxIcon from '@material-ui/icons/AddBox';
 import productDefaultImg from '../../../../assets/storage/images/default_img/product_default_img.svg'
 
 
+const PRODUCT_DEFAULT = {
+    sku: '',
+    barcode: '',
+    name: '',
+    category: '',
+    sold_by: '',
+    price: '',
+    cost: '',
+};
+
+const STOCK_DEFAULT = {
+    supplier_id: '',
+    in_stock: '',
+    minimum_reorder_level: '',
+    default_purchase_costs: '',
+}
+
+const ERR_MSG_KEY = {
+    PRODUCT_ID: 'product.data.product_id',
+    BARCODE: 'product.data.barcode',
+    CATEGORY: 'product.data.category',
+    SKU: 'product.data.sku',
+    COST: 'product.data.cost',
+    PRICE: 'product.data.price',
+    NAME: 'product.data.name',
+    SOLD_BY: 'product.data.sold_by',
+    DEFAULT_PURCHASE_COSTS: 'stock.data.default_purchase_costs',
+    IN_STOCK: 'stock.data.in_stock',
+    MINIMUM_REORDER_LEVEL: 'stock.data.minimum_reorder_level',
+    SUPPLIER_ID: 'stock.data.supplier_id',
+}
+
+const EDIT_PRODUCT_DEFAULT_ERROR_MESSAGES = 
+{
+    'product.product_id': '',
+    'product.data.barcode': '',
+    'product.data.category': '',
+    'product.data.sku': '',
+    'product.data.cost': '',
+    'product.data.price': '',
+    'product.data.name': '',
+    'product.data.sold_by': '',
+    'stock.data.default_purchase_costs': '',
+    'stock.data.in_stock': '',
+    'stock.data.minimum_reorder_level': '',
+    'stock.data.supplier_id': '',
+}
+
 const EditProduct = ({match}) => 
 {
     const classes = createProductUseStyles();
@@ -37,13 +85,15 @@ const EditProduct = ({match}) =>
 
     const {productId} = match.params;
     
-    const [product, setProduct] = useState({});
+    const [product, setProduct] = useState(PRODUCT_DEFAULT);
+    const [stock, setStock] = useState(STOCK_DEFAULT);
     const [categories, setCategories] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
-    const [stock, setStock] = useState({});
+    const [errorMessages, setErrorMessages] = useState(EDIT_PRODUCT_DEFAULT_ERROR_MESSAGES)
 
+    const handleOnChangeProduct = (e) => setProduct({...product, [e.target.name]: e.target.value});
+    const handleOnChangeStock = (e) =>  setStock({...stock, [e.target.name]: e.target.value});
 
-    const [isForSale, setIsForSale] = React.useState(false);
 
     const fetchProduct = async () => 
     {
@@ -77,18 +127,17 @@ const EditProduct = ({match}) =>
         }
     }
 
-    const handleForSaleChange = (event) => setIsForSale(event.target.checked);
-
-    const handleOnChangeProduct = (e) => setProduct({...product, [e.target.name]: e.target.value});
-    const handleOnChangeStock = (e) =>  setStock({...stock, [e.target.name]: e.target.value});
-
-    const handleOnSubmit = async (e) => 
+    const handleUpdateProduct = async (e) => 
     {
         e.preventDefault();
 
         const result = await Product.updateAsync(validatedData());
         
-        if (result.status === 'Success')
+        if (result.status === 'Error')
+        {
+            setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
+        }
+        else
         {
             history.push('/products');
         }
@@ -131,10 +180,10 @@ const EditProduct = ({match}) =>
         fetchSuppliers();
 
         return () => {
-            setProduct('');
-            setCategories('');
-            setSuppliers('');
-            setStock('');
+            setProduct(PRODUCT_DEFAULT);
+            setStock(STOCK_DEFAULT);
+            setCategories([]);
+            setSuppliers([]);
         }
     }, []);
    
@@ -158,6 +207,8 @@ const EditProduct = ({match}) =>
                         <Grid container spacing={3} justify='space-between'>
                             <Grid item xs={12} sm={12} md={5} lg={5}>
                                 <TextField
+                                    error={errorMessages[ERR_MSG_KEY.NAME] !== ''}
+                                    helperText={errorMessages[ERR_MSG_KEY.NAME]}
                                     name='name'
                                     label="Name"
                                     value={product.name}
@@ -166,7 +217,10 @@ const EditProduct = ({match}) =>
                                 />
                             </Grid>
                             <Grid item xs={12} sm={12} md={6} lg={6}>
-                                <FormControl className={classes.formControl}>
+                                <FormControl 
+                                    className={classes.formControl}
+                                    error={Boolean(errorMessages[ERR_MSG_KEY.CATEGORY] !== '')}
+                                >
                                     <InputLabel id="demo-simple-select-label">Category</InputLabel>
                                     <Select
                                         name='category'
@@ -188,21 +242,14 @@ const EditProduct = ({match}) =>
                                         }
                                     
                                     </Select>
+                                    <FormHelperText>{errorMessages[ERR_MSG_KEY.CATEGORY]}</FormHelperText>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} sm={12} md={12} lg={12}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox 
-                                            checked={isForSale} 
-                                            onChange={handleForSaleChange} 
-                                            name="isForSale" 
-                                        />}
-                                    label="This item is available for sale"
-                                />
-                            </Grid>
                             <Grid item xs={12} sm={12} md={10} lg={10}>
-                                <FormControl component="fieldset">
+                                <FormControl 
+                                    component="fieldset"
+                                    error={Boolean(errorMessages[ERR_MSG_KEY.SOLD_BY] !== '')}
+                                >
                                     <FormLabel component="legend">Sold by</FormLabel>
                                     <RadioGroup 
                                         aria-label="gender" 
@@ -227,13 +274,15 @@ const EditProduct = ({match}) =>
                                             </Grid>
                                         </Grid>
                                     </RadioGroup>
+                                    <FormHelperText>{errorMessages[ERR_MSG_KEY.SOLD_BY]}</FormHelperText>
                                 </FormControl>
                             </Grid>
                         </Grid>
                         <Grid container spacing={3} justify='space-between'>
                             <Grid item xs={12} sm={12} md={5} lg={5}>
                                 <TextField
-                                    
+                                    error={errorMessages[ERR_MSG_KEY.PRICE] !== ''}
+                                    helperText={errorMessages[ERR_MSG_KEY.PRICE]}
                                     name='price'
                                     label="Price"
                                     value={product.price}
@@ -243,7 +292,8 @@ const EditProduct = ({match}) =>
                             </Grid>
                             <Grid item xs={12} sm={12} md={6} lg={6}>
                                 <TextField
-                                    
+                                    error={errorMessages[ERR_MSG_KEY.COST] !== ''}
+                                    helperText={errorMessages[ERR_MSG_KEY.COST]}
                                     name='cost'
                                     label="Cost"
                                     value={product.cost}
@@ -255,7 +305,8 @@ const EditProduct = ({match}) =>
                         <Grid container spacing={3} justify='space-between'>
                             <Grid item xs={12} sm={12} md={5} lg={5}>
                                 <TextField
-                                    
+                                    error={errorMessages[ERR_MSG_KEY.SKU] !== ''}
+                                    helperText={errorMessages[ERR_MSG_KEY.SKU]}
                                     name='sku'
                                     label="SKU"
                                     fullWidth
@@ -265,7 +316,8 @@ const EditProduct = ({match}) =>
                             </Grid>
                             <Grid item xs={12} sm={12} md={6} lg={6}>
                                 <TextField
-                                    
+                                    error={errorMessages[ERR_MSG_KEY.BARCODE] !== ''}
+                                    helperText={errorMessages[ERR_MSG_KEY.BARCODE]}
                                     name='barcode'
                                     label="Barcode"
                                     fullWidth
@@ -290,6 +342,8 @@ const EditProduct = ({match}) =>
                         <Grid container spacing={3} justify='space-between'>
                             <Grid item xs={12} sm={12} md={6} lg={6}>
                                 <TextField
+                                    error={errorMessages[ERR_MSG_KEY.IN_STOCK] !== ''}
+                                    helperText={errorMessages[ERR_MSG_KEY.IN_STOCK]}
                                     name='in_stock'
                                     value={stock.in_stock}
                                     onChange={handleOnChangeStock}
@@ -299,6 +353,8 @@ const EditProduct = ({match}) =>
                             </Grid>
                             <Grid item xs={12} sm={12} md={6} lg={6}>
                                 <TextField
+                                    error={errorMessages[ERR_MSG_KEY.MINIMUM_REORDER_LEVEL] !== ''}
+                                    helperText={errorMessages[ERR_MSG_KEY.MINIMUM_REORDER_LEVEL]}
                                     name='minimum_reorder_level'
                                     value={stock.minimum_reorder_level}
                                     onChange={handleOnChangeStock}
@@ -310,7 +366,10 @@ const EditProduct = ({match}) =>
                         </Grid>
                         <Grid container spacing={3} justify='space-between'>
                             <Grid item xs={12} sm={12} md={6} lg={6}>
-                                <FormControl className={classes.formControl}>
+                                <FormControl 
+                                    className={classes.formControl}
+                                    error={Boolean(errorMessages[ERR_MSG_KEY.SUPPLIER_ID] !== '')}
+                                >
                                     <InputLabel id="demo-simple-select-label">Supplier</InputLabel>
                                     <Select
                                         name='supplier_id'
@@ -333,10 +392,13 @@ const EditProduct = ({match}) =>
                                         }
                                     
                                     </Select>
+                                    <FormHelperText>{errorMessages[ERR_MSG_KEY.SUPPLIER_ID]}</FormHelperText>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={12} md={6} lg={6}>
                                 <TextField
+                                    error={errorMessages[ERR_MSG_KEY.DEFAULT_PURCHASE_COSTS] !== ''}
+                                    helperText={errorMessages[ERR_MSG_KEY.DEFAULT_PURCHASE_COSTS]}
                                     name='default_purchase_costs'
                                     value={stock.default_purchase_costs}
                                     onChange={handleOnChangeStock}
@@ -397,7 +459,7 @@ const EditProduct = ({match}) =>
                             variant='contained' 
                             color="default" 
                             className={classes.addBtn}
-                            onClick={handleOnSubmit}
+                            onClick={handleUpdateProduct}
                         >
                             Update
                         </Button>

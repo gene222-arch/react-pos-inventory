@@ -28,10 +28,12 @@ const ProductList = () =>
         { field: 'category', headerName: 'Category', width: 200 },
         { field: 'price', headerName: 'Price', width: 130 },
         { field: 'cost', headerName: 'Cost', width: 130 },
-        { field: 'margin', headerName: 'Margin', width: 130 },
+        { field: 'margin', headerName: 'Margin %', width: 130,
+            valueFormatter: (params) => parseFloat(params.value).toFixed(2)
+        },
         { field: 'in_stock', headerName: 'In stock', width: 130,
             cellClassName: (params) =>  clsx('super-app', {
-                negative: params.value < params.row.minimum_reorder_level 
+                negative: params.value <= params.row.minimum_reorder_level 
               })
         },
         { field: 'minimum_reorder_level', headerName: 'Min stock', width: 130},

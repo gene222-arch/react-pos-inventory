@@ -17,6 +17,8 @@ import GrossProfitIcon from '@material-ui/icons/ShowChart';
 import SalesReturnIcon from '@material-ui/icons/RemoveShoppingCart';
 import NetSalesIcon from '@material-ui/icons/MultilineChart';
 import InvoiceIcon from '@material-ui/icons/Receipt';
+import MarginSalesIcon from '@material-ui/icons/DonutSmall';
+import PurchaseReturnIcon from '@material-ui/icons/KeyboardReturn';
 import PurchaseOrdersIcon from '@material-ui/icons/AddShoppingCart';
 import { dashboardUseStyles } from '../../../assets/material-styles/styles'
 import NO_DATA_IMG from '../../../assets/storage/images/dashboard/no_data.svg'
@@ -29,7 +31,12 @@ const DASHBOARD_DEFAULT_PROPS = {
         gross_profit: 0.00,
         sales_return: 0.00,
         net_sales: 0.00,
-    }
+        margin_sales: 0.00,
+        purchase_return: 0.00
+    },
+    monthlySales: [],
+    pendingInvoices: [],
+    inProcessPurchaseOrders: []
 }
 
 const Dashboard = () => 
@@ -93,6 +100,7 @@ const Dashboard = () =>
         {
             if (result.data)
             {
+                console.log(result.data);
                 setDashboardData(result.data);
             }
             setLoading(false);
@@ -117,146 +125,213 @@ const Dashboard = () =>
         ? <Loading />
         : (    
             <div className={classes.root}> 
-            <Grid container spacing={4} justify='center'>
-                <Grid item xs={12} sm={12} md={6} lg={3} className={classes.reportCardContainer}>
-                    <Card>
-                        <CardHeader
-                            avatar={
-                                <Avatar 
-                                    variant='rounded' 
-                                    className={`${classes.cardHeaderIcon} ${classes.revenueContainer}`}>
-                                    <RevenueIcon className={classes.salesReportIcons}/>
-                                </Avatar>
-                            }
-                            title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.gross_sales).toFixed(2)}`}
-                            subheader="Revenue"
-                            titleTypographyProps={{ 
-                                variant: 'h4',
-                                className: classes.title
-                            }}
-                            subheaderTypographyProps={{ 
-                                className: classes.subheader
-                            }}
-                        />
-                        <CardContent>
-                            <Divider />
-                        </CardContent>
-                        <CardActions className={classes.cardActionsContainer}>
-                            <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                <TrendingUpIcon /> {'$2000'} Last month
-                            </Typography>
-                        </CardActions>
-                    </Card>
-                </Grid>                
-                
-                <Grid item xs={12} sm={12} md={6} lg={3} className={classes.reportCardContainer}>
-                    <Card>
-                        <CardHeader
-                            avatar={
-                                <Avatar 
-                                    variant='rounded' 
-                                    className={`${classes.cardHeaderIcon} ${classes.grossProfitContainer}`}>
-                                    <GrossProfitIcon className={classes.salesReportIcons}/>
-                                </Avatar>
-                            }
-                            title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.gross_profit).toFixed(2)}`}
-                            subheader="Gross profit"
-                            titleTypographyProps={{ 
-                                variant: 'h4',
-                                className: classes.title
-                            }}
-                            subheaderTypographyProps={{ 
-                                className: classes.subheader
-                            }}
-                        />
-                        <CardContent>
-                            <Divider />
-                        </CardContent>
-                        <CardActions className={classes.cardActionsContainer}>
-                            <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                <TrendingUpIcon /> {'$2000'} Last month
-                            </Typography>
-                        </CardActions>
-                    </Card>
-                </Grid>                
-
-                <Grid item xs={12} sm={12} md={6} lg={3} className={classes.reportCardContainer}>
-                    <Card>
-                        <CardHeader
-                            avatar={
-                                <Avatar 
-                                    variant='rounded' 
-                                    className={`${classes.cardHeaderIcon} ${classes.salesReturnContainer}`}>
-                                    <SalesReturnIcon className={classes.salesReportIcons}/>
-                                </Avatar>
-                            }
-                            title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.sales_return).toFixed(2)}`}
-                            subheader="Sales return"
-                            titleTypographyProps={{ 
-                                variant: 'h4',
-                                className: classes.title
-                            }}
-                            subheaderTypographyProps={{ 
-                                className: classes.subheader
-                            }}
-                        />
-                        <CardContent>
-                            <Divider />
-                        </CardContent>
-                        <CardActions className={classes.cardActionsContainer}>
-                            <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                <TrendingDownIcon /> {'-$2000'} Last month
-                            </Typography>
-                        </CardActions>
-                    </Card>
-                </Grid>                
-
-                <Grid item xs={12} sm={12} md={6} lg={3} className={classes.reportCardContainer}>
-                    <Card>
-                        <CardHeader
-                            avatar={
-                                <Avatar 
-                                    variant='rounded' 
-                                    className={`${classes.cardHeaderIcon} ${classes.netSalesContainer}`}>
-                                    <NetSalesIcon className={classes.salesReportIcons}/>
-                                </Avatar>
-                            }
-                            title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.net_sales).toFixed(2)}`}
-                            subheader="Net sales"
-                            titleTypographyProps={{ 
-                                variant: 'h4',
-                                className: classes.title
-                            }}
-                            subheaderTypographyProps={{ 
-                                className: classes.subheader
-                            }}
-                        />
-                        <CardContent>
-                            <Divider />
-                        </CardContent>
-                        <CardActions className={classes.cardActionsContainer}>
-                            <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                <TrendingUpIcon /> {'$2000'} Last month
-                            </Typography>
-                        </CardActions>
-                    </Card>
-                </Grid>                
-            
-                <Grid item xs={12} sm={12} md={12} lg={12}>
-                    <Card className={classes.chartContainer}>
-                        <CardContent className={classes.chartContainer}>
-                            <HighchartsReact
-                                key={componentKey}
-                                highcharts={Highcharts} 
-                                options={salesChartOptions} 
-                                
+                <Grid container spacing={3} justify='center'>
+                {/* Revenue */}
+                    <Grid item xs={12} sm={12} md={6} lg={4} className={classes.reportCardContainer}>
+                        <Card>
+                            <CardHeader
+                                avatar={
+                                    <Avatar 
+                                        variant='rounded' 
+                                        className={`${classes.cardHeaderIcon} ${classes.revenueContainer}`}>
+                                        <RevenueIcon className={classes.salesReportIcons}/>
+                                    </Avatar>
+                                }
+                                title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.gross_sales).toFixed(2)}`}
+                                subheader="Revenue"
+                                titleTypographyProps={{ 
+                                    variant: 'h4',
+                                    className: classes.title
+                                }}
+                                subheaderTypographyProps={{ 
+                                    className: classes.subheader
+                                }}
                             />
-                        </CardContent>
-                    </Card>
+                            <CardContent>
+                                <Divider />
+                            </CardContent>
+                            <CardActions className={classes.cardActionsContainer}>
+                                <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
+                                    <TrendingUpIcon /> {'$2000'} Last month
+                                </Typography>
+                            </CardActions>
+                        </Card>
+                    </Grid>                
+                    
+                {/* Gross profit */}
+                    <Grid item xs={12} sm={12} md={6} lg={4} className={classes.reportCardContainer}>
+                        <Card>
+                            <CardHeader
+                                avatar={
+                                    <Avatar 
+                                        variant='rounded' 
+                                        className={`${classes.cardHeaderIcon} ${classes.grossProfitContainer}`}>
+                                        <GrossProfitIcon className={classes.salesReportIcons}/>
+                                    </Avatar>
+                                }
+                                title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.gross_profit).toFixed(2)}`}
+                                subheader="Gross profit"
+                                titleTypographyProps={{ 
+                                    variant: 'h4',
+                                    className: classes.title
+                                }}
+                                subheaderTypographyProps={{ 
+                                    className: classes.subheader
+                                }}
+                            />
+                            <CardContent>
+                                <Divider />
+                            </CardContent>
+                            <CardActions className={classes.cardActionsContainer}>
+                                <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
+                                    <TrendingUpIcon /> {'$2000'} Last month
+                                </Typography>
+                            </CardActions>
+                        </Card>
+                    </Grid>          
+
+                {/* Margin sales */}
+                    <Grid item xs={12} sm={12} md={6} lg={4} className={classes.reportCardContainer}>
+                        <Card>
+                            <CardHeader
+                                avatar={
+                                    <Avatar 
+                                        variant='rounded' 
+                                        className={`${classes.cardHeaderIcon} ${classes.marginSalesContainer}`}>
+                                        <MarginSalesIcon className={classes.salesReportIcons}/>
+                                    </Avatar>
+                                }
+                                title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.margin_sales).toFixed(2)}`}
+                                subheader="Margin sales"
+                                titleTypographyProps={{ 
+                                    variant: 'h4',
+                                    className: classes.title
+                                }}
+                                subheaderTypographyProps={{ 
+                                    className: classes.subheader
+                                }}
+                            />
+                            <CardContent>
+                                <Divider />
+                            </CardContent>
+                            <CardActions className={classes.cardActionsContainer}>
+                                <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
+                                    <TrendingUpIcon /> {'$2000'} Last month
+                                </Typography>
+                            </CardActions>
+                        </Card>
+                    </Grid>     
+
+                {/* Net Sales */}
+                    <Grid item xs={12} sm={12} md={6} lg={4} className={classes.reportCardContainer}>
+                        <Card>
+                            <CardHeader
+                                avatar={
+                                    <Avatar 
+                                        variant='rounded' 
+                                        className={`${classes.cardHeaderIcon} ${classes.netSalesContainer}`}>
+                                        <NetSalesIcon className={classes.salesReportIcons}/>
+                                    </Avatar>
+                                }
+                                title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.net_sales).toFixed(2)}`}
+                                subheader="Net sales"
+                                titleTypographyProps={{ 
+                                    variant: 'h4',
+                                    className: classes.title
+                                }}
+                                subheaderTypographyProps={{ 
+                                    className: classes.subheader
+                                }}
+                            />
+                            <CardContent>
+                                <Divider />
+                            </CardContent>
+                            <CardActions className={classes.cardActionsContainer}>
+                                <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
+                                    <TrendingUpIcon /> {'$2000'} Last month
+                                </Typography>
+                            </CardActions>
+                        </Card>
+                    </Grid>                
+                
+                {/* Purchase return */}
+                    <Grid item xs={12} sm={12} md={6} lg={4} className={classes.reportCardContainer}>
+                        <Card>
+                            <CardHeader
+                                avatar={
+                                    <Avatar 
+                                        variant='rounded' 
+                                        className={`${classes.cardHeaderIcon} ${classes.purchaseReturnContainer}`}>
+                                        <PurchaseReturnIcon className={classes.salesReportIcons}/>
+                                    </Avatar>
+                                }
+                                title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.purchase_return).toFixed(2)}`}
+                                subheader="Purchase return"
+                                titleTypographyProps={{ 
+                                    variant: 'h4',
+                                    className: classes.title
+                                }}
+                                subheaderTypographyProps={{ 
+                                    className: classes.subheader
+                                }}
+                            />
+                            <CardContent>
+                                <Divider />
+                            </CardContent>
+                            <CardActions className={classes.cardActionsContainer}>
+                                <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
+                                    <TrendingDownIcon /> {'-$2000'} Last month
+                                </Typography>
+                            </CardActions>
+                        </Card>
+                    </Grid>                
+        
+                {/* Sales Return */}
+                    <Grid item xs={12} sm={12} md={6} lg={4} className={classes.reportCardContainer}>
+                        <Card>
+                            <CardHeader
+                                avatar={
+                                    <Avatar 
+                                        variant='rounded' 
+                                        className={`${classes.cardHeaderIcon} ${classes.salesReturnContainer}`}>
+                                        <SalesReturnIcon className={classes.salesReportIcons}/>
+                                    </Avatar>
+                                }
+                                title={`${CURRENCY.CURRENCY} ${(dashboardData.salesSummary.sales_return).toFixed(2)}`}
+                                subheader="Sales return"
+                                titleTypographyProps={{ 
+                                    variant: 'h4',
+                                    className: classes.title
+                                }}
+                                subheaderTypographyProps={{ 
+                                    className: classes.subheader
+                                }}
+                            />
+                            <CardContent>
+                                <Divider />
+                            </CardContent>
+                            <CardActions className={classes.cardActionsContainer}>
+                                <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
+                                    <TrendingDownIcon /> {'-$2000'} Last month
+                                </Typography>
+                            </CardActions>
+                        </Card>
+                    </Grid>                
+
+                    <Grid item xs={12} sm={12} md={11} lg={11}>
+                        <Card className={classes.chartContainer}>
+                            <CardContent className={classes.chartContainer}>
+                                <HighchartsReact
+                                    key={componentKey}
+                                    highcharts={Highcharts} 
+                                    options={salesChartOptions} 
+                                    
+                                />
+                            </CardContent>
+                        </Card>
+                    </Grid>
                 </Grid>
-            
-            </Grid>
-            <Grid container spacing={4}>
+                <Grid container spacing={3}>
                 <Grid item xs={12} sm={12} md={6} lg={6}>
                     <Card>
                         <CardHeader
@@ -348,8 +423,7 @@ const Dashboard = () =>
                     </Card>
                 </Grid>
             </Grid>
-        
-        </div>
+            </div>
         );
 }
 

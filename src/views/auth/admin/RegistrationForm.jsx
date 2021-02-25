@@ -1,12 +1,13 @@
   
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom'
+import React, {useState} from 'react';
+import registerAsync from '../../../services/auth/register/register'
+import {prepareSetErrorMessages} from '../../../utils/errorMessages.js'
+import * as Cookie from '../../../utils/cookies'
+import { NavLink, useHistory } from 'react-router-dom'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
@@ -34,14 +35,49 @@ const Copyright = () => {
 const RegistrationForm = () => 
 {
     const classes = registrationFormUseStyles();
-    const [ reg, setReg ] = useState({
+    const history = useHistory();
+
+    const [ credentials, setCredentials ] = useState({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
-        role: 'admin',
-        remember_me: false,
+        role: 'admin'
     });
+
+    const [ errorMessages, setErrorMessages ] = useState({
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+    });
+
+    const handleCredentialsOnChange = (e) => setCredentials({...credentials, [e.target.name]: e.target.value})
+
+
+
+    const handleCredentialsOnSubmit = async (e) => 
+    {
+        e.preventDefault();
+
+        const result = await registerAsync(credentials);
+        
+        if (result.status === 'Success')
+        {
+            Cookie.setItem('access_token', result.data.access_token);
+
+            if (Cookie.has('access_token'))
+            {
+                history.push('/');
+            }
+        }
+        else 
+        {
+            setErrorMessages(prepareSetErrorMessages(result.errors, errorMessages))
+        }
+
+    }
+
 
     return (
         <Grid container component="main" className={classes.root}>
@@ -54,62 +90,68 @@ const RegistrationForm = () =>
                     <Typography component="h1" variant="h5">
                         Admin Sign up
                     </Typography>
-                    <form className={classes.form} noValidate={false}>
+                    <form className={classes.form} noValidate onSubmit={handleCredentialsOnSubmit}>
                         <TextField
-                            error={false}
-                            helperText={''}
+                            error={errorMessages.name !== ''}
+                            helperText={errorMessages.name}
                             variant="outlined"
                             margin="normal"
-                            required
+                            
                             fullWidth
                             id="name"
                             label="Name"
                             name="name"
                             autoComplete="name"
                             autoFocus
+                            value={credentials.name}
+                            onChange={handleCredentialsOnChange}
                         />
+
                         <TextField
-                            error={false}
-                            helperText={''}
+                            error={errorMessages.email !== ''}
+                            helperText={errorMessages.email}
                             variant="outlined"
                             margin="normal"
-                            required
+                        
                             fullWidth
                             id="email"
                             label="Email"
                             name="email"
                             autoComplete="email"
                             autoFocus
+                            value={credentials.email}
+                            onChange={handleCredentialsOnChange}
                         />
+
                         <TextField
-                            error={false}
-                            helperText={''}
+                            error={errorMessages.password !== ''}
+                            helperText={errorMessages.password}
                             variant="outlined"
                             margin="normal"
-                            required
+                            
                             fullWidth
                             name="password"
                             label="Password"
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            value={credentials.password}
+                            onChange={handleCredentialsOnChange}
                         />
+
                         <TextField
-                            error={false}
-                            helperText={''}
+                            error={errorMessages.password_confirmation !== ''}
+                            helperText={errorMessages.password_confirmation}
                             variant="outlined"
                             margin="normal"
-                            required
                             fullWidth
                             name="password_confirmation"
                             label="Confirm Password"
                             type="password"
                             id="password_confirmation"
                             autoComplete="current-password"
-                        />
-                        <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
-                            label="Remember me"
+                            value={credentials.password_confirmation}
+                            onChange={handleCredentialsOnChange}
                         />
                         <Button
                             type="submit"
@@ -121,11 +163,6 @@ const RegistrationForm = () =>
                             Sign up
                         </Button>
                         <Grid container>
-                            <Grid item xs>
-                                <Link href="#" variant="body2">
-                                    
-                                </Link>
-                            </Grid>
                             <Grid item>
                                 <NavLink to="/auth/login" variant="body2" className={classes.loginLink}>
                                     {"Already have an account? Sign In"}

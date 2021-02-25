@@ -15,6 +15,7 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
+import Alert from '@material-ui/lab/Alert';
 import { loginFormUseStyles } from '../../assets/material-styles/styles';
 import * as Cookie from '../../utils/cookies'
 
@@ -33,20 +34,28 @@ const Copyright = () => {
 }
 
 
+const DEFAULT_CREDENTIAL_PROPS = {
+    email: '',
+    password: '',
+    remember_me: false,
+};
+
+const DEFAULT_ERROR_MESSAGE_PROPS = {
+    email: '',
+    password: ''
+};
+
+
 const LoginForm = () => 
 {
     const classes = loginFormUseStyles();
     const history = useHistory();
+    const [loading, setLoading] = useState(false);
 
-    const [credentials, setCredentials] = useState({
-        email: '',
-        password: '',
-        remember_me: false,
-    });
-    const [errorMessages, setErrorMessages] = useState({
-        email: '',
-        password: '',
-    });
+    const [credentials, setCredentials] = useState(DEFAULT_CREDENTIAL_PROPS);
+    const [errorMessages, setErrorMessages] = useState(DEFAULT_ERROR_MESSAGE_PROPS);
+
+    const [mismatch, setMismatch] = useState('');
 
     
     const handleCredentialsOnChange = (e) => 
@@ -63,13 +72,21 @@ const LoginForm = () =>
     };
 
     const handleOnClickLogin = async (e) => 
-    {
+    {   
+        setLoading(true);
         e.preventDefault();
 
-        const result = await loginAsync(credentials);
+        const result = await loginAsync(history, credentials);
    
-        if (result.status === 'Success') 
+        if (result.status === 'Error')
         {
+            setErrorMessages(DEFAULT_ERROR_MESSAGE_PROPS);
+            setMismatch(result.message);   
+        }
+
+        else if (result.status === 'Success') 
+        {
+            setMismatch('');
             Cookie.setItem('access_token', result.data.access_token);
 
             if (Cookie.has('access_token'))
@@ -81,6 +98,7 @@ const LoginForm = () =>
         {
             setErrorMessages(prepareSetErrorMessages(result.errors, errorMessages));
         }
+        setLoading(false);
     }
 
 
@@ -97,6 +115,15 @@ const LoginForm = () =>
                     <Typography component="h1" variant="h5">
                         Sign in
                     </Typography>
+                    {
+                        mismatch && (
+                            <Alert 
+                                className={classes.mismatchErrorMessage}
+                                severity="error" 
+                                onClose={() => setMismatch('')}
+                            >{mismatch}!</Alert>
+                        )
+                    }
                     <form className={classes.form} noValidate onSubmit={handleOnClickLogin}>
                         <TextField
                             error={errorMessages.email !== ''}
@@ -145,8 +172,13 @@ const LoginForm = () =>
                             variant="contained"
                             color="primary"
                             className={classes.submit}
+                            disabled={loading}
                         >
-                            Sign In
+                            {
+                                loading 
+                                    ? 'Signing in...'
+                                    : 'Sign in'
+                            }
                         </Button>
                         <Grid container>
                             <Grid item xs>

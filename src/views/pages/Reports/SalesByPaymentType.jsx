@@ -8,6 +8,7 @@ import DateFnsUtils from '@date-io/date-fns';
 import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 import { salesByUseStyles } from '../../../assets/material-styles/styles'
 import * as DateHelper from '../../../utils/dates'
+import {prepareSetErrorMessages} from '../../../utils/errorMessages'
 
 
 const SalesByPaymentType = () => 
@@ -17,6 +18,11 @@ const SalesByPaymentType = () =>
     const [endDate, setEndDate] = useState(null);
 
     const [salesByPaymentType, setSalesByPaymentType] = useState([]);
+    const [errorMessages, setErrorMessages] = useState({
+        startDate: '',
+        endDate: ''
+    })
+
     const columns = [
         { field: 'payment_type', headerName: 'Payment type', width: 320 },
         { field: 'gross_sales', headerName: 'Gross sales', width: 310 },
@@ -51,9 +57,18 @@ const SalesByPaymentType = () =>
             endDate: endDate
         });
 
+        if (result.status === 'Error')
+        {
+            setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
+        }
+
         if (result.status === 'Success')
         {
-            setSalesByPaymentType(result.data);
+            setSalesByPaymentType(result.data)
+        }
+        else 
+        {
+            setSalesByPaymentType([])
         }
     }
 
@@ -78,6 +93,8 @@ const SalesByPaymentType = () =>
                                         <Grid container spacing={1} justify='flex-start' alignItems='center'>
                                             <Grid item xs={12} sm={6} md={4} lg={3}>
                                                 <KeyboardDatePicker
+                                                    error={errorMessages.startDate !== ''}
+                                                    helperText={errorMessages.startDate}
                                                     fullWidth
                                                     margin="normal"
                                                     id="From"
@@ -92,6 +109,8 @@ const SalesByPaymentType = () =>
                                             </Grid>
                                             <Grid item xs={12} sm={6} md={4} lg={3}>
                                                 <KeyboardDatePicker
+                                                    error={errorMessages.endDate !== ''}
+                                                    helperText={errorMessages.endDate}
                                                     fullWidth
                                                     margin="normal"
                                                     id="to"
@@ -109,12 +128,15 @@ const SalesByPaymentType = () =>
                                                     variant="contained" 
                                                     color="primary"
                                                     onClick={fetchSalesByPaymentTypeWithDate}
+                                                    disabled={
+                                                        Boolean(startDate === null || endDate === null)
+                                                    }
                                                 >
                                                     Apply
                                                 </Button>
                                             </Grid>
                                             {
-                                                (startDate !== null || endDate !== null) && (
+                                                (startDate !== null && endDate !== null) && (
                                                     <Grid item>
                                                         <Button 
                                                             variant='contained'

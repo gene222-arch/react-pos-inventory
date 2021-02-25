@@ -7,6 +7,7 @@ import Grid from '@material-ui/core/Grid'
 import DateFnsUtils from '@date-io/date-fns';
 import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 import * as DateHelper from '../../../utils/dates'
+import {prepareSetErrorMessages} from '../../../utils/errorMessages'
 import {salesByUseStyles} from '../../../assets/material-styles/styles'
 
 
@@ -17,6 +18,10 @@ const SalesByCategory = () =>
     const [endDate, setEndDate] = useState(null);
 
     const [salesByCategory, setSalesByCategory] = useState([]);
+    const [errorMessages, setErrorMessages] = useState({
+        startDate: '',
+        endDate: ''
+    })
 
     const columns = [
         { field: 'id', hide: true },
@@ -46,7 +51,6 @@ const SalesByCategory = () =>
         if (result.status === 'Success')
         {
             setSalesByCategory(result.data)
-            console.log(result.data)
         }
     }
 
@@ -58,10 +62,19 @@ const SalesByCategory = () =>
             endDate: endDate
         });
 
+        if (result.status === 'Error')
+        {
+            setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
+        }
+
         if (result.status === 'Success')
         {
             setSalesByCategory(result.data)
             console.log(result.data)
+        }
+        else 
+        {
+            setSalesByCategory([])
         }
     }
 
@@ -85,6 +98,8 @@ const SalesByCategory = () =>
                                         <Grid container spacing={1} justify='flex-start' alignItems='center'>
                                             <Grid item xs={12} sm={6} md={3} lg={3}>
                                                 <KeyboardDatePicker
+                                                    error={errorMessages.startDate !== ''}
+                                                    helperText={errorMessages.startDate}
                                                     fullWidth
                                                     margin="normal"
                                                     id="From"
@@ -99,6 +114,8 @@ const SalesByCategory = () =>
                                             </Grid>
                                             <Grid item xs={12} sm={6} md={3} lg={3}>
                                                 <KeyboardDatePicker
+                                                    error={errorMessages.endDate !== ''}
+                                                    helperText={errorMessages.endDate}
                                                     fullWidth
                                                     margin="normal"
                                                     id="to"
@@ -115,12 +132,16 @@ const SalesByCategory = () =>
                                                 <Button 
                                                     variant="contained" 
                                                     color="primary" 
-                                                    onClick={fetchSalesByCategoryWithDate}>
+                                                    onClick={fetchSalesByCategoryWithDate}
+                                                    disabled={
+                                                        Boolean(startDate === null || endDate === null)
+                                                    }
+                                                >
                                                     Apply
                                                 </Button>
                                             </Grid>
                                             {
-                                                (startDate !== null || endDate !== null) && (
+                                                (startDate !== null && endDate !== null) && (
                                                     <Grid item>
                                                         <Button 
                                                             variant='contained'

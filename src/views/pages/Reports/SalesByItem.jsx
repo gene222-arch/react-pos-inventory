@@ -7,16 +7,27 @@ import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsReact from 'highcharts-react-official'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, ListItemSecondaryAction } from '@material-ui/core'
-import { List, ListItem, ListItemText, Avatar, CardHeader, Button, Typography, TextField } from '@material-ui/core'
-import {Select, FormControl, Divider, InputLabel, MenuItem} from '@material-ui/core';
+import { List, ListItem, ListItemText, Avatar, CardHeader, Button, Typography } from '@material-ui/core'
+import {Select, FormControl, InputLabel, MenuItem} from '@material-ui/core';
 import Grid from '@material-ui/core/Grid'
 import StarIcon from '@material-ui/icons/Star';
 import DateFnsUtils from '@date-io/date-fns';
 import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 import { salesByUseStyles } from '../../../assets/material-styles/styles'
 import * as DateHelper from '../../../utils/dates'
+import EmptyDataIcon from '@material-ui/icons/HourglassEmpty';
+import {prepareSetErrorMessages} from '../../../utils/errorMessages'
+
 
 HighchartsExporting(Highcharts)
+
+
+const SALES_BY_ITEM_DEFAULT_PROPS = {
+    tableData: [],
+    topFiveItems: [],
+    chartData: []
+};
+
 
 const SalesByItem = () => 
 {
@@ -27,22 +38,28 @@ const SalesByItem = () =>
 
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-    const [salesByItem, setSalesByItem] = useState({
-        tableData: [],
-        chartData: []
-    });
+    const [salesByItem, setSalesByItem] = useState(SALES_BY_ITEM_DEFAULT_PROPS);
     const [chartXLabel, setChartXLabel] = useState([]);
+
+    const [errorMessages, setErrorMessages] = useState({
+        startDate: '',
+        endDate: ''
+    })
+
 
     const columns = [
         { field: 'id', hide: true },
         { field: 'product_description', headerName: 'Item', width: 270 },
         { field: 'category', headerName: 'Category', width: 270 },
         { field: 'items_sold', headerName: 'Items sold', width: 170 },
-        { field: 'sales', headerName: 'Sales', width: 170 },
-        { field: 'net_sales', headerName: 'Net sales', width: 170 },
-        { field: 'cost_of_goods_sold', headerName: 'Cost of goods sold', width: 200 },
+        { field: 'sales', headerName: 'Sales', width: 170,
+        valueFormatter: params => parseFloat(params.value).toFixed(2) },
+        { field: 'net_sales', headerName: 'Net sales', width: 170,
+        valueFormatter: params => parseFloat(params.value).toFixed(2) },
+        { field: 'cost_of_goods_sold', headerName: 'Cost of goods sold', width: 200,
+        valueFormatter: params => parseFloat(params.value).toFixed(2) },
         { field: 'gross_profit', headerName: 'Gross profit', width: 170,
-            valueFormatter: params => params.value.toFixed(2)
+            valueFormatter: params => parseFloat(params.value).toFixed(2)
         },
     ];
 
@@ -116,13 +133,14 @@ const SalesByItem = () =>
     {
         const result = await SalesByItem_.fetchReports();
 
-        console.log(result);
         if (result.status === 'Success')
         {
+            console.log(result.data);
             setSalesByItem(result.data);
-            handleChartXLabel(result.data);
-            setLoading(false);
+            handleChartXLabel(result.data.tableData);
         }
+
+        setLoading(false);
     }   
 
 
@@ -133,12 +151,16 @@ const SalesByItem = () =>
             endDate: endDate
         });
 
-        console.log(result);
         if (result.status === 'Success')
         {
             setSalesByItem(result.data);
-            handleChartXLabel(result.data);
+            handleChartXLabel(result.data.tableData);
             setLoading(false);
+        }
+
+        if (result.status === 'Error')
+        {
+            setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
         }
     }   
 
@@ -146,7 +168,7 @@ const SalesByItem = () =>
     const handleChartXLabel = (data) => 
     {
         const xAxis = [];
-        data.tableData.map(item => {
+        data.map(item => {
             xAxis.push(item.product_description)
         })
 
@@ -163,7 +185,7 @@ const SalesByItem = () =>
         });
 
         return () => {
-            setSalesByItem([]);
+            setSalesByItem(SALES_BY_ITEM_DEFAULT_PROPS);
             setChartXLabel([]);
         }
     }, []);
@@ -183,6 +205,8 @@ const SalesByItem = () =>
                                         <Grid container spacing={1} justify='flex-start' alignItems='center'>
                                             <Grid item xs={12} sm={5} md={4} lg={3}>
                                                 <KeyboardDatePicker
+                                                    error={errorMessages.startDate !== ''}
+                                                    helperText={errorMessages.startDate}
                                                     fullWidth
                                                     margin="normal"
                                                     id="From"
@@ -197,6 +221,8 @@ const SalesByItem = () =>
                                             </Grid>
                                             <Grid item xs={12} sm={5} md={4} lg={3}>
                                                 <KeyboardDatePicker
+                                                    error={errorMessages.endDate !== ''}
+                                                    helperText={errorMessages.endDate}
                                                     fullWidth
                                                     margin="normal"
                                                     id="to"
@@ -214,12 +240,15 @@ const SalesByItem = () =>
                                                     variant="contained" 
                                                     color="primary"
                                                     onClick={fetchSalesByItemReportsWithDate}
+                                                    disabled={
+                                                        Boolean(startDate === null || endDate === null)
+                                                    }
                                                 >
                                                     Apply
                                                 </Button>
                                             </Grid>
                                             {
-                                                (startDate !== null || endDate !== null) && (
+                                                (startDate !== null && endDate !== null) && (
                                                     <Grid item>
                                                         <Button 
                                                             variant='contained'
@@ -230,31 +259,6 @@ const SalesByItem = () =>
                                                     </Grid>
                                                 )
                                             }
-                                            <Grid item xs={12} sm={4} md={3} lg={3} className={classes.gridFlexGrow}>
-                                                <FormControl className={classes.formControl}>
-                                                    <InputLabel id="demo-simple-select-label">Type</InputLabel>
-                                                    <Select
-                                                        name='supplier_id'
-                                                        displayEmpty
-                                                        inputProps={{ 'aria-label': 'Without label' }}
-                                                        fullWidth
-                                                        value={chartType}
-                                                        onChange={(e) => setChartType(e.target.value)}
-                                                    >
-                                                        {
-                                                            ['line', 'column', 'bar'].map((type, index) => (
-                                                                <MenuItem 
-                                                                    key={index}
-                                                                    value={type}
-                                                                >
-                                                                    {type}
-                                                                </MenuItem>
-                                                            ))
-                                                        }
-                                                    
-                                                    </Select>
-                                                </FormControl>
-                                            </Grid>
                                         </Grid>
                                     </MuiPickersUtilsProvider>
                                 </Grid>
@@ -264,7 +268,7 @@ const SalesByItem = () =>
                     </Card>
                 </Grid>
                 <Grid item xs={12} sm={12} md={12} lg={12}>
-                    <Grid container spacing={1}>
+                    <Grid container spacing={1} alignItems='center'>
                         <Grid item xs={12} sm={12} md={4} lg={4}>
                             <Card>
                                 <CardHeader
@@ -281,20 +285,29 @@ const SalesByItem = () =>
                                 />
                                 <CardContent>
                                     <Grid item>
-                                        <List>
+                                        <List className={classes.topFiveItemListContainer}>
                                             {
-                                                salesByItem.tableData.map((item, index) => (
-                                                    <ListItem key={index}>
-                                                        <ListItemText 
-                                                            primary={`${item.product_description}`}
-                                                        />
-                                                        <ListItemSecondaryAction>
-                                                            <Typography variant="h5" color="initial">
-                                                                {`${CURRENCY}${item.net_sales}`}
-                                                            </Typography>
-                                                        </ListItemSecondaryAction>
-                                                    </ListItem>
-                                                ))
+                                                salesByItem.topFiveItems.length > 0 
+                                                    ? salesByItem.topFiveItems.map((item, index) => (
+                                                        <ListItem key={index}>
+                                                            <ListItemText 
+                                                                primary={`${item.product_description}`}
+                                                            />
+                                                            <ListItemSecondaryAction>
+                                                                <Typography variant="h5" color="initial" gutterBottom={false}>
+                                                                    {`${CURRENCY}${item.net_sales}`}
+                                                                </Typography>
+                                                            </ListItemSecondaryAction>
+                                                        </ListItem>
+                                                    ))
+                                                : (
+                                                    <> 
+                                                        <EmptyDataIcon />
+                                                        <Typography variant="subtitle2" color="initial">
+                                                            Empty data
+                                                        </Typography>
+                                                    </>
+                                                )
                                             }
                                         </List>
                                     </Grid>
@@ -306,12 +319,40 @@ const SalesByItem = () =>
                         <Grid item xs={12} sm={12} md={8} lg={8}>
                             <Card>
                                 <CardContent>
-                                    <HighchartsReact                                
-                                        key={componentKey} 
-                                        highcharts={Highcharts} 
-                                        options={salesByItemChartOptions} 
-                                        
-                                    />
+                                <Grid container spacing={9}>
+                                    <Grid item xs={12} sm={12} md={6} lg={6}>
+                                        <FormControl className={classes.formControl}>
+                                            <InputLabel id="demo-simple-select-label">Type</InputLabel>
+                                                <Select
+                                                    name='supplier_id'
+                                                    displayEmpty
+                                                    inputProps={{ 'aria-label': 'Without label' }}
+                                                    fullWidth
+                                                    value={chartType}
+                                                    onChange={(e) => setChartType(e.target.value)}
+                                                >
+                                                    {
+                                                        ['line', 'column', 'bar'].map((type, index) => (
+                                                            <MenuItem 
+                                                                key={index}
+                                                                value={type}
+                                                            >
+                                                                {type}
+                                                            </MenuItem>
+                                                        ))
+                                                    }
+                                                
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={12} md={12} lg={12}>
+                                        <HighchartsReact                                
+                                            key={componentKey} 
+                                            highcharts={Highcharts} 
+                                            options={salesByItemChartOptions} 
+                                        />
+                                    </Grid>
+                                </Grid>
                                 </CardContent>
                             </Card>
                         </Grid>

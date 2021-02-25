@@ -11,14 +11,16 @@ import {
     CardHeader,
     } from '@material-ui/core';
 import LoyaltyIcon from '@material-ui/icons/Loyalty';
-import { createDiscountUseStyles } from '../../../../assets/material-styles/styles'
+import { discountUseStyles } from '../../../../assets/material-styles/styles'
+import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
 
 
 const CreateDiscount = ({match}) => 
 {
-    const classes = createDiscountUseStyles();
+    const classes = discountUseStyles();
     const history = useHistory();
-    const [loading, setLoading] = useState(true);
+    const [loadingData, setLoadingData] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const {discountId} = match.params; 
 
@@ -27,10 +29,13 @@ const CreateDiscount = ({match}) =>
         name: '',
         percentage: ''    
     });
+    const [errorMessage, setErrorMessage] = useState({
+        name: '',
+        percentage: ''
+    });
 
     
     const handleOnChangeDiscount = (e) => setDiscount({...discount, [e.target.name]: e.target.value});
-
 
     const fetchDiscount = async () => 
     {
@@ -45,7 +50,7 @@ const CreateDiscount = ({match}) =>
                 name: name,
                 percentage: percentage
             });
-            setLoading(false)
+            setLoadingData(false)
         }
     }
 
@@ -54,10 +59,11 @@ const CreateDiscount = ({match}) =>
         setLoading(true);
         const result = await Discount_.updateAsync(discount);
 
-        if (result.status === 'Success')
-        {
-            history.push('/products/discounts')
-        }
+        result.status === 'Error'
+            ?  setErrorMessage(prepareSetErrorMessages(result.message, errorMessage))
+            :  history.push('/products/discounts');
+        
+            setLoading(false);
     }
 
 
@@ -69,7 +75,7 @@ const CreateDiscount = ({match}) =>
         };
     }, []);
 
-    return loading 
+    return loadingData 
         ? <Loading />
         : (
         <>
@@ -88,6 +94,8 @@ const CreateDiscount = ({match}) =>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <TextField
+                                error={errorMessage.name !== ''}
+                                helperText={errorMessage.name}
                                 name="name"
                                 label="Name"
                                 fullWidth
@@ -97,6 +105,8 @@ const CreateDiscount = ({match}) =>
                         </Grid>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <TextField
+                                error={errorMessage.percentage !== ''}
+                                helperText={errorMessage.percentage}
                                 name="percentage"
                                 label="%"
                                 fullWidth
@@ -123,6 +133,7 @@ const CreateDiscount = ({match}) =>
                             color="default" 
                             className={classes.addBtn}
                             onClick={editDiscount}
+                            disabled={loading}
                         >
                             Update
                         </Button>

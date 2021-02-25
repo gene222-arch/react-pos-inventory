@@ -132,6 +132,7 @@ const Discounts = () =>
                     rowsPerPageOptions={[5, 10, 20]}
                     checkboxSelection 
                     onSelectionChange={handleSelectionOnChange}
+                    className={classes.dataGrid}
                 />
             </div>
         </>

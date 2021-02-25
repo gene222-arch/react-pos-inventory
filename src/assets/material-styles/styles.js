@@ -98,6 +98,12 @@ export const salesByUseStyles = makeStyles((theme) => ({
     topFiveItemIcon: {
         color: yellow[500]
     },
+    topFiveItemListContainer: {
+        textAlign: 'center',
+        [theme.breakpoints.up('md')]: {
+            height: '28rem'
+        }
+    },
     formControl: {
         width: '100%'
     },
@@ -198,7 +204,7 @@ export const AdminLayoutUseStyles = makeStyles((theme) => ({
     },
     content: {
         flexGrow: 1,
-        padding: theme.spacing(3, 2),
+        padding: theme.spacing(3, 1.5),
     },
     container: {
         padding: 0,
@@ -272,6 +278,13 @@ export const dashboardUseStyles = makeStyles( theme => ({
     salesReturnContainer: {
         backgroundColor: red[500]
     },
+    marginSalesContainer: {
+        backgroundColor: orange[300]
+    },
+    purchaseReturnContainer: {
+        color: '#2c2c2c',
+        backgroundColor: '#DDD'
+    },
     grossProfitContainer: {
         backgroundColor: indigo[500]
     },
@@ -326,6 +339,9 @@ export const loginFormUseStyles = makeStyles((theme) => ({
         '&:hover': {
             textDecoration: 'underline'
         }
+    },
+    mismatchErrorMessage: {
+        width: '100%'
     }
 }));
 
@@ -778,8 +794,8 @@ export const createProductUseStyles = makeStyles((theme) => ({
     }
 }))
 
-export const createCategoryUseStyles = makeStyles((theme) => ({
-    createCategoryCard: {
+export const categoryUseStyles = makeStyles((theme) => ({
+    categoryCard: {
         marginBottom: theme.spacing(2),
         [theme.breakpoints.up('sm')]: {
             width: '70%',
@@ -803,11 +819,11 @@ export const createCategoryUseStyles = makeStyles((theme) => ({
     },
 }))
 
-export const createDiscountUseStyles = makeStyles((theme) => ({
+export const discountUseStyles = makeStyles((theme) => ({
     createDiscountCard: {
         marginBottom: theme.spacing(2),
         [theme.breakpoints.up('md')]: {
-            width: '50%',
+            width: '35%',
             padding: '1rem'
         }
     },
