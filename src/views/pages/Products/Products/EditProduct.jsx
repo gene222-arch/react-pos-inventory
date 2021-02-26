@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy } from 'react';
 import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
 import Loading from '../../../../components/Loading'
 import * as Product from '../../../../services/products/products'
@@ -22,11 +22,12 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import productDefaultImg from '../../../../assets/storage/images/default_img/product_default_img.svg'
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
+
 
 
 const PRODUCT_DEFAULT = {
@@ -81,7 +82,8 @@ const EditProduct = ({match}) =>
 {
     const classes = createProductUseStyles();
     const history = useHistory();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [loadingData, setLoadingData] = useState(true);
 
     const {productId} = match.params;
     
@@ -90,10 +92,22 @@ const EditProduct = ({match}) =>
     const [categories, setCategories] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
     const [errorMessages, setErrorMessages] = useState(EDIT_PRODUCT_DEFAULT_ERROR_MESSAGES)
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
     const handleOnChangeProduct = (e) => setProduct({...product, [e.target.name]: e.target.value});
-    const handleOnChangeStock = (e) =>  setStock({...stock, [e.target.name]: e.target.value});
 
+    const handleOnChangeStock = (e) =>  setStock({...stock, [e.target.name]: e.target.value});
 
     const fetchProduct = async () => 
     {
@@ -103,7 +117,7 @@ const EditProduct = ({match}) =>
         {
             setProduct(result.data);
             setStock(result.data.stock);
-            setLoading(false);
+            setLoadingData(false);
         }
     }
 
@@ -129,6 +143,7 @@ const EditProduct = ({match}) =>
 
     const handleUpdateProduct = async (e) => 
     {
+        setLoading(true);
         e.preventDefault();
 
         const result = await Product.updateAsync(validatedData());
@@ -137,10 +152,20 @@ const EditProduct = ({match}) =>
         {
             setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
         }
+        if (result.status === 'Error')
+        {
+            setAlertSeverity('error');
+            setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
+        }
         else
         {
-            history.push('/products');
+            setAlertSeverity('success');
+            setAlertMessage(result.message)
+            setTimeout(() => history.push('/products'), 2000);
         }
+
+        setOpenAlert(true);
+        setTimeout(() =>  setLoading(false), 2000);
     }
 
 
@@ -187,12 +212,18 @@ const EditProduct = ({match}) =>
         }
     }, []);
    
-    return loading 
+    return loadingData 
     ? 
         <Loading />
     :
         (
             <>
+                <AlertPopUpMessage 
+                    open={openAlert}
+                    handleClose={handleCloseAlert}
+                    globalMessage={alertMessage}
+                    severity={alertSeverity} 
+                />
 
                 <Card className={classes.createProductCard}>
                     <CardHeader
@@ -450,6 +481,7 @@ const EditProduct = ({match}) =>
                             color="default" 
                             className={classes.cancelBtn}
                             onClick={() => history.push('/products')}
+                            disabled={loading}
                         >
                             Cancel
                         </Button>
@@ -460,6 +492,7 @@ const EditProduct = ({match}) =>
                             color="default" 
                             className={classes.addBtn}
                             onClick={handleUpdateProduct}
+                            disabled={loading}
                         >
                             Update
                         </Button>

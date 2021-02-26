@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy } from 'react';
 import Loading from '../../../components/Loading'
 import * as Customers_ from '../../../services/customers/customers'
 import { useHistory } from 'react-router-dom'
-import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider } from '@material-ui/core';
-import LocalShippingIcon from '@material-ui/icons/LocalShipping';
+import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider, FormHelperText } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
@@ -15,9 +14,10 @@ import RoomIcon from '@material-ui/icons/Home';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import { createPageUseStyles } from '../../../assets/material-styles/styles'
 import * as Helper from '../../../utils/helpers'
+import {prepareSetErrorMessages} from '../../../utils/errorMessages'
+const AlertPopUpMessage = lazy(() => import('../../../components/AlertMessages/AlertPopUpMessage'));
 
-
-const DEFAULT = {
+const CUSTOMER_DEFAULT_PROPS = {
     name: '',
     email: '',
     phone: '',
@@ -29,65 +29,94 @@ const DEFAULT = {
 };
 
 
+const EditCustomer = ({match}) => {
 
-const EditCustomer = ({match}) => 
-{
-    
     const classes = createPageUseStyles();
     const history = useHistory();
-    const [loading, setLoading] = useState(true);
+    const [loadingData, setLoadingData] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const {customerId} = match.params;
 
+    const [customer, setCustomer] = useState(CUSTOMER_DEFAULT_PROPS);
+    const [errorMessages, setErrorMessages] = useState(CUSTOMER_DEFAULT_PROPS);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
 
-    const customerId = match.params.customerId;
-    const [customer, setCustomer] = useState(DEFAULT);
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
+
 
     const handleCustomerOnChange = (e) => setCustomer({...customer, [e.target.name]: e.target.value});
-
 
     const fetchCustomer = async () => 
     {
         const result = await Customers_.fetchAsync({customer_id: customerId});
-
+    
         if (result.status === 'Success')
         {
             setCustomer(result.data);
-            setLoading(false);
         }
+        
+        setLoadingData(false);
     }
 
-    const EditCustomer = async () => 
+    const updateCustomer = async (e) => 
     {
-        delete customer.created_at;
-        delete customer.updated_at;
+        e.preventDefault();
+        setLoading(true);
+
+        delete customer.created_at
+        delete customer.updated_at
 
         const data = {
             customer_id: customerId,
             customer_data: customer
         };
 
-        console.log(data);
         const result = await Customers_.updateAsync(data);
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
         {
-            history.push('/customers');
+            setAlertSeverity('error');
+            setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
         }
+        else
+        {
+            setAlertSeverity('success');
+            setAlertMessage(result.message)
+            setTimeout(() => history.push('/customers'), 2000);
+        }
+
+        setOpenAlert(true);
+        setTimeout(() =>  setLoading(false), 2000);
     }
 
 
-    useEffect(() => 
-    {
+    useEffect(() => {
         fetchCustomer();
-
+        
         return () => {
-            setCustomer(DEFAULT)
+            setCustomer(CUSTOMER_DEFAULT_PROPS);
         }
-    }, [])
+    }, []);
 
-    return loading 
+    return loadingData 
         ? <Loading />
         : (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <Card className={classes.cardContainer}>
                 <Grid container spacing={1} justify='center'>
                     <CardHeader
@@ -97,83 +126,109 @@ const EditCustomer = ({match}) =>
                     />
                 </Grid>
                 <CardContent className={classes.cardContent}>
-                    <TextField
-                        name="name"
-                        value={customer.name}
-                        onChange={handleCustomerOnChange}
-                        label="Name"
-                        fullWidth
-                        margin='normal'
-                    />
-                    <TextField
-                        name="email"
-                        value={customer.email}
-                        onChange={handleCustomerOnChange}
-                        label="Email"
-                        fullWidth
-                        margin='normal'
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <AlternateEmailIcon className={classes.textFieldIcons}/>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                    <TextField
-                        name="phone"
-                        value={customer.phone}
-                        onChange={handleCustomerOnChange}
-                        label="Phone"
-                        fullWidth
-                        margin='normal'
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <PhoneAndroidIcon className={classes.textFieldIcons}/>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                    <TextField
-                        name="address"
-                        value={customer.address}
-                        onChange={handleCustomerOnChange}
-                        label="Address"
-                        fullWidth
-                        margin='normal'
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <RoomIcon className={classes.textFieldIcons}/>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
+                <Grid container spacing={1}>
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <TextField
+                                error={Boolean(errorMessages.name)}
+                                helperText={errorMessages.name}
+                                name="name"
+                                value={customer.name}
+                                onChange={handleCustomerOnChange}
+                                label="Name"
+                                fullWidth
+                                margin='normal'
+                            />
+                        </Grid>
+                        
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <TextField
+                                error={Boolean(errorMessages.email)}
+                                helperText={errorMessages.email}
+                                name="email"
+                                value={customer.email}
+                                onChange={handleCustomerOnChange}
+                                label="Email"
+                                fullWidth
+                                margin='normal'
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <AlternateEmailIcon className={classes.textFieldIcons}/>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <TextField
+                                error={Boolean(errorMessages.phone)}
+                                helperText={errorMessages.phone}
+                                name="phone"
+                                value={customer.phone}
+                                onChange={handleCustomerOnChange}
+                                label="Phone"
+                                fullWidth
+                                margin='dense'
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <PhoneAndroidIcon className={classes.textFieldIcons}/>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <TextField
+                                error={Boolean(errorMessages.address)}
+                                helperText={errorMessages.address}
+                                name="address"
+                                value={customer.address}
+                                onChange={handleCustomerOnChange}
+                                label="Address"
+                                fullWidth
+                                margin='normal'
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <RoomIcon className={classes.textFieldIcons}/>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
                     <Grid container justify='space-between'>
                         <Grid item xs={6} sm={6} md={5} lg={5}>
                             <TextField
+                                error={Boolean(errorMessages.city)}
+                                helperText={errorMessages.city}
                                 name="city"
                                 value={customer.city}
                                 onChange={handleCustomerOnChange}
                                 label="City"
                                 fullWidth
-                                margin='normal'
+                                margin='dense'
                             />
                         </Grid>
                         <Grid item xs={6} sm={6} md={5} lg={5}>
                             <TextField
+                                error={Boolean(errorMessages.postal_code)}
+                                helperText={errorMessages.postal_code}
                                 name="postal_code"
                                 value={customer.postal_code}
                                 onChange={handleCustomerOnChange}
                                 label="Postal/zip code"
                                 fullWidth
-                                margin='normal'
+                                margin='dense'
                             />
                         </Grid>
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
-                        <FormControl className={classes.formControl}>
+                        <FormControl 
+                            className={classes.formControl}
+                            error={Boolean(errorMessages.country)}
+                        >
                             <InputLabel id="demo-simple-select-label">Country</InputLabel>
                             <Select
                                 name="country"
@@ -182,7 +237,7 @@ const EditCustomer = ({match}) =>
                                 value={customer.country}
                                 onChange={handleCustomerOnChange}
                                 fullWidth
-                                margin='normal'
+                                margin='dense'
                             >
                                 {
                                     Helper.countryList.map((country, index) => (
@@ -193,15 +248,22 @@ const EditCustomer = ({match}) =>
                                 }
                                 
                             </Select>
+                            <FormHelperText>{
+                                    Boolean(errorMessages.country)
+                                        ? errorMessages.country
+                                        : ''
+                                }</FormHelperText>
                         </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                         <TextField
+                            error={Boolean(errorMessages.province)}
+                            helperText={errorMessages.province}
                             name="province"
                             value={customer.province}
                             onChange={handleCustomerOnChange}
                             label="Region/State/Province"
-                            margin='normal'
+                            margin='dense'
                             fullWidth
                         />
                     </Grid>
@@ -214,6 +276,7 @@ const EditCustomer = ({match}) =>
                             color="default" 
                             className={classes.cancelBtn}
                             onClick={() => history.push('/customers')}
+                            disabled={loading}
                         >
                             Cancel
                         </Button>
@@ -223,9 +286,10 @@ const EditCustomer = ({match}) =>
                             variant='contained' 
                             color="default" 
                             className={classes.addBtn}
-                            onClick={EditCustomer}
+                            onClick={updateCustomer}
+                            disabled={loading}
                         >
-                            Update
+                            UPDATE
                         </Button>
                     </Grid>
                 </Grid>

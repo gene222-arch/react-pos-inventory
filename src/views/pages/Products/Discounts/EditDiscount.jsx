@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, lazy} from 'react'
 import Loading from '../../../../components/Loading'
 import * as Discount_ from '../../../../services/products/discounts'
 import { useHistory } from 'react-router-dom'
@@ -13,6 +13,7 @@ import {
 import LoyaltyIcon from '@material-ui/icons/Loyalty';
 import { discountUseStyles } from '../../../../assets/material-styles/styles'
 import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
 
 
 const CreateDiscount = ({match}) => 
@@ -21,6 +22,9 @@ const CreateDiscount = ({match}) =>
     const history = useHistory();
     const [loadingData, setLoadingData] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
 
     const {discountId} = match.params; 
 
@@ -29,12 +33,21 @@ const CreateDiscount = ({match}) =>
         name: '',
         percentage: ''    
     });
+
     const [errorMessage, setErrorMessage] = useState({
         name: '',
         percentage: ''
     });
 
-    
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
+
     const handleOnChangeDiscount = (e) => setDiscount({...discount, [e.target.name]: e.target.value});
 
     const fetchDiscount = async () => 
@@ -59,11 +72,20 @@ const CreateDiscount = ({match}) =>
         setLoading(true);
         const result = await Discount_.updateAsync(discount);
 
-        result.status === 'Error'
-            ?  setErrorMessage(prepareSetErrorMessages(result.message, errorMessage))
-            :  history.push('/products/discounts');
+        if (result.status === 'Error')
+        {
+            setAlertSeverity('error');
+            setErrorMessage(prepareSetErrorMessages(result.message, errorMessage))
+        }
+        else 
+        {
+            setAlertSeverity('success');
+            setAlertMessage(result.message);
+            setTimeout(() => history.push('/products/discounts'), 2000);
+        }
         
-            setLoading(false);
+        setOpenAlert(true);
+        setTimeout(() =>  setLoading(false), 2000);
     }
 
 
@@ -79,6 +101,13 @@ const CreateDiscount = ({match}) =>
         ? <Loading />
         : (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
+            
             <Card className={classes.createDiscountCard}>
                 <Grid container justify='center'>
                     <Grid item>

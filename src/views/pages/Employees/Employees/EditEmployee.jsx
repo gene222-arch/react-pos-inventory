@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy } from 'react';
+import Loading from '../../../../components/Loading'
 import * as Employees_ from '../../../../services/employees/employees'
 import { useHistory } from 'react-router-dom'
-import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider } from '@material-ui/core';
+import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider, FormHelperText } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
@@ -11,33 +12,53 @@ import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
 import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import { createPageUseStyles } from '../../../../assets/material-styles/styles'
+import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
 
+
+const EMPLOYEE_DEFAULT_PROPS = {
+    employee_id: 0,
+    name: '',
+    email: '',
+    phone: '',
+    role: ''
+};
 
 
 const EditEmployee = ({match}) => 
 {
+
     const classes = createPageUseStyles();
     const history = useHistory();
-
-    const {employeeId} = match.params;
+    const [loading, setLoading] = useState(false);
+    const [loadingData, setLoadingData] = useState(true);
     const [roles, setRoles] = useState([]);
-    const [employee, setEmployee] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        role: ''
-    });
+    const {employeeId} = match.params;
+
+    const [employee, setEmployee] = useState(EMPLOYEE_DEFAULT_PROPS);
+    const [errorMessages, setErrorMessages] = useState(EMPLOYEE_DEFAULT_PROPS);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
     const handleEmployeeOnChange = (e) => setEmployee({...employee, [e.target.name]: e.target.value});
 
-
-    const updateEmployee = async () => 
+    const fetchRoles = async () => 
     {
-        const result = await Employees_.updateAsync({...employee, employee_id: employeeId});
+        const result = await Employees_.fetchAllRolesAsync();
 
         if (result.status === 'Success')
         {
-            history.push('/employees');
+            setRoles(result.data);
         }
     }
 
@@ -50,44 +71,58 @@ const EditEmployee = ({match}) =>
 
         if (result.status === 'Success')
         {
-            const {name, email, phone} = result.data.employee;
-            const {role} = result.data;
-
-            setEmployee({
-                name: name,
-                email: email,
-                phone: phone,
-                role: role
-            });
+            setEmployee(result.data);
         }
-    }  
 
-
-    const fetchRoles = async () => 
-    {
-        const result = await Employees_.fetchAllRolesAsync();
-
-        if (result.status === 'Success')
-        {
-            setRoles(result.data);
-        }
+        setLoadingData(false);
     }
-    
+
+
+    const updateEmployee = async () => 
+    {
+        setLoading(true);
+
+        const result = await Employees_.updateAsync(employee);
+
+        if (result.status === 'Error')
+        {
+            setAlertSeverity('error');
+            setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
+        }
+        else
+        {
+            setAlertSeverity('success');
+            setAlertMessage(result.message)
+            setTimeout(() => history.push('/employees'), 2000);
+        }
+
+        setOpenAlert(true);
+        setTimeout(() =>  setLoading(false), 2000);
+    }
+
 
 
     useEffect(() => {
-        fetchEmployee()
         fetchRoles();
+        fetchEmployee();
 
         return () => {
             setRoles([]);
-            setEmployee({});
+            setEmployee(EMPLOYEE_DEFAULT_PROPS);
         }
     }, []);
 
 
-    return (
+    return loadingData 
+        ? <Loading />
+        : (
         <>
+             <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <Card className={classes.cardContainer}>
                 <Grid container spacing={1} justify='center'>
                     <CardHeader
@@ -100,6 +135,8 @@ const EditEmployee = ({match}) =>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <TextField
+                                error={Boolean(errorMessages.name)}
+                                helperText={errorMessages.name}
                                 name="name"
                                 label="Name"
                                 fullWidth
@@ -110,6 +147,8 @@ const EditEmployee = ({match}) =>
                         </Grid>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <TextField
+                                error={Boolean(errorMessages.email)}
+                                helperText={errorMessages.email}
                                 name="email"
                                 label="Email"
                                 fullWidth
@@ -127,12 +166,14 @@ const EditEmployee = ({match}) =>
                         </Grid>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <TextField
+                                error={Boolean(errorMessages.phone)}
+                                helperText={errorMessages.phone}
                                 name="phone"
                                 label="Phone"
                                 fullWidth
                                 margin='dense'
                                 InputProps={{
-                                    startAdornment: (
+                                    startdornment: (
                                         <InputAdornment position="start">
                                             <PhoneAndroidIcon className={classes.textFieldIcons}/>
                                         </InputAdornment>
@@ -143,7 +184,10 @@ const EditEmployee = ({match}) =>
                             />
                         </Grid>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
-                        <FormControl className={classes.formControl}>
+                        <FormControl 
+                            className={classes.formControl}
+                            error={Boolean(errorMessages.role)}
+                        >
                             <InputLabel id="demo-simple-select-label">Role</InputLabel>
                             <Select
                                 name='role'
@@ -155,7 +199,7 @@ const EditEmployee = ({match}) =>
                                 onChange={handleEmployeeOnChange}
                             >
                                 {
-                                    roles.map((role, index) => (
+                                roles.map((role, index) => (
                                         <MenuItem key={index} value={role.name}>
                                             {role.name}
                                         </MenuItem>
@@ -163,6 +207,11 @@ const EditEmployee = ({match}) =>
                                 }
                                 
                             </Select>
+                            <FormHelperText>{
+                                Boolean(errorMessages.role)
+                                    ? errorMessages.role
+                                    : ''    
+                            }</FormHelperText>
                         </FormControl>  
                     </Grid>
                     </Grid>
@@ -175,7 +224,8 @@ const EditEmployee = ({match}) =>
                             variant='contained' 
                             color="default" 
                             className={classes.cancelBtn}
-                            onClick={() => history.push('/employee')}
+                            onClick={() => history.push('/employees')}
+                            disabled={loading}
                         >
                             Cancel
                         </Button>
@@ -186,6 +236,7 @@ const EditEmployee = ({match}) =>
                             color="default" 
                             className={classes.addBtn}
                             onClick={updateEmployee}
+                            disabled={loading}
                         >
                             UPDATE
                         </Button>

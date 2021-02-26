@@ -77,14 +77,17 @@ const PurchaseOrderDetails = ({match}) =>
     };
 
     const handleClickOpen = () => setOpenSendMail(true);
+
     const handleClose = () => setOpenSendMail(false);
 
     const handleClickMenu = (event) => setAnchorEl(event.currentTarget);
+
     const handleClickMobileMenu = (event) => setMobileAnchorEl(event.currentTarget);
     const handleMenuClose = () => setAnchorEl(null);
+
     const handleMobileMenuClose = () =>   setMobileAnchorEl(null);
-
-
+    
+    
     const fetchPurchaseOrder = async () => 
     {
         const result = await PurchaseOrder_.fetchAsync({
@@ -97,7 +100,6 @@ const PurchaseOrderDetails = ({match}) =>
             setPurchaseOrderDetails(result.data.items);
         }
     }
-
 
     const cancelPurchaseOrder = async () => 
     {

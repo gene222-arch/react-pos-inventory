@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, lazy} from 'react';
 import {TAX_RATE} from '../../../config/accounting'
 import Loading from '../../../components/Loading'
 import * as SalesReturn_ from '../../../services/sales-returns/salesReturn'
@@ -9,8 +9,16 @@ import { Card, CardContent, Grid } from '@material-ui/core';
 import { FormControl, InputLabel, Select, MenuItem, TextField, Typography } from '@material-ui/core'
 import Button from '@material-ui/core/Button';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import { createBadOrdersUseStyles } from '../../../assets/material-styles/styles'
+import { createBadOrdersSalesReturnUseStyles } from '../../../assets/material-styles/styles'
+const AlertPopUpMessage = lazy(() => import('../../../components/AlertMessages/AlertPopUpMessage'));
 
+
+
+const DEFECTS = [
+    'Manufacturing Defects.',
+    'Design Defects',
+    'Marketing Defects'
+];
 const DEFAULT_PROPS = 
 {
     pos: {
@@ -24,13 +32,27 @@ const DEFAULT_PROPS =
 
 const CreateSalesReturn = () => 
 {
-    const classes = createBadOrdersUseStyles();
+    const classes = createBadOrdersSalesReturnUseStyles();
     const history = useHistory();
     const [loading, setLoading] = useState(false);
+    const [loadingData, setLoadingData] = useState(false);
 
     const [posId, setPosId] = useState(0);
     const [customerOrderList, setCustomerOrderList] = useState([]);
     const [customerOrderDetails, setCustomerOrderDetails] = useState(DEFAULT_PROPS);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
+
 
     const columns = [
         { field: 'id',  hide: true, },
@@ -43,13 +65,36 @@ const CreateSalesReturn = () =>
             headerName: 'Defect', 
             width: 200,
             renderCell: (params) => (
-                <TextField
-                    value={params.value}
-                    onChange={
-                        (e) => handleOnChangeDefect(e, params.row)
-                    }
-                    inputProps={{min: 0, style: { textAlign: 'center' }}}
-                />
+                <>
+                    <Grid container alignItems='center'>
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <FormControl 
+                                className={classes.formControl}
+                                error={Boolean(params.value === '')}
+                            >
+                                    <Select
+                                        displayEmpty
+                                        inputProps={{ 'aria-label': 'Without label' }}
+                                        fullWidth
+                                        value={params.value}
+                                        onChange={(e) => handleOnChangeDefect(e, params.row)}
+                                    >
+                                        {
+                                            DEFECTS.map((defect, index) => (
+                                                <MenuItem 
+                                                    key={index}
+                                                    value={defect}
+                                                >
+                                                    {defect}
+                                                </MenuItem>
+                                            ))
+                                        }
+                                </Select>
+                            </FormControl>
+                
+                        </Grid>
+                    </Grid>
+                </>
             ),
         },
         { 
@@ -58,6 +103,7 @@ const CreateSalesReturn = () =>
             width: 150,
             renderCell: (params) => (
                 <TextField
+                    error={Boolean(params.value <= 0)}
                     value={params.value}
                     onChange={
                         (e) => handleOnChangeQuantity(e, params.row)
@@ -98,7 +144,9 @@ const CreateSalesReturn = () =>
 
         if (noOfItemsToReturn > ordered_quantity)
         {
-            alert('Quantity exceeded the number of items ordered')
+            setAlertSeverity('error');
+            setAlertMessage('Quantity can\'t exceed the received quantity.');
+            setOpenAlert(true);
         }
         else 
         {
@@ -113,7 +161,6 @@ const CreateSalesReturn = () =>
                 tax: tax,
                 total: total
             });
-            console.log(filterData)
 
             const newOrderDetails = customerOrderDetails.items.map(item => 
                     item.id === filterData.id 
@@ -129,20 +176,26 @@ const CreateSalesReturn = () =>
     {
         let defect = e.target.value;
 
-        console.log(data)
+        if (defect.match('/^[a-z][a-z\s]*$/'))
+        {
+            setAlertSeverity('error');
+            setAlertMessage('Letters and spaces only');
+        }
+        else 
+        {
+            const filterData = ({
+                ...data,
+                defect: defect
+            });
+    
+            const newOrderDetails = customerOrderDetails.items.map(item => 
+                    item.id === filterData.id 
+                        ? filterData
+                        : item
+            );
             
-        const filterData = ({
-            ...data,
-            defect: defect
-        });
-
-        const newOrderDetails = customerOrderDetails.items.map(item => 
-                item.id === filterData.id 
-                    ? filterData
-                    : item
-        );
-        
-        setCustomerOrderDetails({...customerOrderDetails, items: newOrderDetails});
+            setCustomerOrderDetails({...customerOrderDetails, items: newOrderDetails});
+        }
     };
     
     const handleOnRemoveProduct = (customerOrderId) => 
@@ -162,7 +215,7 @@ const CreateSalesReturn = () =>
         if (result.status === 'Success')
         {
             setCustomerOrderList(result.data);
-            setLoading(false);
+            setLoadingData(false);
         }
 
     }
@@ -173,24 +226,53 @@ const CreateSalesReturn = () =>
         
         setPosId(id);
 
-        const result = await POS_.fetchToSalesReturnAsync({
-            pos_id: id 
-        })
-    
-        if (result.status === 'Success')
+        if (!id)
         {
-            setCustomerOrderDetails(result.data);
+            setCustomerOrderDetails(DEFAULT_PROPS);
+        }
+        else 
+        {
+            const result = await POS_.fetchToSalesReturnAsync({
+                pos_id: id 
+            })
+        
+            if (result.status === 'Success')
+            {
+                setCustomerOrderDetails(result.data);
+            }
         }
     };
 
     const createSalesReturn = async () => 
     {
+        setLoading(true);
         const result = await SalesReturn_.storeAsync(validateData())
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
         {
-            history.push('/sales-returns')
+            const hasItems = validateData().posSalesReturnDetails.length;
+            setAlertSeverity('error')
+
+            const hasEmptyFields = validateData()
+                .posSalesReturnDetails
+                .find(posDetail => posDetail.quantity === 0 || posDetail.defect === '');
+
+            if (!hasEmptyFields)
+            {
+                hasItems <= 0 && setAlertMessage(result.message.posSalesReturnDetails);
+                posId === 0 && setAlertMessage('Please select a customer order.');
+            }
+                
         }
+        else 
+        {
+            setAlertSeverity('success');
+            setAlertMessage(result.message);
+            setTimeout(() => history.push('/sales-returns'), 2000);
+        }
+
+        setOpenAlert(true);
+        setTimeout(() => setLoading(false), 2000);
     }
 
     const validateData = () => 
@@ -222,14 +304,22 @@ const CreateSalesReturn = () =>
         return () => {
             setCustomerOrderDetails(DEFAULT_PROPS);
             setCustomerOrderList([]);
+            setPosId(0);
         }
     }, []);
 
 
-    return loading
+    return loadingData
         ? <Loading />
         : (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
+
             <Card className={classes.selectPOContainer}>
                 <CardContent>
                     <Grid container spacing={1}>
@@ -246,6 +336,7 @@ const CreateSalesReturn = () =>
                                                 value={posId}
                                                 onChange={handleOnPurchaseOrder}
                                             >
+                                                <MenuItem value={0}>Select customer order #</MenuItem>
                                                 {
                                                     customerOrderList.map(co => (
                                                         <MenuItem 
@@ -293,6 +384,7 @@ const CreateSalesReturn = () =>
                                     color="default" 
                                     className={classes.cancelBtn}
                                     onClick={() => history.push('/inventory-mngmt/purchase-orders')}
+                                    disabled={loading}
                                 >
                                     Cancel
                                 </Button>
@@ -303,6 +395,7 @@ const CreateSalesReturn = () =>
                                     color="default" 
                                     className={classes.addBtn}
                                     onClick={createSalesReturn}
+                                    disabled={loading}
                                 >
                                     Create
                                 </Button>

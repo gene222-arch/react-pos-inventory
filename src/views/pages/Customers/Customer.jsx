@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, lazy} from 'react';
 import DeleteDialog from '../../../components/DeleteDialog'
 import * as Customers_ from '../../../services/customers/customers'
 import { useHistory } from 'react-router-dom'
@@ -8,31 +8,46 @@ import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { dataGridUseStyles } from '../../../assets/material-styles/styles'
+const AlertPopUpMessage = lazy(() => import('../../../components/AlertMessages/AlertPopUpMessage'));
+
 
 
 const Customers = () => 
 {
-
     const classes = dataGridUseStyles();
     const history = useHistory();
 
     const [rowIds, setRowIds] = useState([]);
     const [open, setOpen] = useState(false);
     const [customers, setCustomers] = useState([]);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
     const columns = [
         { field: 'id', hide: true },
-        { field: 'customer', headerName: 'Customer', width: 335 },
-        { field: 'first_visit', headerName: 'First visit', width: 200 },
-        { field: 'last_visit', headerName: 'Last visit', width: 200 },
-        { field: 'total_visits', headerName: 'Total visits', width: 200 },
-        { field: 'total_spent', headerName: 'Total spent', width: 200,
+        { field: 'customer', headerName: 'Customer', width: 242.5 },
+        { field: 'first_visit', headerName: 'First visit', width: 242.5 },
+        { field: 'last_visit', headerName: 'Last visit', width: 242.5 },
+        { field: 'total_visits', headerName: 'Total visits', width: 242.5 },
+        { field: 'total_spent', headerName: 'Total spent', width: 242.5,
             valueFormatter: (params) => `P ${params.value.toFixed(2)}`,
         },
     ];
 
     const handleClickOpen = () =>  setOpen(true);
+
     const handleClose = () => setOpen(false);
+
     const handleSelectionOnChange = (params) => setRowIds(params.rowIds);
 
     const fetchCustomers = async () => 
@@ -49,7 +64,12 @@ const Customers = () =>
     {
         const result = await Customers_.destroyAsync({customer_ids: rowIds});
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
+        {
+            setAlertSeverity('warning');
+            setAlertMessage('Please click the button only once.');
+        }
+        else
         {
             let _customers = [...customers];
 
@@ -57,10 +77,15 @@ const Customers = () =>
                 _customers = _customers.filter(customer => customer.id !== parseInt(rowId) )
             });
 
+            setAlertSeverity('success');
+            setAlertMessage(result.message);
+
             setCustomers(_customers);
             setOpen(false);
             setRowIds([]);
         }
+
+        setOpenAlert(true);
     }
 
     useEffect(() => {
@@ -68,11 +93,18 @@ const Customers = () =>
 
         return () => {
             setCustomers([]);
+            setRowIds([]);
         }
     }, [])
 
     return (
         <>
+              <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <DeleteDialog 
                 open={open} 
                 handleClose={handleClose} 
@@ -133,6 +165,7 @@ const Customers = () =>
                     rowsPerPageOptions={[5, 10, 20]}
                     checkboxSelection 
                     onSelectionChange={handleSelectionOnChange}
+                    className={classes.dataGrid}
                 />
             </div>
         </>

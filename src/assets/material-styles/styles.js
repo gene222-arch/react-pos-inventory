@@ -688,9 +688,10 @@ export const purchaseOrderUseStyles = makeStyles((theme) => ({
     }
 }))
 
-export const createBadOrdersUseStyles = makeStyles((theme) => ({
+export const createBadOrdersSalesReturnUseStyles = makeStyles((theme) => ({
     formControl: {
         width: '100%',
+        marginTop: '.35rem'
     },
     selectEmpty: {
         marginTop: theme.spacing(2),

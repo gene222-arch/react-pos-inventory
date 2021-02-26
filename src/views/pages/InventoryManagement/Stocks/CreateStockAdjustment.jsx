@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy } from 'react';
 import * as Product_ from '../../../../services/products/products'
 import * as StockAdjustment_ from '../../../../services/inventory-management/stockAdjustments'
 import { useHistory } from 'react-router-dom'
@@ -7,20 +7,33 @@ import { Card, CardContent, Grid } from '@material-ui/core';
 import { FormControl, InputLabel, Select, MenuItem, TextField } from '@material-ui/core'
 import Button from '@material-ui/core/Button';
 import { createPageUseStyles } from '../../../../assets/material-styles/styles'
-import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
 
 
 const CreateStockAdjustment = () => 
 {
     const classes = createPageUseStyles();
     const history = useHistory();
+    const [loading, setLoading] = useState(false);
 
     const [reason, setReason] = useState('Received items');
     const [productId, setProductId] = useState(0);
     const [products, setProducts] = useState([]);
     const [stockAdjustmentDetails, setStockAdjustmentDetails] = useState([]);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
 
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
+    
     let columns = [];
 
     switch (reason) 
@@ -38,8 +51,7 @@ const CreateStockAdjustment = () =>
                     width: 250,
                     renderCell: (params) => (
                         <TextField
-                            id=""
-                            label=""
+                            error={Boolean(params.value <= 0)}
                             value={params.value}
                             onChange={
                                 (e) => handleOnReceivedItems(e, params.row)
@@ -84,8 +96,7 @@ const CreateStockAdjustment = () =>
                     width: 150,
                     renderCell: (params) => (
                         <TextField
-                            id=""
-                            label=""
+                            error={Boolean(params.value <= 0)}
                             value={params.value}
                             onChange={
                                 (e) => handleOnInventoryCount(e, params.row)
@@ -129,8 +140,7 @@ const CreateStockAdjustment = () =>
                     width: 200,
                     renderCell: (params) => (
                         <TextField
-                            id=""
-                            label=""
+                            error={Boolean(params.value <= 0)}
                             value={params.value}
                             onChange={
                                 (e) => handleOnLossDamage(e, params.row)
@@ -270,26 +280,38 @@ const CreateStockAdjustment = () =>
 
     const createStockAdjustment = async () => 
     {
+        setLoading(true);
         const result = await StockAdjustment_.storeAsync(validateData());
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
         {
-            history.push('/inventory-mngmt/stock-adjustments')
+            setAlertSeverity('error');
         }
+        else 
+        {
+            setAlertSeverity('success');
+            setAlertMessage(result.message);
+            setTimeout(() => history.push('/inventory-mngmt/stock-adjustments'), 2000);
+        }
+
+        setOpenAlert(true);
+        setTimeout(() => setLoading(false), 2000);
     }
 
 
     const validateData = () => 
     {
-        stockAdjustmentDetails.map(stock => {
-            delete stock.product_id
-            delete stock.id
-            delete stock.product_description
-        })
+        const stockAdjustmentDetails_ = stockAdjustmentDetails.map(stock => ({
+            stock_id: stock.id,
+            added_stock: stock.added_stock,
+            removed_stock: stock.removed_stock,
+            counted_stock: stock.counted_stock,
+            stock_after: stock.stock_after
+        }))
 
         return {
             reason: reason,
-            stockAdjustmentDetails: stockAdjustmentDetails
+            stockAdjustmentDetails: stockAdjustmentDetails_
         };
     }
 
@@ -304,6 +326,13 @@ const CreateStockAdjustment = () =>
 
     return (
         <>
+
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <Card className={classes.selectPOContainer}>
                 <CardContent>
                     <Grid container spacing={3} alignItems='center' justify='space-between'>
@@ -382,6 +411,7 @@ const CreateStockAdjustment = () =>
                         color="default" 
                         className={classes.cancelBtn}
                         onClick={() => history.push('/inventory-mngmt/stock-adjustments')}
+                        disabled={loading}
                     >
                         Cancel
                     </Button>
@@ -392,6 +422,7 @@ const CreateStockAdjustment = () =>
                         color="default" 
                         className={classes.addBtn}
                         onClick={createStockAdjustment}
+                        disabled={loading}
                     >
                         Create
                     </Button>

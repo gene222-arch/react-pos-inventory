@@ -31,6 +31,21 @@ export const fetchAllFilteredAsync = async (payload) =>
 }
 
 
+export const fetchForBadOrdersAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .get('/purchase-orders/request-bad-orders');
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
 export const fetchAsync = async (payload) => 
 {
     try {

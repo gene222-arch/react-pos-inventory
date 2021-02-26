@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, lazy} from 'react';
 import DeleteDialog from '../../../../components/DeleteDialog'
 import * as ProductDiscounts from '../../../../services/products/discounts'
 import { useHistory } from 'react-router-dom'
@@ -8,6 +8,7 @@ import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
 
 
 
@@ -20,6 +21,9 @@ const Discounts = () =>
     const [open, setOpen] = useState(false);
     const [rowIds, setRowIds] = useState([]);
     const [discounts, setDiscounts] = useState([]);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
 
     const columns = [
         { field: 'name', headerName: 'Percentage', width: 300 },
@@ -30,8 +34,19 @@ const Discounts = () =>
      * Dialog
      */
     const handleClickOpen = () =>  setOpen(true);
+
     const handleClose = () => setOpen(false);
+
     const handleSelectionOnChange = (params) => setRowIds(params.rowIds);
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
     const fetchDiscounts = async () => 
     {
@@ -48,7 +63,12 @@ const Discounts = () =>
     {
         const result = await ProductDiscounts.destroyAsync({discount_ids: rowIds});
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
+        {
+            setAlertSeverity('warning');
+            setAlertMessage('Please click the button only once.');
+        }
+        else
         {
             let _discounts = [...discounts];
 
@@ -56,10 +76,15 @@ const Discounts = () =>
                 _discounts = _discounts.filter(discount => discount.id !== parseInt(rowId) )
             });
 
+            setAlertSeverity('success');
+            setAlertMessage(result.message);
+
             setDiscounts(_discounts);
             setOpen(false);
             setRowIds([]);
         }
+
+        setOpenAlert(true);
     }
 
 
@@ -75,6 +100,13 @@ const Discounts = () =>
 
     return (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
+
             <DeleteDialog 
                 open={open} 
                 handleClose={handleClose} 

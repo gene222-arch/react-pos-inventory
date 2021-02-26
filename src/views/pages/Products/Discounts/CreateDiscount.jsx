@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, lazy} from 'react'
 import * as Discount_ from '../../../../services/products/discounts'
 import { useHistory } from 'react-router-dom'
 import { 
@@ -12,6 +12,8 @@ import {
 import LoyaltyIcon from '@material-ui/icons/Loyalty';
 import { discountUseStyles } from '../../../../assets/material-styles/styles'
 import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
+
 
 
 
@@ -19,6 +21,7 @@ const DISCOUNT_DEFAULT = {
     name: '',
     percentage: '',
 };
+
 
 const CreateDiscount = () => 
 {
@@ -28,6 +31,19 @@ const CreateDiscount = () =>
 
     const [discount, setDiscount] = useState(DISCOUNT_DEFAULT);
     const [errorMessage, setErrorMessage] = useState(DISCOUNT_DEFAULT);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
     const handleOnChangeDiscount = (e) => setDiscount({...discount, [e.target.name]: e.target.value});
 
@@ -36,16 +52,33 @@ const CreateDiscount = () =>
         setLoading(true);
         const result = await Discount_.storeAsync(discount);
 
-        result.status === 'Error'
-            ?  setErrorMessage(prepareSetErrorMessages(result.message, errorMessage))
-            :  history.push('/products/discounts');
-
-        setLoading(false);
+        if (result.status === 'Error')
+        {
+            setAlertSeverity('error');
+            setErrorMessage(prepareSetErrorMessages(result.message, errorMessage))
+        }
+        else 
+        {
+            setAlertSeverity('success');
+            setAlertMessage(result.message);
+            setTimeout(() => history.push('/products/discounts'), 2000);
+        }
+        
+        setOpenAlert(true);
+        setTimeout(() =>  setLoading(false), 2000);
     }
 
 
     return (
             <>
+
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
+
             <Card className={classes.createDiscountCard}>
                 <Grid container justify='center'>
                     <Grid item>

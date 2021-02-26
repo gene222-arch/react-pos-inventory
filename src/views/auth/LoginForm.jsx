@@ -1,5 +1,5 @@
   
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {loginAsync} from '../../services/auth/login/login'
 import {prepareSetErrorMessages} from '../../utils/errorMessages'
 import { NavLink, useHistory } from 'react-router-dom'
@@ -101,6 +101,13 @@ const LoginForm = () =>
         setLoading(false);
     }
 
+
+    useEffect(() => {
+        return () => {
+            setCredentials(DEFAULT_CREDENTIAL_PROPS);
+            setErrorMessages(DEFAULT_ERROR_MESSAGE_PROPS);
+        }
+    }, []);
 
 
     return (

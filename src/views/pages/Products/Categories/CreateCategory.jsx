@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, lazy} from 'react'
 import * as Category_ from '../../../../services/products/categories'
 import { useHistory } from 'react-router-dom'
 import { 
@@ -10,6 +10,7 @@ import {
     } from '@material-ui/core';
 import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
 import { categoryUseStyles } from '../../../../assets/material-styles/styles'
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
 
 
 
@@ -20,9 +21,19 @@ const CreateCategory = () =>
     const [loading, setLoading] = useState(false);
 
     const [name, setName] = useState('');
-    const [errorMessage, setErrorMessage] = useState({
-        name: ''
-    })
+    const [errorMessage, setErrorMessage] = useState({ name: '' });
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
     const handleOnChangeName = (e) => setName(e.target.value);
 
@@ -30,17 +41,33 @@ const CreateCategory = () =>
     {
         setLoading(true);
         const result = await Category_.storeAsync({name});
-        
-        result.status === 'Error'
-            ?  setErrorMessage(prepareSetErrorMessages(result.message, errorMessage))
-            :  history.push('/products/categories');
 
-        setLoading(false);
+        if (result.status === 'Error')
+        {
+            setAlertSeverity('error');
+            setErrorMessage(prepareSetErrorMessages(result.message, errorMessage));
+        }
+        else
+        {
+            setAlertSeverity('success');
+            setAlertMessage(result.message)
+            setTimeout(() => history.push('/products/categories'), 2000);
+        }
+
+        setOpenAlert(true);
+        setTimeout(() =>  setLoading(false), 2000);
     }
 
 
     return (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
+
             <Grid container spacing={1}>
                 <Grid item xs={12} sm={12} md={9} lg={9}>
                     <Card className={classes.categoryCard}>

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, lazy} from 'react';
 import DeleteDialog from '../../../../components/DeleteDialog'
 import * as Suppliers_ from '../../../../services/inventory-management/suppliers'
 import { useHistory } from 'react-router-dom'
@@ -8,6 +8,7 @@ import Button from '@material-ui/core/Button';
 import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
 
 
 const columns = [
@@ -28,6 +29,18 @@ const Suppliers = () =>
     const [open, setOpen] = useState(false);
 
     const[suppliers, setSuppliers] = useState([]);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenAlert(false);
+    }
 
     /**
      * Dialog
@@ -53,7 +66,12 @@ const Suppliers = () =>
     {
         const result = await Suppliers_.destroyAsync({supplier_ids: rowIds});
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
+        {
+            setAlertSeverity('warning');
+            setAlertMessage('Please click the button only once.');
+        }
+        else
         {
             let _suppliers = [...suppliers];
 
@@ -61,10 +79,15 @@ const Suppliers = () =>
                 _suppliers = _suppliers.filter(supplier => supplier.id !== parseInt(rowId) )
             });
 
+            setAlertSeverity('success');
+            setAlertMessage('Products deleted successfully.');
+
             setSuppliers(_suppliers);
             setOpen(false);
             setRowIds([]);
         }
+
+        setOpenAlert(true);
     }
 
 
@@ -81,6 +104,12 @@ const Suppliers = () =>
 
     return (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <DeleteDialog 
                 open={open} 
                 handleClose={handleClose} 

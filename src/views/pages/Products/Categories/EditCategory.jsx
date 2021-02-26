@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, lazy} from 'react'
 import Loading from '../../../../components/Loading'
 import * as Categories_ from '../../../../services/products/categories'
 import { useHistory } from 'react-router-dom'
@@ -11,6 +11,7 @@ import {
     } from '@material-ui/core';
 import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
 import { categoryUseStyles } from '../../../../assets/material-styles/styles'
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
 
 
 const CreateCategory = ({match}) => 
@@ -26,9 +27,19 @@ const CreateCategory = ({match}) =>
         id: categoryId,
         name: ''
     });
-    const [errorMessage, setErrorMessage] = useState({
-        name: ''
-    });
+    const [errorMessage, setErrorMessage] = useState({name: ''});
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
 
     const handleOnChangeName = (e) => setCategory({...category, name: e.target.value});
@@ -49,11 +60,20 @@ const CreateCategory = ({match}) =>
         setLoading(true);
         const result = await Categories_.updateAsync(category);
 
-        result.status === 'Error'
-            ?  setErrorMessage(prepareSetErrorMessages(result.message, errorMessage))
-            :  history.push('/products/categories');
+        if (result.status === 'Error')
+        {
+            setAlertSeverity('error');
+            setErrorMessage(prepareSetErrorMessages(result.message, errorMessage));
+        }
+        else
+        {
+            setAlertSeverity('success');
+            setAlertMessage(result.message)
+            setTimeout(() => history.push('/products/categories'), 2000);
+        }
 
-        setLoading(false);
+        setOpenAlert(true);
+        setTimeout(() =>  setLoading(false), 2000);
     }
 
 
@@ -69,6 +89,12 @@ const CreateCategory = ({match}) =>
         ? <Loading />
         : (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <Grid container spacing={1}>
                 <Grid item xs={12} sm={12} md={6} lg={6}>
                     <Card className={classes.categoryCard}>

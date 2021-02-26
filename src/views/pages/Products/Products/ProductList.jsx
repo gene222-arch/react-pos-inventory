@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, lazy} from 'react';
 import * as ExcelExport from '../../../../services/exports/excel/products'
 import DeleteDialog from '../../../../components/DeleteDialog'
 import clsx from 'clsx'
@@ -10,6 +10,7 @@ import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
 
 
 const ProductList = () => 
@@ -20,6 +21,18 @@ const ProductList = () =>
     const [open, setOpen] = useState(false);
     const [products, setProducts] = useState([]);
     const [rowIds, setRowIds] = useState([]);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
     const columns = [
         { field: 'id', hide:true },
@@ -45,19 +58,16 @@ const ProductList = () =>
      * Dialog
      */
     const handleClickOpen = () =>  setOpen(true);
+
     const handleClose = () => setOpen(false);
 
-    const handleOnSelectionChange = (params) => 
-    {
-        console.log(params.rowIds);
-        setRowIds(params.rowIds)
-    }
+    const handleOnSelectionChange = (params) => setRowIds(params.rowIds);
 
     const fetchProducts = async () => 
     {
         const result = await Product_.fetchAllAsync();
 
-        if (result.status = 'Success')
+        if (result.status === 'Success')
         {
             setProducts(result.data);
         }
@@ -67,7 +77,12 @@ const ProductList = () =>
     {
         const result = await Product_.destroyAsync({product_ids: rowIds});
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
+        {
+            setAlertSeverity('warning');
+            setAlertMessage('Please click the button only once.');
+        }
+        else
         {
             let _products = [...products];
 
@@ -75,10 +90,15 @@ const ProductList = () =>
                 _products = _products.filter(product => product.id !== parseInt(rowId) )
             });
 
+            setAlertSeverity('success');
+            setAlertMessage('Products deleted successfully.');
+
             setProducts(_products);
             setOpen(false);
             setRowIds([]);
         }
+
+        setOpenAlert(true);
     }
 
     const handleExcelExport = async () => 
@@ -102,6 +122,12 @@ const ProductList = () =>
 
     return (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <DeleteDialog 
                 open={open} 
                 handleClose={handleClose} 
