@@ -61,6 +61,7 @@ const CreateCategory = () =>
                                     color="default" 
                                     className={classes.cancelBtn}
                                     onClick={() => history.push('/products/categories')}
+                                    disabled={loading}
                                 >
                                     Cancel
                                 </Button>

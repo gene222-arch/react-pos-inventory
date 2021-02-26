@@ -89,6 +89,7 @@ const CreateDiscount = () =>
                             color="default" 
                             className={classes.cancelBtn}
                             onClick={() => history.push('/products/discounts')}
+                            disabled={loading}
                         >
                             Cancel
                         </Button>

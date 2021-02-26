@@ -185,7 +185,7 @@ export const destroyPurchaseProductsAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .delete('/products', {
+            .delete('/purchase-orders/products', {
                 data: payload
             });
 

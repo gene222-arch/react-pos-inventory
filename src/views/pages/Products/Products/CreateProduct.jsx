@@ -80,6 +80,7 @@ const CreateProduct = () =>
 {
     const classes = createProductUseStyles();
     const history = useHistory();
+    const [loading, setLoading] = useState(false);
 
     const [product, setProduct] = useState(PRODUCT_DEFAULT);
     const [stock, setStock] = useState(STOCK_DEFAULT);
@@ -113,6 +114,7 @@ const CreateProduct = () =>
 
     const handleCreateProduct = async (e) => 
     {
+        setLoading(true);
         e.preventDefault();
 
         const data = {
@@ -130,6 +132,8 @@ const CreateProduct = () =>
         {
             history.push('/products');
         }
+
+        setLoading(false);
     }
 
 
@@ -403,6 +407,7 @@ const CreateProduct = () =>
                         color="default" 
                         className={classes.cancelBtn}
                         onClick={() => history.push('/products')}
+                        disabled={loading}
                     >
                         Cancel
                     </Button>
@@ -413,6 +418,7 @@ const CreateProduct = () =>
                         color="default" 
                         className={classes.addBtn}
                         onClick={handleCreateProduct}
+                        disabled={loading}
                     >
                         Save
                     </Button>

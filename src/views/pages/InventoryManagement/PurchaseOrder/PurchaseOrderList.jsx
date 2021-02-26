@@ -43,7 +43,8 @@ const PurchaseOrderList = () =>
         },
         { field: 'expected_on', headerName: 'Expected on', width: 200,
             cellClassName: (params) =>  clsx('super-app', {
-                negative: params.value == DateHelper.currentDateWithFormat('mdy'),
+                negative: params.value == DateHelper.currentDateWithFormat('mdy') && params.row.status !== 'Closed',
+                grey: params.row.status === 'Closed'
             })
         },
         { field: 'total_ordered_quantity', headerName: 'Total', width: 163 },

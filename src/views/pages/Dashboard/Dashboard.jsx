@@ -96,15 +96,16 @@ const Dashboard = () =>
     {
         const result = await Dashboard_.fetchDashboardData();
 
-        if (result.status === 'Success')
+        if (result.status === 'No Content')
         {
-            if (result.data)
-            {
-                console.log(result.data);
-                setDashboardData(result.data);
-            }
-            setLoading(false);
+            alert('no content')
+            setDashboardData(DASHBOARD_DEFAULT_PROPS);
         }
+        else 
+        {
+            setDashboardData(result.data);
+        }
+        setLoading(false);
     }
 
 

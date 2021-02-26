@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy } from 'react';
 import Loading from '../../../../components/Loading'
 import * as PurchaseOrder_ from '../../../../services/inventory-management/purchaseOrders'
 import { NavLink, useHistory } from 'react-router-dom'
-import LinearWithValueLabel from '../../../../components/LinearWithValueLabel'
 import { purchaseOrderDetailsUseStyles } from '../../../../assets/material-styles/styles'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Divider, Grid, Typography } from '@material-ui/core';
@@ -15,12 +14,17 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import SendMailDialog from './SendMailDialog'
 import EditIcon from '@material-ui/icons/Edit';
+const LinearWithValueLabel = lazy(() => import('../../../../components/LinearWithValueLabel'));
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
+const ReceivedStocks = lazy(() => import('./ReceivedStocks'));
+
 
 
 const columns = [
     { field: 'id',  hide: true, },
     { field: 'product_id', hide: true },
     { field: 'product_description', headerName: 'Product', width: 250 },
+    { field: 'status', headerName: 'Status', width: 150 },
     { field: 'ordered_quantity', headerName: 'Ordered quantity', width: 250
     },
     { field: 'purchase_cost', headerName: 'Purchase cost', width: 250,
@@ -30,23 +34,31 @@ const columns = [
     valueFormatter: param => param.value.toFixed(2) },
 ];
 
+const PURCHASE_ORDER_DEFAULT_PROPS = {
+    id: 0,
+    status: '',
+    ordered_by: '',
+    supplier_id: 0,
+    supplier: '',
+    purchase_order_date: '',
+    expected_delivery_date: '',
+    total_ordered_quantity: 0,
+    total_received_quantity: 0
+};
 
 const PurchaseOrderDetails = ({match}) => 
 {
     const classes = purchaseOrderDetailsUseStyles();
     const history = useHistory();
+    const [loading, setLoading] = useState(false);
+
     const purchaseOrderId = match.params.purchaseOrderId;
 
-    const [purchaseOrder, setPurchaseOrder] = useState({
-        id: 0,
-        ordered_by: '',
-        supplier_id: 0,
-        supplier: '',
-        purchase_order_date: '',
-        expected_delivery_date: '',
-        total_ordered_quantity: 0,
-        total_received_quantity: 0
-    });
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const [purchaseOrder, setPurchaseOrder] = useState(PURCHASE_ORDER_DEFAULT_PROPS);
     const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([]);
 
     const [openSendMail, setOpenSendMail] = useState(false);
@@ -55,6 +67,14 @@ const PurchaseOrderDetails = ({match}) =>
     const [anchorEl, setAnchorEl] = useState(null);
     const openMenu = Boolean(anchorEl);
     
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
     const handleClickOpen = () => setOpenSendMail(true);
     const handleClose = () => setOpenSendMail(false);
@@ -81,6 +101,7 @@ const PurchaseOrderDetails = ({match}) =>
 
     const cancelPurchaseOrder = async () => 
     {
+        setLoading(true);
         const productIds = purchaseOrderDetails.map(pod => pod.product_id);
 
         const result = await PurchaseOrder_.cancelOrderAsync({
@@ -88,10 +109,21 @@ const PurchaseOrderDetails = ({match}) =>
             product_ids: productIds
         });
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
         {
-            alert('Success')
+            setAlertSeverity('error');
+            setAlertMessage(result.message);
+            setOpenAlert(true);
         }
+        else 
+        {
+            setAlertSeverity('success');
+            setAlertMessage(result.message)
+            setOpenAlert(true);
+            setTimeout(() =>  history.push('/inventory-mngmt/purchase-orders'), 2000);
+        }
+
+        setTimeout(() => setLoading(false), 2000);
     }
    
 
@@ -108,6 +140,12 @@ const PurchaseOrderDetails = ({match}) =>
         ? <Loading />
         : (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                successMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <Card className={classes.purchaseOrderCard}>
                 <CardContent>
                     <Grid container justify='space-between'>
@@ -128,10 +166,17 @@ const PurchaseOrderDetails = ({match}) =>
                         <Grid item className={classes.options}>
                             <Grid container>
                             {
-                                purchaseOrder.total_ordered_quantity !== purchaseOrder.total_received_quantity && (
+                                Boolean(purchaseOrder.total_remaining_ordered_quantity) && (
                                 <>
                                     <Grid item>
-                                        <Button variant="text" color="default">
+                                        <ReceivedStocks purchaseOrderId={purchaseOrderId}/>
+                                    </Grid>
+                                    <Grid item>
+                                        <Button 
+                                            variant="text" 
+                                            color="default"
+                                            disabled={loading}
+                                        >
                                             <NavLink 
                                                 to={`/inventory-mngmt/receive-purchase-orders/${purchaseOrderId}`} 
                                                 className={classes.links}
@@ -144,6 +189,7 @@ const PurchaseOrderDetails = ({match}) =>
                                         <Button 
                                             variant="text" 
                                             color="default"
+                                            disabled={loading}
                                             onClick={
                                                 () => history.push(`/inventory-mngmt/purchase-order/${purchaseOrderId}/edit`)
                                             }
@@ -185,12 +231,15 @@ const PurchaseOrderDetails = ({match}) =>
                                             },
                                             }}
                                         >
-                                        <MenuItem > Save as PDF </MenuItem>
-                                        <MenuItem > Save as CSV </MenuItem>
+                                            <MenuItem > Save as PDF </MenuItem>
+                                            <MenuItem > Save as CSV </MenuItem>
                                         {
-                                            purchaseOrder.total_ordered_quantity !== purchaseOrder.total_received_quantity 
-                                            && (
-                                                <MenuItem onClick={cancelPurchaseOrder}> Cancel orders </MenuItem>
+                                            Boolean(purchaseOrder.total_remaining_ordered_quantity) && (
+                                                <MenuItem 
+                                                    button 
+                                                    disabled={loading}
+                                                    onClick={cancelPurchaseOrder}
+                                                > Cancel orders </MenuItem>
                                             )
                                         }
                                         
@@ -221,15 +270,18 @@ const PurchaseOrderDetails = ({match}) =>
                                     }}
                                 >
                                 {
-                                    purchaseOrder.total_ordered_quantity !== purchaseOrder.total_received_quantity && (
+                                    Boolean(purchaseOrder.total_remaining_ordered_quantity) && (
                                     <>
-                                        <MenuItem button onClick={
+                                        <MenuItem 
+                                            button 
+                                            disabled={loading}
+                                            onClick={
                                             () => history.push(`/inventory-mngmt/receive-purchase-orders/${purchaseOrderId}`)
                                         }>
                                             Receive
                                         </MenuItem>
                                         <MenuItem onClick={
-                                            () => history.push(`/inventory-mngmt/purchase-order/${purchaseOrderId}`)
+                                            () => history.push(`/inventory-mngmt/purchase-order/${purchaseOrderId}/edit`)
                                         }>
                                             Edit
                                         </MenuItem>
@@ -237,6 +289,7 @@ const PurchaseOrderDetails = ({match}) =>
                                 }
                                 <MenuItem 
                                     button 
+                                    disabled={loading}
                                     onClick={handleClickOpen}
                                 >
                                     Send
@@ -248,9 +301,11 @@ const PurchaseOrderDetails = ({match}) =>
                                     Save as CSV
                                 </MenuItem>
                                 {
-                                     purchaseOrder.total_ordered_quantity !== purchaseOrder.total_received_quantity 
-                                     && (
-                                        <MenuItem button onClick={cancelPurchaseOrder}>
+                                     Boolean(purchaseOrder.total_remaining_ordered_quantity) && (
+                                        <MenuItem 
+                                            disabled={loading}
+                                            button 
+                                            onClick={cancelPurchaseOrder}>
                                             Cancel orders
                                         </MenuItem>
                                      )

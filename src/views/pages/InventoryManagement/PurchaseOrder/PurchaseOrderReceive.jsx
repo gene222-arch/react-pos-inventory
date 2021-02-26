@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy } from 'react';
 import EditDialog from '../../../../components/EditDialog'
 import * as PurchaseOrder_ from '../../../../services/inventory-management/purchaseOrders'
 import { NavLink, useHistory } from 'react-router-dom'
@@ -6,9 +6,10 @@ import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { receivePOTextFieldUseStyles } from '../../../../assets/material-styles/styles'
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'))
 
 
-const purchaseOrderProps = {
+const PURCHASE_ORDER_PROPS = {
     id: 0,
     purchase_order_id: 0,
     supplier_id: 0,
@@ -18,15 +19,51 @@ const PurchaseOrderReceive = ({match}) =>
 {
     const history = useHistory();
     const classes = receivePOTextFieldUseStyles();
+    const [loading, setLoading] = useState(false);
+
     const [open, setOpen] = useState(false);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertSeverity, setAlertSeverity] = useState('');
+    const [alertMessage, setAlertMessage] = useState('');
 
     const {purchaseOrderId} = match.params;
-    const [purchaseOrder, setPurchaseOrder] = useState(purchaseOrderProps);
+    const [purchaseOrder, setPurchaseOrder] = useState(PURCHASE_ORDER_PROPS);
     const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([]);
+
+
+    const columns = [
+        { field: 'id',  hide: true, },
+        { field: 'purchase_order_details_id', hide: true },
+        { field: 'product_id', hide: true },
+        { field: 'product_description', headerName: 'Product', width: 160 },
+        { field: 'total_ordered_quantity', headerName: 'Ordered', width: 160 },
+        { field: 'total_received_quantity', headerName: 'Received', width: 160 },
+        { field: 'received_quantity', headerName: 'To receive', width: 160,
+            renderCell: (params) => (
+                <TextField
+                    error={Boolean(params.value <= 0)}
+                    InputProps={{ inputProps: { min: 1, max: params.row.total_ordered_quantity, style: { textAlign: 'right' } } }}
+                    value={params.value}
+                    onChange={
+                        (e) => handleOnChangeToReceive(e, params.row.id)
+                    }
+                    className={classes.toReceiveTextField}
+                />
+            ),
+        },
+    ];
+    
 
     const handleClickOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
 
+        setOpenAlert(false);
+    };
 
     const handleOnChangeToReceive = (e, poId) =>
     {
@@ -44,7 +81,9 @@ const PurchaseOrderReceive = ({match}) =>
                     }
                     else 
                     {
-                        alert("Received quantity can't exceed ordered quantity");
+                        setAlertSeverity('error');
+                        setAlertMessage('Received quantity can\'t exceed ordered quantity');
+                        setOpenAlert(true);
                     }
                 }
  
@@ -69,29 +108,6 @@ const PurchaseOrderReceive = ({match}) =>
         }
     };
 
-    const columns = [
-        { field: 'id',  hide: true, },
-        { field: 'purchase_order_details_id', hide: true },
-        { field: 'product_id', hide: true },
-        { field: 'product_description', headerName: 'Product', width: 160 },
-        { field: 'total_ordered_quantity', headerName: 'Ordered', width: 160 },
-        { field: 'total_received_quantity', headerName: 'Received', width: 160 },
-        { field: 'received_quantity', headerName: 'To receive', width: 160,
-            renderCell: (params) => (
-                <TextField
-                    id=""
-                    label=""
-                    InputProps={{ inputProps: { min: 1, max: params.row.total_ordered_quantity } }}
-                    value={params.value}
-                    onChange={
-                        (e) => handleOnChangeToReceive(e, params.row.id)
-                    }
-                    className={classes.toReceiveTextField}
-                />
-            ),
-        },
-    ];
-    
 
     const fetchPurchaseOrders = async () => 
     {
@@ -107,14 +123,39 @@ const PurchaseOrderReceive = ({match}) =>
     }
 
 
-    const receivePurchaseOrder = async () => 
+    const handleOnReceivePurchase = async () => 
     {
-        const result = await PurchaseOrder_.receiveAsync(validateDate())
+        setLoading(true);
+        const result = await PurchaseOrder_.receiveAsync(validateDate());
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
         {
-            history.push(`/inventory-mngmt/purchase-order-details/${purchaseOrderId}`)
+            setAlertSeverity('error');
+            setAlertMessage('Unable to save changes. Please fix the errors and try again');
         }
+        else 
+        {
+            const hasReceivedItems = validateDate()
+                .items_received_quantities
+                .find(item => item.received_quantity > 0);
+            
+            if (!hasReceivedItems) 
+            {
+                setAlertSeverity('warning');
+                setAlertMessage('No items received');
+            }
+            else 
+            {
+                setAlertSeverity('success');
+                setAlertMessage('Purchase order received');
+            }
+
+            setOpenAlert(true);
+        
+            setTimeout(() =>  history.push(`/inventory-mngmt/purchase-order-details/${purchaseOrderId}`), 2000);
+        }
+
+        setTimeout(() => setLoading(false), 2000);
     }
 
 
@@ -148,6 +189,13 @@ const PurchaseOrderReceive = ({match}) =>
     
     return (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
+
             <EditDialog 
                 open={open}
                 handleClose={handleClose}
@@ -160,7 +208,7 @@ const PurchaseOrderReceive = ({match}) =>
                 <CardContent>
                     <Grid container justify='space-between'>
                         <Grid item>
-                            <Button variant="outlined" color="primary">
+                            <Button variant="text" color="primary">
                                 <NavLink to={'/products/list'} className={classes.title}>
                                     <strong>Products</strong>
                                 </NavLink>
@@ -171,6 +219,7 @@ const PurchaseOrderReceive = ({match}) =>
                                 variant="outlined" 
                                 color="primary"
                                 onClick={handleClickOpen}
+                                disabled={loading}
                             >
                                 <strong>MARK ALL SA RECEIVED</strong>
                             </Button>
@@ -199,6 +248,7 @@ const PurchaseOrderReceive = ({match}) =>
                         className={classes.cancelDeleteBtn} 
                         color="secondary"
                         onClick={() => history.push(`/inventory-mngmt/purchase-order-details/${purchaseOrderId}`)}
+                        disabled={loading}
                     >
                         Cancel
                     </Button>
@@ -207,7 +257,8 @@ const PurchaseOrderReceive = ({match}) =>
                     <Button 
                         variant="contained" 
                         className={classes.addBtn}
-                        onClick={receivePurchaseOrder}
+                        onClick={handleOnReceivePurchase}
+                        disabled={loading}
                     >
                         Receive
                     </Button>

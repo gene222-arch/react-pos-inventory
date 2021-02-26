@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy } from 'react';
 import ReceivedStocks from './ReceivedStocks'
+import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
 import Loading from '../../../../components/Loading'
 import * as PurchaseOrder_ from '../../../../services/inventory-management/purchaseOrders'
 import * as Suppliers_ from '../../../../services/inventory-management/suppliers'
@@ -15,17 +16,27 @@ import MenuItem from '@material-ui/core/MenuItem';
 import DateFnsUtils from '@date-io/date-fns';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers';
-import AddIcon from '@material-ui/icons/Add';
 import * as DateHelper from '../../../../utils/dates'
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'))
 
+
+const PURCHASE_ORDER_ERROR_DEFAULT = {
+    supplier_id: '',
+    purchase_order_date: '',
+    expected_delivery_date: '',
+    items: '',
+};
 
 
 const PurchaseOrderEdit = ({match}) => 
 {
     const classes = purchaseOrderUseStyles();
     const history = useHistory();
-    const [loading, setLoading] = useState(true)
-
+    const [loading, setLoading] = useState(false);
+    const [loadingData, setLoadingData] = useState(true);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertSeverity, setAlertSeverity] = useState('');
+    const [alertMessage, setAlertMessage] = useState('');
     const {purchaseOrderId} = match.params;
 
     const [purchaseOrder, setPurchaseOrder] = useState({
@@ -34,12 +45,14 @@ const PurchaseOrderEdit = ({match}) =>
         purchase_order_date: '',
         expected_delivery_date: '',
     });
-
     const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([]);
-
     const [suppliers, setSuppliers] = useState([]);
     const [products, setProducts] = useState([]);
     const [productId, setProductId] = useState({});
+    const [productIds, setProductIds] = useState([]);
+    const[errorMessages, setErrorMessages] = useState(PURCHASE_ORDER_ERROR_DEFAULT)
+
+
     const columns = [
         { field: 'id', hide: true},
         { field: 'product_id', hide: true},
@@ -52,8 +65,7 @@ const PurchaseOrderEdit = ({match}) =>
             width: 160,
             renderCell: (params) => (
                 <TextField
-                    id=""
-                    label=""
+                    error={Boolean(params.value <= 0)}
                     value={params.value}
                     onChange={
                         (e) => handleOnChangeQuantity(e, params.row.id)
@@ -68,8 +80,7 @@ const PurchaseOrderEdit = ({match}) =>
             width: 160,
             renderCell: (params) => (
                 <TextField
-                    id=""
-                    label=""
+                    error={Boolean(params.value <= 0)}
                     value={params.value}
                     onChange={
                         (e) => handleOnChangePurchaseCost(e, params.row.id)
@@ -81,7 +92,7 @@ const PurchaseOrderEdit = ({match}) =>
         { field: 'amount', headerName: 'Amount', width: 160,
             valueFormatter: (params) => {
                const po = purchaseOrderDetails.find(po => po.id === params.row.id);
-               return po.ordered_quantity * po.purchase_cost;
+               return (po.ordered_quantity * po.purchase_cost).toFixed(2);
             }
         },
         {
@@ -93,7 +104,7 @@ const PurchaseOrderEdit = ({match}) =>
                     className={classes.deleteAction} 
                     variant="text" 
                     color="default" 
-                    onClick={() => handleOnRemovePurchaseOrder(params.row.id)}
+                    onClick={() => handleOnRemovePurchaseOrder(params.row.id, params.row.product_id)}
                 >
                     <DeleteForeverIcon />
                 </Button>
@@ -101,7 +112,14 @@ const PurchaseOrderEdit = ({match}) =>
         }
     ];
 
-    const handleOnChangeProductId = (e) => setProductId(e.target.value);
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
     const handleOnChangeQuantity = (e, poId) => 
     {
@@ -140,16 +158,13 @@ const PurchaseOrderEdit = ({match}) =>
         setPurchaseOrderDetails(po);
     };
 
-    const handleOnRemovePurchaseOrder = async (poId) => 
+    const handleOnRemovePurchaseOrder = async (poId, productId) => 
     {
         const po = purchaseOrderDetails
             .filter(purchaseOrderDetail => (purchaseOrderDetail.id !== poId));
         
         setPurchaseOrderDetails(po);
-
-        const result = await PurchaseOrder_.destroyPurchaseProductsAsync({
-            purchase_order_detail_id: poId
-        });
+        setProductIds([...productIds, productId]);
     };
 
     const handleOnChangeSupplier = (e) => setPurchaseOrder({
@@ -178,14 +193,22 @@ const PurchaseOrderEdit = ({match}) =>
             const {purchaseOrder, items} = result.data
             setPurchaseOrder(purchaseOrder);
             setPurchaseOrderDetails(items);
-            setLoading(false);
+            setLoadingData(false);
+        }
+        else 
+        {
+            history.push('/inventory-mngmt/purchase-orders');
         }
     }
 
-    const fetchProductToPurchase = async () => 
+    const fetchProductToPurchase = async (e) => 
     {
+        const id = parseInt(e.target.value);
+
+        setProductId(id);
+
         const result = await Product_.fetchToPurchaseAsync({
-            product_id: productId
+            product_id: id
         });
 
         if (result.status === 'Success')
@@ -226,19 +249,44 @@ const PurchaseOrderEdit = ({match}) =>
         }
     }
     
-    const upsertPurchaseOrder = async () => 
+    const handlePurchaseOrderChanges = async () => 
     {
-        const result = await PurchaseOrder_.upsertAsync(validateData());
+        setLoading(true);
 
-        if (result.status === 'Success')
+        const deleteResult = await PurchaseOrder_.destroyPurchaseProductsAsync({
+            purchase_order_id: purchaseOrderId,
+            product_ids: productIds
+        });
+
+        if (deleteResult.status === 'Error')
         {
-            history.push('/inventory-mngmt/purchase-orders')
+            setAlertSeverity('error');
+            setOpenAlert(true);
+        }
+        else 
+        {
+            const upsertResult = await PurchaseOrder_.upsertAsync(validateData());
+        
+        if (upsertResult.status === 'Error')
+        {
+            setAlertSeverity('error');
+            setOpenAlert(true);
+            setErrorMessages(prepareSetErrorMessages(upsertResult.message, errorMessages));
+        }
+        else 
+        {
+            setAlertSeverity('success');
+            setAlertMessage(upsertResult.message)
+            setOpenAlert(true);
+            setTimeout(() =>  history.push('/inventory-mngmt/purchase-orders'), 2000);
+        }
+
+        setTimeout(() => setLoading(false), 2000);
         }
     }
 
     const validateData = () => 
     {
-
         const filterPurchaseOrder = {
             purchase_order_id: parseInt(purchaseOrderId),
             supplier_id: purchaseOrder.supplier_id,
@@ -260,6 +308,7 @@ const PurchaseOrderEdit = ({match}) =>
         };
     }
 
+    
     useEffect(() => {
         fetchPurchaseOrder();
         fetchProducts();
@@ -273,14 +322,25 @@ const PurchaseOrderEdit = ({match}) =>
         }
     }, []);
 
-    return loading ? <Loading />
+
+    return loadingData ? <Loading />
         : (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                successMessage={alertMessage}
+                severity={alertSeverity} 
+            />
+
             <Card className={classes.purchaseOrderCard}>
                 <CardContent>
                     <Grid container spacing={1}>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
-                            <FormControl className={classes.formControl}>
+                            <FormControl 
+                                className={classes.formControl}
+                                error={Boolean(errorMessages.supplier_id !== '')}
+                            >
                                 <Select
                                     name='supplier_id'
                                     value={purchaseOrder.supplier_id}
@@ -291,7 +351,7 @@ const PurchaseOrderEdit = ({match}) =>
                                     fullWidth
                                 >
                                 {
-                                    suppliers.map(supplier => (
+                                    suppliers.length > 0 && suppliers.map(supplier => (
                                         <MenuItem
                                             key={supplier.id} 
                                             value={supplier.id}>
@@ -300,7 +360,13 @@ const PurchaseOrderEdit = ({match}) =>
                                 }
                                 
                                 </Select>
-                                <FormHelperText>Select a supplier</FormHelperText>
+                                <FormHelperText>
+                                {
+                                    errorMessages.supplier_id !== ''
+                                        ? errorMessages.supplier_id
+                                        : 'Select a supplier'
+                                }
+                                </FormHelperText>
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} sm={12} md={10} lg={10}>
@@ -308,6 +374,8 @@ const PurchaseOrderEdit = ({match}) =>
                                 <Grid container spacing={1} justify='space-between'>
                                     <Grid item xs={12} sm={6} md={5} lg={5}>
                                         <KeyboardDatePicker
+                                            error={errorMessages.purchase_order_date !== ''}
+                                            helperText={errorMessages.purchase_order_date}
                                             fullWidth
                                             margin="normal"
                                             name="purchase_order_date"
@@ -323,6 +391,8 @@ const PurchaseOrderEdit = ({match}) =>
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={5} lg={5}>
                                         <KeyboardDatePicker
+                                            error={errorMessages.expected_delivery_date !== ''}
+                                            helperText={errorMessages.expected_delivery_date}
                                             fullWidth
                                             margin="normal"
                                             name="expected_delivery_date"
@@ -348,7 +418,10 @@ const PurchaseOrderEdit = ({match}) =>
                         <Grid item>
                         <Grid container spacing={1}>
                             <Grid item>
-                                <FormControl className={classes.formControl}>
+                                <FormControl 
+                                    className={classes.formControl}
+                                    error={Boolean(errorMessages.items !== '')}
+                                >
                                     <InputLabel id="demo-simple-select-label">Add product</InputLabel>
                                     <Select
                                         name='role'
@@ -358,10 +431,10 @@ const PurchaseOrderEdit = ({match}) =>
                                         fullWidth
                                         margin='dense'
                                         value={productId}
-                                        onChange={handleOnChangeProductId}
+                                        onChange={fetchProductToPurchase}
                                     >
                                         {
-                                            products.map((product) => (
+                                            products.length > 0 && products.map((product) => (
                                                 <MenuItem key={product.id} value={product.id}>
                                                     {product.name}
                                                 </MenuItem>
@@ -369,21 +442,12 @@ const PurchaseOrderEdit = ({match}) =>
                                         }
                                         
                                     </Select>
+                                    <FormHelperText>{errorMessages.items}</FormHelperText>
                                 </FormControl>  
-                            </Grid>
-                            <Grid item>
-                                <Button 
-                                    variant='outlined' 
-                                    color="default" 
-                                    className={classes.addBtn}
-                                    onClick={fetchProductToPurchase}
-                                >
-                                    <AddIcon />
-                                </Button>
                             </Grid>
                         
                         </Grid>
-                        
+                    
                         </Grid>
                         <Grid item>
                             <ReceivedStocks purchaseOrderId={purchaseOrderId}/>
@@ -411,7 +475,8 @@ const PurchaseOrderEdit = ({match}) =>
                         variant='contained' 
                         color="default" 
                         className={classes.cancelBtn}
-                        onClick={() => history.push('/inventory-mngmt/purchase-orders')}
+                        onClick={() => history.push(`/inventory-mngmt/purchase-order-details/${purchaseOrderId}`)}
+                        disabled={loading}
                     >
                         Cancel
                     </Button>
@@ -421,9 +486,10 @@ const PurchaseOrderEdit = ({match}) =>
                         variant='contained' 
                         color="default" 
                         className={classes.addBtn}
-                        onClick={upsertPurchaseOrder}
+                        onClick={handlePurchaseOrderChanges}
+                        disabled={loading}
                     >
-                        Create
+                        UPDATE
                     </Button>
                 </Grid>
             </Grid>
