@@ -3,6 +3,7 @@ import {TAX_RATE} from '../../../config/accounting'
 import Loading from '../../../components/Loading'
 import * as SalesReturn_ from '../../../services/sales-returns/salesReturn'
 import * as POS_ from '../../../services/pos/pos'
+import * as Customer_ from '../../../services/customers/customers'
 import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid } from '@material-ui/core';
@@ -103,7 +104,7 @@ const CreateSalesReturn = () =>
             width: 150,
             renderCell: (params) => (
                 <TextField
-                    error={Boolean(params.value <= 0)}
+                    error={Boolean(params.value <= 0) || !Number.isInteger(params.value)}
                     value={params.value}
                     onChange={
                         (e) => handleOnChangeQuantity(e, params.row)
@@ -142,33 +143,42 @@ const CreateSalesReturn = () =>
         const {price, ordered_quantity, discount} = data;
         noOfItemsToReturn = parseInt(noOfItemsToReturn) || 0;
 
-        if (noOfItemsToReturn > ordered_quantity)
+        if (!Number.isInteger(noOfItemsToReturn))
         {
             setAlertSeverity('error');
-            setAlertMessage('Quantity can\'t exceed the received quantity.');
+            setAlertMessage('Please input a valid number.');
             setOpenAlert(true);
         }
         else 
         {
-            const subTotal = (parseFloat(price) * noOfItemsToReturn).toFixed(2);
-            const tax = (subTotal * TAX_RATE).toFixed(2);
-            const total = ((parseFloat(price) * noOfItemsToReturn) + ((parseFloat(price) * noOfItemsToReturn) * TAX_RATE) - discount).toFixed(2);
+            if (noOfItemsToReturn > ordered_quantity)
+            {
+                setAlertSeverity('error');
+                setAlertMessage('Quantity can\'t exceed the ordered quantity.');
+                setOpenAlert(true);
+            }
+            else 
+            {
+                const subTotal = (parseFloat(price) * noOfItemsToReturn).toFixed(2);
+                const tax = (subTotal * TAX_RATE).toFixed(2);
+                const total = ((parseFloat(price) * noOfItemsToReturn) + ((parseFloat(price) * noOfItemsToReturn) * TAX_RATE) - discount).toFixed(2);
 
-            const filterData = ({
-                ...data,
-                quantity: noOfItemsToReturn,
-                sub_total: subTotal,
-                tax: tax,
-                total: total
-            });
+                const filterData = ({
+                    ...data,
+                    quantity: noOfItemsToReturn,
+                    sub_total: subTotal,
+                    tax: tax,
+                    total: total
+                });
 
-            const newOrderDetails = customerOrderDetails.items.map(item => 
-                    item.id === filterData.id 
-                        ? filterData
-                        : item
-            );
-            
-            setCustomerOrderDetails({...customerOrderDetails, items: newOrderDetails});
+                const newOrderDetails = customerOrderDetails.items.map(item => 
+                        item.id === filterData.id 
+                            ? filterData
+                            : item
+                );
+                
+                setCustomerOrderDetails({...customerOrderDetails, items: newOrderDetails});
+            }
         }
     };
 
@@ -208,9 +218,7 @@ const CreateSalesReturn = () =>
 
     const fetchCustomerOrders = async () => 
     {
-        const result = await POS_.fetchAllFilteredAsync({
-            filters: ['id']
-        });
+        const result = await Customer_.fetchAllWithOrdersAsync();
 
         if (result.status === 'Success')
         {
@@ -336,12 +344,18 @@ const CreateSalesReturn = () =>
                                                 value={posId}
                                                 onChange={handleOnPurchaseOrder}
                                             >
-                                                <MenuItem value={0}>Select customer order #</MenuItem>
+                                                
                                                 {
-                                                    customerOrderList.map(co => (
-                                                        <MenuItem 
+                                                    customerOrderList.map((co, index) => (
+                                                        !index 
+                                                        ? (
+                                                            <MenuItem value={0}>Select customer order #</MenuItem>
+                                                        )
+                                                        : <MenuItem 
                                                             key={co.id}
-                                                            value={co.id}>CO{co.id}</MenuItem>
+                                                            value={co.id}>CO{co.id}
+                                                        </MenuItem>
+                                                        
                                                     ))
                                                 }
                                         </Select>

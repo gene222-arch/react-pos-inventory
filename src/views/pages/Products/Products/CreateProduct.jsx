@@ -24,6 +24,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import AddBoxIcon from '@material-ui/icons/AddBox';
+import Switch from '@material-ui/core/Switch';
 import productDefaultImg from '../../../../assets/storage/images/default_img/product_default_img.svg'
 const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
 
@@ -32,10 +33,12 @@ const PRODUCT_DEFAULT = {
     sku: '',
     barcode: '',
     name: '',
+    image: 'no_image.svg',
     category: '',
     sold_by: '',
     price: '',
     cost: '',
+    is_for_sale: false,
 };
 
 const STOCK_DEFAULT = {
@@ -83,6 +86,7 @@ const CreateProduct = () =>
 
     const [product, setProduct] = useState(PRODUCT_DEFAULT);
     const [stock, setStock] = useState(STOCK_DEFAULT);
+    const [filePreview, setFilePreview] = useState(productDefaultImg);
     const [categories, setCategories] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
     const [errorMessages, setErrorMessages] = useState(CREATE_PRODUCT_DEFAULT_ERROR_MESSAGES);
@@ -100,8 +104,39 @@ const CreateProduct = () =>
     };
 
 
-    const handleOnChangeProduct = (e) => setProduct({...product, [e.target.name]: e.target.value});
+    const handleOnChangeProduct = (e) => {
+        
+        const {name, value, checked} = e.target;
+
+        name !== 'is_for_sale'
+            ? setProduct({...product, [name]: value})
+            : setProduct({...product, [name]: checked});
+    };
+
     const handleOnChangeStock = (e) =>  setStock({...stock, [e.target.name]: e.target.value});
+
+    const handleOnChangeFile = async (e) => 
+    {
+        let files = e.target.files || e.dataTransfer.files;
+        if (!files.length)
+            return;
+        
+        const file = files[0];
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+            setFilePreview(e.target.result);
+        };
+
+        reader.readAsDataURL(file);
+
+        const result = await Product.uploadImageAsync({
+            product_image: file
+        });
+
+        setProduct({...product, image: result.data});
+        console.log(result);
+    }
 
     const fetchCategories = async () => 
     {
@@ -128,12 +163,7 @@ const CreateProduct = () =>
         setLoading(true);
         e.preventDefault();
 
-        const data = {
-            product: product,
-            stock: stock
-        };
-
-        const result = await Product.storeAsync(data);
+        const result = await Product.storeAsync(validateData());
         
         if (result.status === 'Error')
         {
@@ -149,6 +179,28 @@ const CreateProduct = () =>
 
         setOpenAlert(true);
         setTimeout(() =>  setLoading(false), 2000);
+    }
+
+    const validateData = () => 
+    {    
+        for (const key in stock) {
+            if (!stock[key])
+            {
+                delete stock[key];
+            }
+        }
+
+        for (const key in product) {
+            if (!product[key] && key !== 'is_for_sale')
+            {
+                delete product[key];
+            }
+        }
+
+        return {
+            product: product,
+            stock: stock
+        };
     }
 
 
@@ -225,6 +277,17 @@ const CreateProduct = () =>
                                 </Select>
                                 <FormHelperText>{errorMessages[ERR_MSG_KEY.CATEGORY]}</FormHelperText>
                             </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <FormControlLabel
+                                control={
+                                    <Switch 
+                                        checked={product.is_for_sale} 
+                                        onChange={handleOnChangeProduct} 
+                                        name="is_for_sale" 
+                                        />}
+                                label="Available for sale"
+                            />
                         </Grid>
                         <Grid item xs={12} sm={12} md={10} lg={10}>
                             <FormControl 
@@ -399,7 +462,7 @@ const CreateProduct = () =>
                 <CardContent>
                     <Grid container spacing={3} alignItems='center' justify='flex-start' direction='column'>
                         <Grid item xs={12} sm={12} md={6} lg={6}>
-                            <img src={productDefaultImg} alt="" className={classes.productImagePreview}/>
+                            <img src={filePreview} alt="" className={classes.productImagePreview}/>
                         </Grid>
                         <Grid item>
                             <input
@@ -408,6 +471,7 @@ const CreateProduct = () =>
                                 style={{ display: 'none' }}
                                 id="raised-button-file"
                                 type="file"
+                                onChange={handleOnChangeFile}
                             />
                                 <label htmlFor="raised-button-file">
                                     <Button 

@@ -1,0 +1,1 @@
+export const hasPermissionTo = permission => accessRights.permissions.includes(permission);

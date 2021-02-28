@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, lazy} from 'react'
 import * as POS_ from '../../../services/pos/pos'
 import Loading from '../../../components/Loading'
 import OrderDetails from './OrderDetails'
@@ -10,6 +10,8 @@ import EditOrder from './EditOrder'
 import ProcessPayment from './ProcessPayment'
 import {posUseStyles} from '../../../assets/material-styles/styles'
 import Grid from '@material-ui/core/Grid'
+const AlertPopUpMessage = lazy(() => import('../../../components/AlertMessages/AlertPopUpMessage'));
+
 
 const PAYMENT_DETAILS = {
     subTotal: 0.00,
@@ -17,6 +19,12 @@ const PAYMENT_DETAILS = {
     tax: 0.00,
     total: 0.00
 };
+
+
+const ALERT_MESSAGES = {
+    CUSTOMER_HAS_YET_TO_ORDER: 'Customer has yet to order, cannot process payment.'
+}
+
 
 const Pos = () => 
 {
@@ -32,6 +40,18 @@ const Pos = () =>
     const [customerId, setCustomerId] = useState(1);
     const [customerIsDiscounted, setCustomerIsDiscounted] = useState(false);
 
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
 
 
@@ -50,7 +70,9 @@ const Pos = () =>
     };
 
     const handleOnChangeCustomerId = (e) => setCustomerId(e.target.value);
+
     const handleOnChangeIsCustomerDiscounted = (boolval) => setCustomerIsDiscounted(boolval);
+
     const handleOnTableSelectionChange = (rowIds) =>  setRowIds(rowIds);
     /**
      * Cart
@@ -77,14 +99,10 @@ const Pos = () =>
         else 
         {
             setOrderDetails([]);
-            setPaymentAmountDetails({
-                subTotal: 0.00,
-                discount: 0.00, 
-                tax: 0.00,
-                total: 0.00
-            });
+            setPaymentAmountDetails(PAYMENT_DETAILS);
         }
-        setLoading(false)
+
+        setLoading(false);
     }
 
     const handleAddToCartOnClick = async (productId) => 
@@ -94,9 +112,15 @@ const Pos = () =>
             product_id: productId
         });
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
         {
-            await fetchCustomerCart();
+            setAlertSeverity('warning');
+            setAlertMessage(result.message);
+            setOpenAlert(true);
+        }
+        else 
+        {
+            fetchCustomerCart();
         }
     }   
 
@@ -108,11 +132,18 @@ const Pos = () =>
                 customer_id: customerId,
                 barcode: e.target.value
             });
-            console.log()
-            if (result.status === 'Success')
+
+            if (result.status === 'Error')
+            {
+                setAlertSeverity('warning');
+                setAlertMessage(result.message);
+            }
+            else 
             {
                 fetchCustomerCart();
             }
+
+            setOpenAlert(true);
         }
     }       
 
@@ -129,23 +160,26 @@ const Pos = () =>
 
             posDetailIds.forEach((id) => {
                 _orderDetails = _orderDetails.filter((order) => id != order.pos_details_id)
-            })
+            });
 
             setOrderDetails(_orderDetails);
         }
     }
 
-    const handleOnCancelOrder = async () => 
+
+    const handleOnProcessPayment = () => 
     {
-        const result = await POS_.cancelOrdersAsync({customer_id: customerId});
-
-        if (result.status === 'Success')
+        if (!orderDetails.length)
         {
-            await fetchCustomerCart();
+            setAlertSeverity('error');
+            setAlertMessage(ALERT_MESSAGES.CUSTOMER_HAS_YET_TO_ORDER);
+            setOpenAlert(true);
         }
-    }
-
-    const handleOnProcessPayment = () => setProcessPayment(!processPayment);
+        else
+        {
+            setProcessPayment(!processPayment)
+        }
+    };
     
 
     useEffect(() => {
@@ -154,16 +188,23 @@ const Pos = () =>
 
 
 
-    return loading ? <Loading /> 
-        : processPayment && orderDetails.length > 0 
-            ? <ProcessPayment 
-                handleOnProcessPayment={handleOnProcessPayment} 
-                customerId={customerId}
-                orderDetails={orderDetails}
-                paymentAmountDetails={paymentAmountDetails}
-            />
+    return loading 
+        ? <Loading /> 
+        : (processPayment && orderDetails.length > 0) 
+            ?   <ProcessPayment 
+                    handleOnProcessPayment={handleOnProcessPayment} 
+                    customerId={customerId}
+                    orderDetails={orderDetails}
+                    paymentAmountDetails={paymentAmountDetails}
+                />
             : (
                 <>
+                    <AlertPopUpMessage 
+                        open={openAlert}
+                        handleClose={handleCloseAlert}
+                        globalMessage={alertMessage}
+                        severity={alertSeverity} 
+                    />
                     {
                         Object.keys(editOrderPayload).length > 0 && (
                             <EditOrder 
@@ -186,7 +227,6 @@ const Pos = () =>
                                 <OrderOptions 
                                     customerId={customerId}
                                     orderDetails={orderDetails}
-                                    handleOnCancelOrder={handleOnCancelOrder}
                                     fetchCustomerCart={fetchCustomerCart}
                                     customerIsDiscounted={customerIsDiscounted}
                                     handleOnChangeIsCustomerDiscounted={handleOnChangeIsCustomerDiscounted}

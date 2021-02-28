@@ -5,8 +5,15 @@ import * as Helpers from '../../../utils/helpers'
 export const importProductsAsync = async (payload) => 
 {
     try {
-        const result = await axiosInstance()
-            .post('/import/products', Helpers.prepareToFormData(payload));
+
+        const formData = new FormData();
+
+        payload.files.forEach(file => {
+            formData.append('files', file);
+        });
+
+        const result = await axiosInstance(null, null, 'multipart/form-data')
+            .post('/import/products', formData);
 
         return result.data;
     } catch (error) {

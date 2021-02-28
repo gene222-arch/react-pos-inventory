@@ -38,7 +38,7 @@ export const fetchToSalesReturnAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .post('/pos/customer-orders/to-sales-return', Helpers.prepareToFormData(payload));
+            .post('/pos/customer-orders/to-sales-return', payload);
 
         return result.data;
 

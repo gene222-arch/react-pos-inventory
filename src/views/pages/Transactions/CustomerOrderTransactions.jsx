@@ -1,9 +1,11 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, lazy} from 'react';
+import * as ExcelExport from '../../../services/exports/excel/payments'
+import * as CSVExport from '../../../services/exports/csv/payments'
 import * as CustomerOrderTransactions_ from '../../../services/transactions/customerOrders'
 import {useHistory} from 'react-router-dom'
-import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { dataGridUseStyles } from '../../../assets/material-styles/styles'
-import Typography from '@material-ui/core/Typography'
+import { DataGrid, GridToolbar } from '@material-ui/data-grid';
+const AlertPopUpMessage = lazy(() => import('../../../components/AlertMessages/AlertPopUpMessage'));
 
 
 const CustomerOrderTransactions = () => 
@@ -12,6 +14,18 @@ const CustomerOrderTransactions = () =>
     const history = useHistory();
 
     const [customerOrders, setCustomerOrders] = useState([]);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
     const columns = [
         { field: 'id', headerName: 'Order #', width: 115 },
@@ -21,6 +35,26 @@ const CustomerOrderTransactions = () =>
         { field: 'number_of_items', headerName: 'Number of items', width: 170 },
     
     ];
+
+
+    const handleExcelExport = () => 
+    {
+        ExcelExport.generateExcelAsync();
+
+        setAlertSeverity('info');
+        setAlertMessage('Products exporting.');
+        setOpenAlert(true);
+    }
+
+    const handleCSVExport = () => 
+    {
+        CSVExport.generateCSVAsync();
+
+        setAlertSeverity('info');
+        setAlertMessage('Products exporting.');
+        setOpenAlert(true);
+    }
+
 
 
     const fetchCustomerOrdersTransac= async () => 
@@ -43,6 +77,12 @@ const CustomerOrderTransactions = () =>
     
     return (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <div style={{ height: 450, width: '100%' }}>
                 <DataGrid 
                     showToolbar

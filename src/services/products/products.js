@@ -89,6 +89,21 @@ export const updateAsync = async (payload) =>
 }
 
 
+export const uploadImageAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/products/image-upload', Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
 export const destroyAsync = async (payload) => 
 {
     try {

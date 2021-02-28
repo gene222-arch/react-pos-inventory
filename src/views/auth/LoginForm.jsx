@@ -1,5 +1,5 @@
   
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {loginAsync} from '../../services/auth/login/login'
 import {prepareSetErrorMessages} from '../../utils/errorMessages'
 import { NavLink, useHistory } from 'react-router-dom'
@@ -18,6 +18,8 @@ import Typography from '@material-ui/core/Typography';
 import Alert from '@material-ui/lab/Alert';
 import { loginFormUseStyles } from '../../assets/material-styles/styles';
 import * as Cookie from '../../utils/cookies'
+import * as User from '../../config/auth'
+import { PermissionContext } from './../../hooks/useContext/PermissionContext';
 
 
 const Copyright = () => {
@@ -48,6 +50,8 @@ const DEFAULT_ERROR_MESSAGE_PROPS = {
 
 const LoginForm = () => 
 {
+    const {userPermissions, setUserPermissions} = useContext(PermissionContext);
+
     const classes = loginFormUseStyles();
     const history = useHistory();
     const [loading, setLoading] = useState(false);
@@ -91,6 +95,9 @@ const LoginForm = () =>
 
             if (Cookie.has('access_token'))
             {
+                const {user, permissions} = result.data.data;
+                setUserPermissions(permissions);
+                
                 history.push('/');
             }
         }

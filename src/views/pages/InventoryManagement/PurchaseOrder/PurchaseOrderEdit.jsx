@@ -65,7 +65,7 @@ const PurchaseOrderEdit = ({match}) =>
             width: 160,
             renderCell: (params) => (
                 <TextField
-                    error={Boolean(params.value <= 0)}
+                    error={Boolean(params.value <= 0) || !Number.isInteger(params.value)}
                     value={params.value}
                     onChange={
                         (e) => handleOnChangeQuantity(e, params.row.id)
@@ -80,7 +80,7 @@ const PurchaseOrderEdit = ({match}) =>
             width: 160,
             renderCell: (params) => (
                 <TextField
-                    error={Boolean(params.value <= 0)}
+                    error={Boolean(params.value <= 0) || isNaN(params.value)}
                     value={params.value}
                     onChange={
                         (e) => handleOnChangePurchaseCost(e, params.row.id)
@@ -126,7 +126,15 @@ const PurchaseOrderEdit = ({match}) =>
         let value = e.target.value;
         value = parseInt(value) || 0;
 
-        const po = purchaseOrderDetails
+        if (!Number.isInteger(value))
+        {
+            setAlertSeverity('error');
+            setAlertMessage('Please input a valid number');
+            setOpenAlert(true);
+        }
+        else 
+        {
+            const po = purchaseOrderDetails
             .map(purchaseOrderDetail => 
                 (purchaseOrderDetail.id === poId)
                     ? {
@@ -136,7 +144,8 @@ const PurchaseOrderEdit = ({match}) =>
                     : purchaseOrderDetail
             );
         
-        setPurchaseOrderDetails(po);
+            setPurchaseOrderDetails(po);
+        }
     };
 
     const handleOnChangePurchaseCost = (e, poId) => 
@@ -144,7 +153,15 @@ const PurchaseOrderEdit = ({match}) =>
         let value = e.target.value;
         value = parseFloat(value) || 0.00;
 
-        const po = purchaseOrderDetails
+        if (!Number.isInteger(value))
+        {
+            setAlertSeverity('error');
+            setAlertMessage('Please input a valid value');
+            setOpenAlert(true);
+        }
+        else 
+        {
+            const po = purchaseOrderDetails
             .map(purchaseOrderDetail => 
                 (purchaseOrderDetail.id === poId)
                     ? {
@@ -155,7 +172,8 @@ const PurchaseOrderEdit = ({match}) =>
                     : purchaseOrderDetail
             );
         
-        setPurchaseOrderDetails(po);
+            setPurchaseOrderDetails(po);
+        }
     };
 
     const handleOnRemovePurchaseOrder = async (poId, productId) => 
@@ -217,7 +235,9 @@ const PurchaseOrderEdit = ({match}) =>
 
             if (po)
             {
-                alert('Same product exists');
+                setAlertSeverity('warning');
+                setAlertMessage('The product already exist.');
+                setOpenAlert(true);
             }
             else 
             {
@@ -233,7 +253,6 @@ const PurchaseOrderEdit = ({match}) =>
 
         if (result.status === 'Success')
         {
-            console.log(result.data)
             setProducts(result.data);
         }
     }
@@ -245,7 +264,6 @@ const PurchaseOrderEdit = ({match}) =>
         if (result.status === 'Success')
         {
             setSuppliers(result.data);
-            console.log(result.data)
         }
     }
     
@@ -261,27 +279,33 @@ const PurchaseOrderEdit = ({match}) =>
         if (deleteResult.status === 'Error')
         {
             setAlertSeverity('error');
+            setAlertMessage(
+                'Unable to save changes. Please fix the errors and try again'
+            )
             setOpenAlert(true);
         }
         else 
         {
             const upsertResult = await PurchaseOrder_.upsertAsync(validateData());
         
-        if (upsertResult.status === 'Error')
-        {
-            setAlertSeverity('error');
-            setOpenAlert(true);
-            setErrorMessages(prepareSetErrorMessages(upsertResult.message, errorMessages));
-        }
-        else 
-        {
-            setAlertSeverity('success');
-            setAlertMessage(upsertResult.message)
-            setOpenAlert(true);
-            setTimeout(() =>  history.push('/inventory-mngmt/purchase-orders'), 2000);
-        }
+            if (upsertResult.status === 'Error')
+            {
+                setAlertSeverity('error');
+                setOpenAlert(true);
+                setAlertMessage(
+                    'Unable to save changes. Please fix the errors and try again'
+                )
+                setErrorMessages(prepareSetErrorMessages(upsertResult.message, errorMessages));
+            }
+            else 
+            {
+                setAlertSeverity('success');
+                setAlertMessage(upsertResult.message)
+                setOpenAlert(true);
+                setTimeout(() =>  history.push(`/inventory-mngmt/purchase-order-details/${purchaseOrderId}`), 2000);
+            }
 
-        setTimeout(() => setLoading(false), 2000);
+            setTimeout(() => setLoading(false), 2000);
         }
     }
 
@@ -329,7 +353,8 @@ const PurchaseOrderEdit = ({match}) =>
             <AlertPopUpMessage 
                 open={openAlert}
                 handleClose={handleCloseAlert}
-                successMessage={alertMessage}
+                globalMessage={alertMessage}
+
                 severity={alertSeverity} 
             />
 

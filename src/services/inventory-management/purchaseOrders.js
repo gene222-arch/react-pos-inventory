@@ -96,7 +96,7 @@ export const fetchToReceiveAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .post('/purchase-orders/purchase-order-details/to-receive', Helpers.prepareToFormData(payload));
+            .post('/purchase-orders/purchase-order-details/to-receive', payload);
 
         return result.data;
 

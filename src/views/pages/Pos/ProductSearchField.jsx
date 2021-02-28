@@ -47,7 +47,7 @@ const ProductSearchField = ({
                         <Select
                             variant='filled'
                             className={classes.selectEmpty}
-                            displayEmpty
+                            displayEmpty={false}
                             inputProps={{ 'aria-label': 'Without label' }}
                             fullWidth
                             value={category}
@@ -55,17 +55,21 @@ const ProductSearchField = ({
                         >
                             {
                                 categories.length > 0 && (
-                                    (
-                                        <>
-                                            <MenuItem key={0} value={0}>All items</MenuItem>
-                                            {
-                                                categories.map(category => (
+                                    (      
+                                        categories.map((category, index) => (
+
+                                            !index 
+                                                ? (
                                                     <MenuItem  
-                                                        key={category.id}
-                                                        value={category.id}>{category.name}</MenuItem>
-                                                ))
-                                            }
-                                        </>
+                                                        value={0}>All items
+                                                    </MenuItem>
+                                                ) 
+                                                : <MenuItem  
+                                                    key={category.id}
+                                                    value={category.id}>{category.name}
+                                                </MenuItem>
+                                            
+                                        ))
                                     )
                                 )
                             }

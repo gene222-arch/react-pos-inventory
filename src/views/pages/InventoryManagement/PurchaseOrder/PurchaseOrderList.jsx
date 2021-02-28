@@ -1,4 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, lazy} from 'react';
+import * as ExcelExport from '../../../../services/exports/excel/purchaseOrders'
+import * as CSVExport from '../../../../services/exports/csv/purchaseOrders'
 import LinearWithValueLabel from '../../../../components/LinearWithValueLabel'
 import clsx from 'clsx'
 import * as PurchaseOrder_ from '../../../../services/inventory-management/purchaseOrders'
@@ -7,26 +9,44 @@ import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { dataGridUseStyles } from '../../../../assets/material-styles/styles'
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import AddIcon from '@material-ui/icons/Add';
 import * as DateHelper from '../../../../utils/dates'
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
 
 
 
 
 const PurchaseOrderList = () => 
 {
-
     const classes = dataGridUseStyles();
     const history = useHistory();
 
-    const [purchaseOrders, setPurchaseOrders] = useState([]);
+    const [exportMenu, setExportMenu] = useState(null);
 
+    const [purchaseOrders, setPurchaseOrders] = useState([]);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
+
+    const handleClickExport = (event) => setExportMenu(event.currentTarget);
+ 
     const columns = [
         { field: 'id', headerName: 'Purchase order #', width: 163 },
         { field: 'purchase_order_date', headerName: 'Date', width: 200 },
         { field: 'status', headerName: 'Status', width: 163,
             cellClassName: (params) =>  clsx('super-app', {
-                grey: params.value === 'Closed',
+                grey: params.value === 'Closed' || params.value === 'Cancelled',
             })
         },
         { field: 'supplier', headerName: 'Supplier', width: 163 },
@@ -44,7 +64,7 @@ const PurchaseOrderList = () =>
         { field: 'expected_on', headerName: 'Expected on', width: 200,
             cellClassName: (params) =>  clsx('super-app', {
                 negative: params.value == DateHelper.currentDateWithFormat('mdy') && params.row.status !== 'Closed',
-                grey: params.row.status === 'Closed'
+                grey: params.row.status === 'Closed' || params.row.status === 'Cancelled'
             })
         },
         { field: 'total_ordered_quantity', headerName: 'Total', width: 163 },
@@ -62,6 +82,27 @@ const PurchaseOrderList = () =>
     }
 
 
+    const handleExcelExport = () => 
+    {
+        ExcelExport.generateExcelAsync();
+
+        setAlertSeverity('info');
+        setAlertMessage('Purchase orders exporting.');
+        setOpenAlert(true);
+        setExportMenu(null);
+    }
+
+    const handleCSVExport = () => 
+    {
+        CSVExport.generateCSVAsync();
+
+        setAlertSeverity('info');
+        setAlertMessage('Purchase orders exporting.');
+        setOpenAlert(true);
+        setExportMenu(null);
+    }
+
+
     useEffect(() => {
 
         fetchPurchaseOrders();
@@ -73,6 +114,12 @@ const PurchaseOrderList = () =>
 
     return (
         <>
+             <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <Card className={classes.card}>
                 <CardContent>
                     <Grid container>
@@ -91,7 +138,25 @@ const PurchaseOrderList = () =>
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="text" className={classes.btn}> Export </Button>
+                                    <Button 
+                                        aria-controls="simple-menu" 
+                                        aria-haspopup="true" 
+                                        onClick={handleClickExport}
+                                        variant="text" 
+                                        className={classes.btn}
+                                    >
+                                        Export
+                                    </Button>
+                                    <Menu
+                                        id="simple-menu"
+                                        anchorEl={exportMenu}
+                                        keepMounted
+                                        open={Boolean(exportMenu)}
+                                        onClose={() => setExportMenu(null)}
+                                    >
+                                        <MenuItem onClick={handleExcelExport}>Excel</MenuItem>
+                                        <MenuItem onClick={handleCSVExport}>CSV</MenuItem>
+                                    </Menu>
                                 </Grid>
                             </Grid>
                         </Grid>

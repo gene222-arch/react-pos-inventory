@@ -1,6 +1,6 @@
-import React, { lazy } from 'react'
-import { Route, Switch, Redirect, useHistory } from "react-router-dom";
-import { determineIsAuthenticated } from '../utils/helpers'
+import React, { lazy, useContext } from 'react'
+import {PermissionContext} from '../hooks/useContext/PermissionContext'
+import { Route, Switch, useHistory } from "react-router-dom";
 import * as Cookie from '../utils/cookies'
 const LoginForm = lazy(() => import('../views/auth/LoginForm'));
 const ForgotPassword = lazy(() => import('../views/auth/forgot-password/ForgotPassword'));
@@ -55,16 +55,18 @@ const PurchaseOrderTransactions = lazy(() => import('../views/pages/Transactions
 const Settings = lazy(() => import('../views/pages/Settings'))
 const NotFound = lazy(() => import('../views/errors/NotFound'));
 const Unauthorized = lazy(() => import('../views/errors/UnAuthorized'))
+const ProductsImport = lazy(() => import('../views/pages/Imports/Product/ProductsImport'))
 
 
 
 
-export const RenderRoutes = ({routes}) => {
-
+export const RenderRoutes = ({routes}) => 
+{
     const history = useHistory();
+    const {userPermissions} = useContext(PermissionContext);
 
     return (
-        <Switch>
+            <Switch>
             {
                 routes.map((route, index) => (
                     <Route
@@ -101,6 +103,7 @@ export const RenderRoutes = ({routes}) => {
             }
             <Route component={NotFound} />
         </Switch>
+        
     )
 }
 
@@ -378,12 +381,12 @@ export const adminRoutes = {
             restricted: true 
         },
         {
-            path: '/products',
-            name: 'ProductList',
+            path: '/products/import',
+            name: 'ProductsImport',
             icon: '',
             exact: true,
-            component: ProductList,
-            access: 'view_products',
+            component: ProductsImport,
+            access: 'import_products',
             restricted: true 
         },
         {

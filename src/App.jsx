@@ -1,12 +1,19 @@
-import React from 'react'
+import React, {useState, useMemo} from 'react'
 import { Switch, Route } from 'react-router-dom'
+import { PermissionContext } from './hooks/useContext/PermissionContext';
 import { adminRoutes, managerRoutes, cashierRoutes, globalPublicRoutes, RenderRoutes } from './routes/routes'
 const MainLayout = React.lazy(() => import('./views/layouts/MainLayout'));
 const AuthLayout = React.lazy(() => import('./views/layouts/AuthLayout'));
 const NotFound = React.lazy(() => import('./views/errors/NotFound'));
 
+
 const App = () => 
 {
+    const [userPermissions, setUserPermissions] = useState([]);
+    
+    const providerUserPermissions = useMemo(() => ({ userPermissions, setUserPermissions }), 
+        [userPermissions, setUserPermissions]);
+
 	return (
 		<> 
 			<Switch>
@@ -15,9 +22,12 @@ const App = () =>
 						<RenderRoutes routes={globalPublicRoutes.forgotPasswordRoute} />
 					</AuthLayout>
 				</Route>
+				
 				<Route path='/auth/login' exact>
 					<AuthLayout>
-						<RenderRoutes routes={globalPublicRoutes.loginRoute} />
+						<PermissionContext.Provider value={providerUserPermissions}>
+							<RenderRoutes routes={globalPublicRoutes.loginRoute} />
+						</PermissionContext.Provider>
 					</AuthLayout>
 				</Route>
 
@@ -40,9 +50,11 @@ const App = () =>
 				</Route>
 
 				<Route path='/:path?' exact={false}>
-					<MainLayout>
-						<RenderRoutes routes={adminRoutes.privateRoutes}/>
-					</MainLayout>
+					<PermissionContext.Provider value={providerUserPermissions}>
+						<MainLayout>
+							<RenderRoutes routes={adminRoutes.privateRoutes}/>
+						</MainLayout>
+					</PermissionContext.Provider>
 				</Route>
 
 				<Route component={NotFound} />

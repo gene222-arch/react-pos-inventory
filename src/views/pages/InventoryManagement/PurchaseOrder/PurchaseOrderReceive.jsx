@@ -38,10 +38,11 @@ const PurchaseOrderReceive = ({match}) =>
         { field: 'product_description', headerName: 'Product', width: 160 },
         { field: 'total_ordered_quantity', headerName: 'Ordered', width: 160 },
         { field: 'total_received_quantity', headerName: 'Received', width: 160 },
+        { field: 'remaining_total_ordered_quantity', headerName: 'Remaining order', width: 160 },
         { field: 'received_quantity', headerName: 'To receive', width: 160,
             renderCell: (params) => (
                 <TextField
-                    error={Boolean(params.value <= 0)}
+                    error={Boolean(params.value <= 0) || !Number.isInteger(params.value)}
                     InputProps={{ inputProps: { min: 1, max: params.row.total_ordered_quantity, style: { textAlign: 'right' } } }}
                     value={params.value}
                     onChange={
@@ -55,7 +56,9 @@ const PurchaseOrderReceive = ({match}) =>
     
 
     const handleClickOpen = () => setOpen(true);
+
     const handleClose = () => setOpen(false);
+
     const handleCloseAlert = (event, reason) => 
     {
         if (reason === 'clickaway') {
@@ -70,19 +73,27 @@ const PurchaseOrderReceive = ({match}) =>
         let value = e.target.value;
         value = parseInt(value) || 0;
 
-        const po = purchaseOrderDetails
+        if (!Number.isInteger(value))
+        {
+            setAlertSeverity('error');
+            setAlertMessage('Please input a valid number');
+            setOpenAlert(true);
+        }
+        else 
+        {
+            const po = purchaseOrderDetails
             .map(purchaseOrderDetail => {
 
                 if (purchaseOrderDetail.id === poId)
                 {
-                    if (purchaseOrderDetail.total_ordered_quantity >= value)
+                    if (purchaseOrderDetail.remaining_total_ordered_quantity >= value)
                     {
                         return ({...purchaseOrderDetail, received_quantity: value});
                     }
                     else 
                     {
                         setAlertSeverity('error');
-                        setAlertMessage('Received quantity can\'t exceed ordered quantity');
+                        setAlertMessage('Received quantity can\'t exceed the remaining ordered quantity');
                         setOpenAlert(true);
                     }
                 }
@@ -91,7 +102,8 @@ const PurchaseOrderReceive = ({match}) =>
                 return purchaseOrderDetail;
             });
         
-        setPurchaseOrderDetails(po);
+            setPurchaseOrderDetails(po);
+        }
     };
 
     const handleOnClickMarkAllReceived = async () =>
@@ -112,7 +124,12 @@ const PurchaseOrderReceive = ({match}) =>
     const fetchPurchaseOrders = async () => 
     {
         const result = await PurchaseOrder_.fetchToReceiveAsync({
-            purchase_order_id: purchaseOrderId 
+            purchase_order_id: purchaseOrderId,
+            do_filter: true,
+            table_to_filter: 'purchase_order_details',
+            filter_by: 'remaining_ordered_quantity',
+            operator: '>',
+            filter: 0
         })
 
         if (result.status === 'Success')

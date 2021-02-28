@@ -1,4 +1,6 @@
 import React, { useState, useEffect, lazy } from 'react';
+import {generatePDFAsync} from '../../../../services/exports/pdf/purchaseOrders'
+import {findToGenerateCSVAsync} from '../../../../services/exports/csv/purchaseOrders'
 import Loading from '../../../../components/Loading'
 import * as PurchaseOrder_ from '../../../../services/inventory-management/purchaseOrders'
 import { NavLink, useHistory } from 'react-router-dom'
@@ -24,7 +26,6 @@ const columns = [
     { field: 'id',  hide: true, },
     { field: 'product_id', hide: true },
     { field: 'product_description', headerName: 'Product', width: 250 },
-    { field: 'status', headerName: 'Status', width: 150 },
     { field: 'ordered_quantity', headerName: 'Ordered quantity', width: 250
     },
     { field: 'purchase_cost', headerName: 'Purchase cost', width: 250,
@@ -32,6 +33,8 @@ const columns = [
     },
     { field: 'amount', headerName: 'Amount', width: 250, 
     valueFormatter: param => param.value.toFixed(2) },
+    { field: 'cancelled_quantity', headerName: 'Cancelled quantity', width: 250
+    },
 ];
 
 const PURCHASE_ORDER_DEFAULT_PROPS = {
@@ -83,15 +86,46 @@ const PurchaseOrderDetails = ({match}) =>
     const handleClickMenu = (event) => setAnchorEl(event.currentTarget);
 
     const handleClickMobileMenu = (event) => setMobileAnchorEl(event.currentTarget);
+
     const handleMenuClose = () => setAnchorEl(null);
 
     const handleMobileMenuClose = () =>   setMobileAnchorEl(null);
     
     
+    const exportToPDF = () => 
+    {
+        setLoading(true);
+
+        generatePDFAsync({
+            purchase_order_id: purchaseOrderId
+        });
+        setAlertSeverity('info');
+        setAlertMessage('Exporting purchase order');
+        setOpenAlert(true);
+
+        setLoading(false);
+    }
+
+
+    const exportToCSV = () => 
+    {
+        setLoading(true);
+
+        findToGenerateCSVAsync({
+            purchase_order_id: purchaseOrderId
+        });
+
+        setAlertSeverity('info');
+        setAlertMessage('Exporting purchase order');
+        setOpenAlert(true);
+
+        setLoading(false);
+    }
+    
     const fetchPurchaseOrder = async () => 
     {
         const result = await PurchaseOrder_.fetchAsync({
-            purchase_order_id: purchaseOrderId 
+            purchase_order_id: purchaseOrderId
         })
 
         if (result.status === 'Success')
@@ -100,6 +134,9 @@ const PurchaseOrderDetails = ({match}) =>
             setPurchaseOrderDetails(result.data.items);
         }
     }
+
+
+
 
     const cancelPurchaseOrder = async () => 
     {
@@ -145,7 +182,7 @@ const PurchaseOrderDetails = ({match}) =>
             <AlertPopUpMessage 
                 open={openAlert}
                 handleClose={handleCloseAlert}
-                successMessage={alertMessage}
+                globalMessage={alertMessage}
                 severity={alertSeverity} 
             />
             <Card className={classes.purchaseOrderCard}>
@@ -167,12 +204,12 @@ const PurchaseOrderDetails = ({match}) =>
                         </Grid>
                         <Grid item className={classes.options}>
                             <Grid container>
+                                <Grid item>
+                                    <ReceivedStocks purchaseOrderId={purchaseOrderId}/>
+                                </Grid>
                             {
                                 Boolean(purchaseOrder.total_remaining_ordered_quantity) && (
                                 <>
-                                    <Grid item>
-                                        <ReceivedStocks purchaseOrderId={purchaseOrderId}/>
-                                    </Grid>
                                     <Grid item>
                                         <Button 
                                             variant="text" 
@@ -233,15 +270,37 @@ const PurchaseOrderDetails = ({match}) =>
                                             },
                                             }}
                                         >
-                                            <MenuItem > Save as PDF </MenuItem>
-                                            <MenuItem > Save as CSV </MenuItem>
+                                                <Button 
+                                                    variant="text" 
+                                                    color="default"
+                                                    disabled={loading}
+                                                    onClick={exportToPDF}
+                                                    className={classes.btn}
+                                                >   
+                                                        Save as PDF
+                                                </Button>
+                                                <Button 
+                                                    variant="text" 
+                                                    color="default"
+                                                    disabled={loading}
+                                                    onClick={exportToCSV}
+                                                    className={classes.btn}
+                                                >   
+                                                        Save as CSV
+                                                </Button>
                                         {
                                             Boolean(purchaseOrder.total_remaining_ordered_quantity) && (
-                                                <MenuItem 
-                                                    button 
+                                    
+                                                <Button 
+                                                    variant="text" 
+                                                    color="default"
                                                     disabled={loading}
                                                     onClick={cancelPurchaseOrder}
-                                                > Cancel orders </MenuItem>
+                                                    className={classes.btn}
+                                                >   
+                                                        Cancel orders 
+                                                </Button>
+                                           
                                             )
                                         }
                                         
@@ -274,42 +333,63 @@ const PurchaseOrderDetails = ({match}) =>
                                 {
                                     Boolean(purchaseOrder.total_remaining_ordered_quantity) && (
                                     <>
-                                        <MenuItem 
-                                            button 
+                                        <Button
+                                            className={classes.btn} 
+                                            variant="text" 
+                                            color="default"
                                             disabled={loading}
                                             onClick={
                                             () => history.push(`/inventory-mngmt/receive-purchase-orders/${purchaseOrderId}`)
                                         }>
                                             Receive
-                                        </MenuItem>
-                                        <MenuItem onClick={
-                                            () => history.push(`/inventory-mngmt/purchase-order/${purchaseOrderId}/edit`)
-                                        }>
+                                        </Button>
+                                        <Button
+                                            className={classes.btn} 
+                                            variant="text" 
+                                            color="default"
+                                            onClick={ () => history.push(`/inventory-mngmt/purchase-order/${purchaseOrderId}/edit`)}
+                                        >
                                             Edit
-                                        </MenuItem>
+                                        </Button>
                                     </>)
                                 }
-                                <MenuItem 
-                                    button 
+                                <Button
+                                    variant="text" 
+                                    color="default"
                                     disabled={loading}
                                     onClick={handleClickOpen}
+                                    className={classes.btn}
                                 >
                                     Send
-                                </MenuItem>
-                                <MenuItem >
-                                    Save as PDF
-                                </MenuItem>
-                                <MenuItem >
-                                    Save as CSV
-                                </MenuItem>
+                                </Button>
+                                <Button 
+                                    variant="text" 
+                                    color="default"
+                                    disabled={loading}
+                                    onClick={exportToPDF}
+                                    className={classes.btn}
+                                >   
+                                        Save as PDF
+                                </Button>
+                                <Button 
+                                    variant="text" 
+                                    color="default"
+                                    disabled={loading}
+                                    onClick={exportToCSV}
+                                    className={classes.btn}
+                                >   
+                                        Save as CSV
+                                </Button>
                                 {
                                      Boolean(purchaseOrder.total_remaining_ordered_quantity) && (
-                                        <MenuItem 
+                                        <Button
+                                            variant='text'
                                             disabled={loading}
-                                            button 
-                                            onClick={cancelPurchaseOrder}>
+                                            onClick={cancelPurchaseOrder}
+                                            className={classes.btn}
+                                        >
                                             Cancel orders
-                                        </MenuItem>
+                                        </Button>
                                      )
                                 }
                             </Menu>
@@ -322,7 +402,13 @@ const PurchaseOrderDetails = ({match}) =>
                                 PO{purchaseOrderId}
                             </Typography>
                             <Typography variant="subtitle2" color="initial">
-                                Pending
+                                {
+                                    purchaseOrder.status === 'Closed' || purchaseOrder.status === 'Cancelled'
+                                        ? (
+                                            <strong>({purchaseOrder.status})</strong>
+                                        )
+                                        : purchaseOrder.status
+                                }
                             </Typography>
                         </Grid>
                         <Grid item>

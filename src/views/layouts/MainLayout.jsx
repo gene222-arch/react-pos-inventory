@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {logoutAsync} from '../../services/auth/login/login'
-import { NavLink, Redirect, useHistory } from 'react-router-dom'
+import { NavLink, useHistory } from 'react-router-dom'
 import clsx from 'clsx';
 import { useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -17,8 +17,6 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import Container from '@material-ui/core/Container'
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -38,11 +36,14 @@ import TransactionsIcon from '@material-ui/icons/ThumbsUpDown';
 import SalesReturnsIcon from '@material-ui/icons/RemoveShoppingCart';
 import { AdminLayoutUseStyles } from '../../assets/material-styles/styles'
 import * as Cookie from '../../utils/cookies'
-
+import { PermissionContext } from './../../hooks/useContext/PermissionContext';
 
 
 const MainLayout = ({children}) => 
 {
+    const {userPermissions, setUserPermissions } = useContext(PermissionContext);
+
+
 // Styling
     const classes = AdminLayoutUseStyles();
     const theme = useTheme();
@@ -63,9 +64,14 @@ const MainLayout = ({children}) =>
 // 
     const [auth, setAuth] = useState(true);
 
+    const userHasPermissionTo = (permission) => userPermissions.includes(permission);
+
     const handleDrawerOpen = () => setOpen(true);
+
     const handleDrawerClose = () =>  setOpen(false);
+
     const handleMenu = (event) => setAnchorEl(event.currentTarget);
+
     const handleClose = () => setAnchorEl(null);
 
     const handleOpenReportDropdown = (path) => 
@@ -154,6 +160,7 @@ const MainLayout = ({children}) =>
 
             if (!Cookie.has('access_token'))
             {
+                setUserPermissions([]);
                 history.push('/auth/login')
             }
         }
@@ -332,18 +339,22 @@ const MainLayout = ({children}) =>
                 {/* End of Report */}
 
                 {/* Pos */}
-                    <NavLink className={classes.navLinks} to={'/pos'}>
-                        <ListItem 
-                            selected={ selectedMenu === 'POS' }
-                            onClick={ () => handleSelectedMenu( 'POS') }
-                            button>
-                            <ListItemIcon><Pos /></ListItemIcon>
-                            <ListItemText primary={
-                                <Typography variant='subtitle1' className={classes.dropdownTitle}>
-                                    POS
-                                </Typography>} className={classes.pos}/>
-                        </ListItem>
-                    </NavLink>
+                {
+                    !userHasPermissionTo('manage_pos') && (
+                        <NavLink className={classes.navLinks} to={'/pos'}>
+                            <ListItem 
+                                selected={ selectedMenu === 'POS' }
+                                onClick={ () => handleSelectedMenu( 'POS') }
+                                button>
+                                <ListItemIcon><Pos /></ListItemIcon>
+                                <ListItemText primary={
+                                    <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                                        POS
+                                    </Typography>} className={classes.pos}/>
+                            </ListItem>
+                        </NavLink>
+                    )
+                }
                 {/* End of Pos */}
 
                 {/* Product */}

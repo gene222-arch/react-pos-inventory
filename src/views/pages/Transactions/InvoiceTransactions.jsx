@@ -1,18 +1,24 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, lazy} from 'react'
 import EditDialog from '../../../components/EditDialog'
 import DeleteDialog from '../../../components/DeleteDialog'
 import * as InvoiceTransactions_ from '../../../services/transactions/invoices'
-import {useHistory} from 'react-router-dom'
+import * as ExcelExport from '../../../services/exports/excel/invoices'
+import * as CSVExport from '../../../services/exports/csv/invoices'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { dataGridUseStyles } from '../../../assets/material-styles/styles'
 import {Card, CardContent, Grid, Button} from '@material-ui/core'
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import UpdateIcon from '@material-ui/icons/Update';
 import DeleteIcon from '@material-ui/icons/Delete';
+const AlertPopUpMessage = lazy(() => import('../../../components/AlertMessages/AlertPopUpMessage'));
+
 
 
 const InvoiceTransactions = () => 
 {
     const classes = dataGridUseStyles();
+    const [exportMenu, setExportMenu] = useState(null);
 
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -20,6 +26,21 @@ const InvoiceTransactions = () =>
     const [rowIds, setRowIds] = useState([]);
     const [invoices, setInvoices] = useState([]);
     const [status, setStatus] = useState('');
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleClickExport = (event) => setExportMenu(event.currentTarget);
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
+
 
     const columns = [
         { field: 'id', headerName: 'Invoice #', width: 115 },
@@ -39,13 +60,14 @@ const InvoiceTransactions = () =>
      * Dialog
      */
     const handleEditOpen = () =>  setOpenEditDialog(true);
+
     const handleEditClose = () => setOpenEditDialog(false);
+
     const handleDeleteOpen = () =>  setOpenDeleteDialog(true);
+
     const handleDeleteClose = () => setOpenDeleteDialog(false);
-    const handleSelectionOnChange = (params) => {
-        console.log(params);
-        setRowIds(params.rowIds)
-    };
+
+    const handleSelectionOnChange = (params) => setRowIds(params.rowIds);
 
     const fetchInvoiceTransac= async () => 
     {
@@ -54,28 +76,43 @@ const InvoiceTransactions = () =>
         if (result.status === 'Success')
         {
             setInvoices(result.data);
-            console.log(result.data)
         }
     }
-
 
     const updateInvoiceStatus = async () => 
     {
         const result = await InvoiceTransactions_.updateAsync({invoice_ids: rowIds});
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
         {
             fetchInvoiceTransac();
             setOpenEditDialog(false);
-        }
-    }
 
+            setAlertSeverity('warning');
+            setAlertMessage('Please click the button only one.')
+        }
+        else 
+        {
+            setAlertSeverity('success');
+            setAlertMessage(result.message)
+
+            fetchInvoiceTransac();
+            setOpenEditDialog(false);
+        }
+
+        setOpenAlert(true);
+    }
 
     const deleteInvoices = async () => 
     {
         const result = await InvoiceTransactions_.destroyAsync({invoice_ids: rowIds});
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
+        {
+            setAlertSeverity('warning');
+            setAlertMessage(result.message);
+        }
+        else
         {
             let _invoices = [...invoices];
 
@@ -83,10 +120,35 @@ const InvoiceTransactions = () =>
                 _invoices = _invoices.filter(invoice => invoice.id !== parseInt(rowId) )
             });
 
+            setAlertSeverity('success');
+            setAlertMessage(result.message);
+
             setInvoices(_invoices);
             setRowIds([]);
             setOpenDeleteDialog(false);
         }
+
+           setOpenAlert(true);
+    }
+
+    const handleExcelExport = () => 
+    {
+        ExcelExport.generateExcelAsync();
+
+        setAlertSeverity('info');
+        setAlertMessage('Invoices exporting.');
+        setOpenAlert(true);
+        setExportMenu(null);
+    }
+
+    const handleCSVExport = () => 
+    {
+        CSVExport.generateCSVAsync();
+
+        setAlertSeverity('info');
+        setAlertMessage('Invoices exporting.');
+        setOpenAlert(true);
+        setExportMenu(null);
     }
 
 
@@ -94,12 +156,21 @@ const InvoiceTransactions = () =>
     useEffect(() => {
         fetchInvoiceTransac();
 
-        return () => fetchInvoiceTransac();
+        return () => {
+            setInvoices([]);
+        };
     }, []);
     
     return (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <EditDialog 
+
                 open={openEditDialog} 
                 handleClose={handleEditClose} 
                 handleAction={updateInvoiceStatus}
@@ -143,8 +214,27 @@ const InvoiceTransactions = () =>
                             ) 
                             : 
                             (
-                                <>
-                                </>
+                                <Grid item>
+                                    <Button 
+                                        aria-controls="simple-menu" 
+                                        aria-haspopup="true" 
+                                        onClick={handleClickExport}
+                                        variant="text" 
+                                        className={classes.btn}
+                                    >
+                                        Export
+                                    </Button>
+                                    <Menu
+                                        id="simple-menu"
+                                        anchorEl={exportMenu}
+                                        keepMounted
+                                        open={Boolean(exportMenu)}
+                                        onClose={() => setExportMenu(null)}
+                                    >
+                                        <MenuItem onClick={handleExcelExport}>Excel</MenuItem>
+                                        <MenuItem onClick={handleCSVExport}>CSV</MenuItem>
+                                    </Menu>
+                                </Grid>
                             )
                         }
                     </Grid>

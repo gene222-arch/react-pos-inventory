@@ -16,6 +16,35 @@ export const fetchAllAsync = async () =>
 }
 
 
+
+export const fetchAllForPosAsync = async () => 
+{
+    try {
+        
+        const result = await axiosInstance().get('/customers/pos');
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+export const fetchAllWithOrdersAsync = async () => 
+{
+    try {
+        
+        const result = await axiosInstance().get('/customers/with-orders');
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
 export const fetchAsync = async (payload) => 
 {
     try {

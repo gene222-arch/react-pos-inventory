@@ -17,6 +17,7 @@ const AlertPopUpMessage = ({
         warningMessage='Warning',
         infoMessage='Info',
         globalMessage = '',
+        hideDuration = 3000
     }) => 
 {
 
@@ -56,9 +57,8 @@ const AlertPopUpMessage = ({
                     horizontal: 'right',
                 }}
                 open={open}
-                autoHideDuration={6000}
+                autoHideDuration={hideDuration}
                 onClose={handleClose}
-                message="Note archived"
             >
             <> 
                 <Alert severity={severity}>

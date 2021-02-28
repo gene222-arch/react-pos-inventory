@@ -2,13 +2,22 @@ import Axios from 'axios'
 import * as Cookie from './cookies'
 
 
-export default (history = null, redirectPath = null) => 
+export default (history = null, responseType = null, contentType = null) => 
 {
     let headers = {};
 
     if (Cookie.has('access_token'))
     {
         headers.Authorization = `Bearer ${ Cookie.getItem('access_token') }`;
+        
+        if (responseType) 
+        {
+            headers.responseType = responseType;
+        }
+        if (contentType) 
+        {
+            headers.contentType = contentType;
+        }
     }
 
     const axiosInstance = Axios.create({

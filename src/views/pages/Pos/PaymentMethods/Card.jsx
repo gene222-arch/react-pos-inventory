@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, lazy} from 'react'
 import {useHistory} from 'react-router-dom'
 import * as POS_ from '../../../../services/pos/pos'
 import {CURRENCY} from '../../../../config/currency'
@@ -9,6 +9,14 @@ import { green } from '@material-ui/core/colors'
 import { Mail } from '@material-ui/icons'
 import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import FaceIcon from '@material-ui/icons/Face';
+import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
+const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
+
+
+const ALERT_MESSAGES = {
+    CANT_PROCESS_PAYMENT: 'Unable to process payment, please fill in the necessary requirements.'
+}
+
 
 const paymentUseStyles = makeStyles((theme) => ({
     balanceContainer: {
@@ -41,8 +49,28 @@ const Card = ({customer, total, paymentProcessState, dispatchPaymentProcessState
 {
     const classes = paymentUseStyles();
     const history = useHistory();
+    const [loading, setLoading] = useState(false);
     
-    const handleOnChange = (e) => {
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+    const [errorMessages, setErrorMessages] = useState({
+        customer_name: '',
+        customer_email: ''
+    });
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenAlert(false);
+    };
+
+
+    const handleOnChange = (e) => 
+    {
         const {name, value} = e.target;
 
         if (name === 'email') {
@@ -67,18 +95,35 @@ const Card = ({customer, total, paymentProcessState, dispatchPaymentProcessState
 
     const charge = async () => 
     {
-        console.log(validatedData())
+        setLoading(true);
         const result = await POS_.processPaymentAsync(validatedData());
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
         {
-            history.go(0);
+            setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
+            setAlertSeverity('error');
+            setAlertMessage(ALERT_MESSAGES.CANT_PROCESS_PAYMENT);
         }
+        else 
+        {
+            setAlertSeverity('success');
+            setAlertMessage(result.message);
+            setTimeout(() =>  history.go(0), 2000);
+        }
+
+        setOpenAlert(true);
+        setTimeout(() =>  setLoading(false), 2000);
     }
 
 
     return (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <Grid container spacing={4} justify='center'>
                 <Grid item xs={12} sm={12} md={12} lg={12}>
                     <Typography 
@@ -90,11 +135,12 @@ const Card = ({customer, total, paymentProcessState, dispatchPaymentProcessState
                 </Grid>
                 {
                     customer.email === 'NULL' && (
-                        <Grid item xs={12} sm={12} md={12} lg={12}>
-                        <Grid container justify='center' alignItems='center'>
+                    <Grid item xs={12} sm={12} md={12} lg={12}>
+                        <Grid container spacing={2} justify='center' alignItems='center'>
                             <Grid item xs={10} sm={10} md={10} lg={11}>
                                 <TextField
-                                    id=""
+                                    error={Boolean(errorMessages.customer_name)}
+                                    helperText={errorMessages.customer_name}
                                     label="Name" 
                                     name='name' 
                                     fullWidth
@@ -109,7 +155,8 @@ const Card = ({customer, total, paymentProcessState, dispatchPaymentProcessState
                             </Grid>
                             <Grid item xs={10} sm={10} md={10} lg={11}>
                                 <TextField
-                                    id=""
+                                    error={Boolean(errorMessages.customer_name)}
+                                    helperText={errorMessages.customer_name}
                                     label="Email address"  
                                     name='email'
                                     fullWidth
@@ -132,6 +179,7 @@ const Card = ({customer, total, paymentProcessState, dispatchPaymentProcessState
                         color="default" 
                         className={classes.newSale}
                         onClick={charge}
+                        disabled={loading}
                     >
                         New sale 
                     </Button>

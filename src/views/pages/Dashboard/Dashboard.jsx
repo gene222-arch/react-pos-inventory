@@ -23,6 +23,7 @@ import PurchaseOrdersIcon from '@material-ui/icons/AddShoppingCart';
 import { dashboardUseStyles } from '../../../assets/material-styles/styles'
 import NO_DATA_IMG from '../../../assets/storage/images/dashboard/no_data.svg'
 
+
 HighchartsExporting(Highcharts)
 
 const DASHBOARD_DEFAULT_PROPS = {

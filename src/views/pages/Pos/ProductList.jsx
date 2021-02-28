@@ -6,7 +6,6 @@ import * as Category from '../../../services/products/categories'
 import {posUseStyles} from '../../../assets/material-styles/styles'
 import {Grid} from '@material-ui/core'
 import {Card, CardContent, CardActionArea, CardActions, CardMedia, Typography} from '@material-ui/core'
-import EMPTY_IMAGE from '../../../assets/storage/images/empty_data/no_data.svg'
 
 
 const ProductList = ({handleAddToCartOnClick}) => 
@@ -59,14 +58,15 @@ const ProductList = ({handleAddToCartOnClick}) =>
         const result = await Category.fetchAllAsync();
 
         if (result.status === 'Success')
-        {
-            setCategories(result.data);
+        {   
+            let categories_ = result.data;
+            setCategories(categories_);
         }
     }     
 
     const fetchProducts = async () => 
     {
-        const result = await Product.fetchAllAsync();
+        const result = await Product.fetchFilteredItemAsync();
 
         if (result.status = 'Success')
         {
@@ -117,13 +117,10 @@ const ProductList = ({handleAddToCartOnClick}) =>
                                                 <CardActionArea>
                                                     <CardMedia
                                                         className={classes.cardImg}
-                                                        image={EMPTY_IMAGE}
+                                                        image={product.image}
                                                         title="Product has no image yet"
                                                         component='img'
                                                     />
-                                                    <CardContent>
-                                                    
-                                                    </CardContent>
                                                 </CardActionArea>
                                     
                                                 <CardActions className={classes.itemActionArea}>

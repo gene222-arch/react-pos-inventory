@@ -40,7 +40,7 @@ const paymentReducer = (state, action) =>
             return {...state, cash: 0.00};
         break;          
 
-        case 'set-cash':
+        case 'set-number-of-days':
             return {...state, number_of_days: action.payload.numberOfDays};
         break;     
 
@@ -73,7 +73,6 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
 
     const [customer, setCustomer] = useState(CUSTOMER_DEFAULT_PROPS);
 
-
     const handlePaymentMethod = (paymentMethod) => dispatchPaymentProcessState({
         type: 'set-payment-type',
         payload: {
@@ -81,7 +80,8 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
         }
     });
 
-    const handleOnChargeAmount = (e, amount) => {
+    const handleOnChargeAmount = (e, amount) => 
+    {
         if (e.target.name === 'input-cash')
         {
             dispatchPaymentProcessState({
@@ -152,7 +152,7 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
                         customer_id: paymentProcessState.customer_id,
                         payment_method: paymentProcessState.payment_method,
                         should_mail: paymentProcessState.should_mail,
-                        number_of_days: paymentProcessState.numberOfDays
+                        number_of_days: paymentProcessState.number_of_days
                     }
                     break;
                 default:
@@ -189,7 +189,7 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
                         customer_id: paymentProcessState.customer_id,
                         payment_method: paymentProcessState.payment_method,
                         should_mail: paymentProcessState.should_mail,
-                        number_of_days: paymentProcessState.numberOfDays,
+                        number_of_days: paymentProcessState.number_of_days,
                         customer_name: paymentProcessState.customer_name,
                         customer_email: paymentProcessState.customer_email
                     }
@@ -324,7 +324,7 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
                             (   paymentProcessState.payment_method.length > 0 &&
                                 paymentProcessState.payment_method === 'cash') && (
                                 <Charge 
-                                    change={paymentProcessState.cash - paymentAmountDetails.total}
+                                    change={(paymentProcessState.cash - paymentAmountDetails.total).toFixed(2)}
                                     customer={customer}
                                     paymentProcessState={paymentProcessState}
                                     dispatchPaymentProcessState={dispatchPaymentProcessState}

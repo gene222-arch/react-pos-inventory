@@ -1,13 +1,12 @@
-import axiosInstance from '../../../utils/axiosInstance'
+const FileSaver = require('file-saver');
 
-
-export const generateExcelAsync = async () => 
+export const generateCSVAsync = () => 
 {
     try {
-        const result = await axiosInstance().get('/csv-export/products');
 
-        return result.data;
+        FileSaver.saveAs(`${process.env.REACT_APP_BASE_URL}/csv-export/products`, 'products.csv');
+
     } catch (error) {
-        return error.response.data
+        return error;
     }
 }

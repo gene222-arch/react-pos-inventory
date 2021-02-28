@@ -432,6 +432,10 @@ export const dataGridUseStyles = makeStyles((theme) => ({
     dataGrid: {
         backgroundColor: '#FFF'
     },
+    productImgContainer: {
+        width: '100%',
+        height: '4rem'
+    }
 
 }));
 
@@ -457,6 +461,7 @@ export const posUseStyles = makeStyles((theme) => ({
     },
     cardImg: {
         width: '100%',
+        height: '12rem',
         padding: '.5rem'
     },
     itemActionArea: {
@@ -623,6 +628,7 @@ export const purchaseOrderDetailsUseStyles = makeStyles((theme) => ({
     },
     btn: {
         margin: theme.spacing(1, 1, 1, 0),
+        width: '100%'
     },
     purchaseOrderDetails: {
         padding: theme.spacing(2)
@@ -777,7 +783,7 @@ export const createProductUseStyles = makeStyles((theme) => ({
     },
     createProductCard: {
         marginBottom: theme.spacing(2),
-        [theme.breakpoints.up('sm')]: {
+        [theme.breakpoints.up('md')]: {
             width: '70%',
             padding: '1rem'
         }
@@ -788,7 +794,8 @@ export const createProductUseStyles = makeStyles((theme) => ({
         }
     },
     productImagePreview: {
-        width: '100%'
+        width: '100%',
+        height: '20rem'
     },
     cardHeaderIcons: {
         color: '#3a3a3a'

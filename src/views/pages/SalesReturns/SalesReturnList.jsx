@@ -1,19 +1,39 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, lazy} from 'react';
+import * as ExcelExport from '../../../services/exports/excel/salesReturns'
+import * as CSVExport from '../../../services/exports/csv/salesReturns'
 import * as SalesReturn_ from '../../../services/sales-returns/salesReturn.js'
-import { NavLink, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid, makeStyles, TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { dataGridUseStyles } from '../../../assets/material-styles/styles'
 import AddIcon from '@material-ui/icons/Add';
+const AlertPopUpMessage = lazy(() => import('../../../components/AlertMessages/AlertPopUpMessage'));
 
 
 const SalesReturnList = () => 
 {
     const classes = dataGridUseStyles();
     const history = useHistory();
-
+    const [exportMenu, setExportMenu] = useState(null);
+ 
     const [salesReturns, setSalesReturns] = useState([]);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
+
+    const handleClickExport = (event) => setExportMenu(event.currentTarget);
 
     const columns = [
         { field: 'id', hide: true},
@@ -23,6 +43,27 @@ const SalesReturnList = () =>
         { field: 'sales_return', headerName: 'Sales return', width: 240 },
         { field: 'returned_at', headerName: 'Date of return', width: 250 },
     ];
+
+
+    const handleExcelExport = () => 
+    {
+        ExcelExport.generateExcelAsync();
+
+        setAlertSeverity('info');
+        setAlertMessage('Sales returns exporting.');
+        setOpenAlert(true);
+        setExportMenu(null);
+    }
+
+    const handleCSVExport = () => 
+    {
+        CSVExport.generateCSVAsync();
+
+        setAlertSeverity('info');
+        setAlertMessage('Sales returns exporting.');
+        setOpenAlert(true);
+        setExportMenu(null);
+    }
 
 
     const fetchSalesReturns = async () => 
@@ -46,6 +87,12 @@ const SalesReturnList = () =>
 
     return (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <Card>
                 <CardContent>
                     <Grid container>
@@ -63,7 +110,25 @@ const SalesReturnList = () =>
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="text" className={classes.btn}> Export </Button>
+                                    <Button 
+                                        aria-controls="simple-menu" 
+                                        aria-haspopup="true" 
+                                        onClick={handleClickExport}
+                                        variant="text" 
+                                        className={classes.btn}
+                                    >
+                                        Export
+                                    </Button>
+                                    <Menu
+                                        id="simple-menu"
+                                        anchorEl={exportMenu}
+                                        keepMounted
+                                        open={Boolean(exportMenu)}
+                                        onClose={() => setExportMenu(null)}
+                                    >
+                                        <MenuItem onClick={handleExcelExport}>Excel</MenuItem>
+                                        <MenuItem onClick={handleCSVExport}>CSV</MenuItem>
+                                    </Menu>
                                 </Grid>
                             </Grid>
                         </Grid>

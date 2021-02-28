@@ -39,6 +39,7 @@ const PurchaseOrder = () =>
     const [loading, setLoading] = useState(false);
     const [openAlert, setOpenAlert] = useState(false);
     const [alertSeverity, setAlertSeverity] = useState('');
+    const [alertMessage, setAlertMessage] = useState('');
 
     const [purchaseOrder, setPurchaseOrder] = useState(PURCHASE_ORDER_DEFAULT);
     const [purchaseOrderDetails, setPurchaseOrderDetails] = useState([]);
@@ -59,7 +60,7 @@ const PurchaseOrder = () =>
             width: 160,
             renderCell: (params) => (
                 <TextField
-                    error={Boolean(params.value <= 0)}
+                    error={Boolean(params.value <= 0) || !Number.isInteger(params.value)}
                     value={params.value}
                     onChange={
                         (e) => handleOnChangeQuantity(e, params.row.product_id)
@@ -74,7 +75,7 @@ const PurchaseOrder = () =>
             width: 160,
             renderCell: (params) => (
                 <TextField
-                    error={Boolean(params.value <= 0)}
+                    error={Boolean(params.value <= 0) || Number.isInteger(params.value)}
                     value={params.value}
                     onChange={
                         (e) => handleOnChangePurchaseCost(e, params.row.product_id)
@@ -121,7 +122,15 @@ const PurchaseOrder = () =>
         let value = e.target.value;
         value = parseInt(value) || 0;
 
-        const po = purchaseOrderDetails
+        if (!Number.isInteger(value))
+        {
+            setAlertSeverity('error');
+            setAlertMessage('Please input a valid number');
+            setOpenAlert(true);
+        }
+        else 
+        {
+            const po = purchaseOrderDetails
             .map(purchaseOrderDetail => 
                 (purchaseOrderDetail.product_id === poId)
                     ? {
@@ -132,7 +141,9 @@ const PurchaseOrder = () =>
                     : purchaseOrderDetail
             );
         
-        setPurchaseOrderDetails(po);
+            setPurchaseOrderDetails(po);
+        }
+        
     };
 
     const handleOnChangePurchaseCost = (e, poId) => 
@@ -140,7 +151,15 @@ const PurchaseOrder = () =>
         let value = e.target.value;
         value = parseFloat(value).toFixed(2) || 0.00;
 
-        const po = purchaseOrderDetails
+        if (isNaN(value))
+        {
+            setAlertSeverity('error');
+            setAlertMessage('Please input a valid value');
+            setOpenAlert(true);
+        }
+        else 
+        {
+            const po = purchaseOrderDetails
             .map(purchaseOrderDetail => 
                 (purchaseOrderDetail.product_id === poId)
                     ? {
@@ -151,7 +170,8 @@ const PurchaseOrder = () =>
                     : purchaseOrderDetail
             );
         
-        setPurchaseOrderDetails(po);
+            setPurchaseOrderDetails(po);
+        }
     };
 
     const handleOnRemovePurchaseOrder = async (productId) => 
@@ -193,7 +213,9 @@ const PurchaseOrder = () =>
 
             if (po)
             {
-                alert('Same product exists');
+                setAlertSeverity('warning');
+                setAlertMessage('The product already exist.');
+                setOpenAlert(true);
             }
             else 
             {
@@ -232,12 +254,18 @@ const PurchaseOrder = () =>
         {
             setAlertSeverity('error');
             setOpenAlert(true);
+            setAlertMessage(
+                'Unable to save data. Please fix the errors and try again'
+            )
             setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
         }
         else 
         {
             setAlertSeverity('success');
             setOpenAlert(true);
+            setAlertMessage(
+                result.message
+            )
             setTimeout(() =>  history.push('/inventory-mngmt/purchase-orders'), 2000);
         }
 
@@ -277,7 +305,7 @@ const PurchaseOrder = () =>
             <AlertPopUpMessage 
                 open={openAlert}
                 handleClose={handleCloseAlert}
-                successMessage='Purchase order successfully'
+                globalMessage={alertMessage}
                 severity={alertSeverity} 
             />
             <Card className={classes.purchaseOrderCard}>

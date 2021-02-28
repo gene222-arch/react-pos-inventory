@@ -15,10 +15,11 @@ const CustomerSearchField = ({customerId, handleOnChangeCustomerId}) =>
 
     const fetchCustomers = async () => 
     {
-        const result = await Customer.fetchAllAsync();
+        const result = await Customer.fetchAllForPosAsync();
 
         if (result.status = 'Success')
         {
+            console.log(result)
             setCustomers(result.data);
         }
     };

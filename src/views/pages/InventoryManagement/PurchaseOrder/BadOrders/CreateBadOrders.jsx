@@ -109,7 +109,7 @@ const CreateBadOrders = () =>
             renderCell: (params) => (
                 <TextField
                     margin='none'
-                    error={Boolean(params.value <= 0)}
+                    error={Boolean(params.value <= 0) || !Number.isInteger(params.value)}
                     value={params.value}
                     onChange={
                         (e) => handleOnChangeQuantity(e, params.row)
@@ -146,27 +146,36 @@ const CreateBadOrders = () =>
         let noOfItemsToReturn = e.target.value;
         noOfItemsToReturn = parseInt(noOfItemsToReturn) || 0;
 
-        if (noOfItemsToReturn > data.received_quantity)
+        if (!Number.isInteger(noOfItemsToReturn))
         {
             setAlertSeverity('error');
-            setAlertMessage('Quantity can\'t exceed the received quantity.');
+            setAlertMessage('Please input a valid number.');
             setOpenAlert(true);
         }
         else 
         {
-            const filterData = ({
-                ...data,
-                quantity: noOfItemsToReturn,
-                amount: data.purchase_cost * noOfItemsToReturn
-            });
-
-            const po = purchaseOrderDetails.items.map(item => 
-                    item.id === filterData.id 
-                        ? filterData
-                        : item
-            );
-            
-            setPurchaseOrderDetails({...purchaseOrderDetails, items: po});
+            if (noOfItemsToReturn > data.received_quantity)
+            {
+                setAlertSeverity('error');
+                setAlertMessage('Quantity can\'t exceed the received quantity.');
+                setOpenAlert(true);
+            }
+            else 
+            {
+                const filterData = ({
+                    ...data,
+                    quantity: noOfItemsToReturn,
+                    amount: data.purchase_cost * noOfItemsToReturn
+                });
+    
+                const po = purchaseOrderDetails.items.map(item => 
+                        item.id === filterData.id 
+                            ? filterData
+                            : item
+                );
+                
+                setPurchaseOrderDetails({...purchaseOrderDetails, items: po});
+            }
         }
     };
 

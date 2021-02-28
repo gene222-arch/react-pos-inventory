@@ -1,13 +1,10 @@
-import axiosInstance from '../../../utils/axiosInstance'
+const FileSaver = require('file-saver');
 
-
-export const generateExcelAsync = async () => 
+export const generateExcelAsync = () => 
 {
     try {
-        const result = await axiosInstance().get('/excel-export/invoices');
-
-        return result.data;
+        FileSaver.saveAs(`${process.env.REACT_APP_BASE_URL}/excel-export/invoices`, 'invoices.xlsx');
     } catch (error) {
-        return error.response.data
+        return error;
     }
 }

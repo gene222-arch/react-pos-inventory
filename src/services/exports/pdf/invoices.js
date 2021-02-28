@@ -1,13 +1,12 @@
-import axiosInstance from '../../../utils/axiosInstance'
+const FileSaver = require('file-saver');
 
-
-export const generatePDFAsync = async () => 
+export const generatePDFAsync = (payload) => 
 {
     try {
-        const result = await axiosInstance().get('/pdf-export/invoices');
+        FileSaver.saveAs(`
+            ${process.env.REACT_APP_BASE_URL}/pdf-export/invoices/${payload.invoice_id}`, 'payment.pdf');
 
-        return result.data;
     } catch (error) {
-        return error.response.data
+        return error;
     }
 }

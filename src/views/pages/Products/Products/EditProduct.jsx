@@ -25,6 +25,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import AddBoxIcon from '@material-ui/icons/AddBox';
+import Switch from '@material-ui/core/Switch';
 import productDefaultImg from '../../../../assets/storage/images/default_img/product_default_img.svg'
 const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'));
 
@@ -34,10 +35,12 @@ const PRODUCT_DEFAULT = {
     sku: '',
     barcode: '',
     name: '',
+    image: '',
     category: '',
     sold_by: '',
     price: '',
     cost: '',
+    is_for_sale: false,
 };
 
 const STOCK_DEFAULT = {
@@ -91,6 +94,7 @@ const EditProduct = ({match}) =>
     const [stock, setStock] = useState(STOCK_DEFAULT);
     const [categories, setCategories] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
+    const [filePreview, setFilePreview] = useState(productDefaultImg);
     const [errorMessages, setErrorMessages] = useState(EDIT_PRODUCT_DEFAULT_ERROR_MESSAGES)
     const [openAlert, setOpenAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
@@ -105,7 +109,14 @@ const EditProduct = ({match}) =>
         setOpenAlert(false);
     };
 
-    const handleOnChangeProduct = (e) => setProduct({...product, [e.target.name]: e.target.value});
+    const handleOnChangeProduct = (e) => 
+    {
+        const {name, value, checked} = e.target;
+
+        name !== 'is_for_sale'
+            ? setProduct({...product, [name]: value})
+            : setProduct({...product, [name]: checked});
+    };
 
     const handleOnChangeStock = (e) =>  setStock({...stock, [e.target.name]: e.target.value});
 
@@ -141,6 +152,30 @@ const EditProduct = ({match}) =>
         }
     }
 
+    const handleOnChangeFile = async (e) => 
+    {
+        let files = e.target.files || e.dataTransfer.files;
+        if (!files.length)
+            return;
+        
+        const file = files[0];
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+            setFilePreview(e.target.result);
+        };
+
+        reader.readAsDataURL(file);
+
+        const result = await Product.uploadImageAsync({
+            product_image: file
+        });
+
+        setProduct({...product, image: result.data});
+        console.log(result);
+    }
+
+    
     const handleUpdateProduct = async (e) => 
     {
         setLoading(true);
@@ -171,28 +206,36 @@ const EditProduct = ({match}) =>
 
     const validatedData = () => 
     {
+        for (const key in stock) 
+        {
+            delete stock['updated_at']
+            delete stock['created_at']
+
+            if (!stock[key])
+            {
+                delete stock[key];
+            }
+        }
+
+        for (const key in product) 
+        {
+            delete product['stock']
+            delete product['updated_at']
+            delete product['created_at']
+
+            if (!product[key] && key !== 'is_for_sale')
+            {
+                delete product[key];
+            }
+        }
+
         return {
             product: {
                 product_id: productId,
-                data: {
-                    sku: product.sku,
-                    barcode: product.barcode,
-                    name: product.name,
-                    category: product.category,
-                    sold_by: product.sold_by,
-                    price: product.price,
-                    cost: product.cost,
-                }
+                data: ({...product})
             },
             stock: {
-                data: {
-                    supplier_id: stock.supplier_id,
-                    in_stock: stock.in_stock,
-                    stock_in: stock.stock_in,
-                    stock_out: stock.stock_out,
-                    minimum_reorder_level: stock.minimum_reorder_level,
-                    default_purchase_costs: stock.default_purchase_costs,
-                }
+                data: ({...stock})
             }
         };
     }
@@ -275,6 +318,17 @@ const EditProduct = ({match}) =>
                                     </Select>
                                     <FormHelperText>{errorMessages[ERR_MSG_KEY.CATEGORY]}</FormHelperText>
                                 </FormControl>
+                            </Grid>
+                            <Grid item xs={12} sm={12} md={12} lg={12}>
+                                <FormControlLabel
+                                    control={
+                                        <Switch 
+                                            checked={product.is_for_sale} 
+                                            onChange={handleOnChangeProduct} 
+                                            name="is_for_sale" 
+                                            />}
+                                    label="Available for sale"
+                                />
                             </Grid>
                             <Grid item xs={12} sm={12} md={10} lg={10}>
                                 <FormControl 
@@ -449,7 +503,7 @@ const EditProduct = ({match}) =>
                     <CardContent>
                         <Grid container spacing={3} alignItems='center' justify='flex-start' direction='column'>
                             <Grid item xs={12} sm={12} md={6} lg={6}>
-                                <img src={productDefaultImg} alt="" className={classes.productImagePreview}/>
+                                <img src={product.image} alt="" className={classes.productImagePreview}/>
                             </Grid>
                             <Grid item>
                                 <input
@@ -459,6 +513,7 @@ const EditProduct = ({match}) =>
                                     id="raised-button-file"
                                     multiple
                                     type="file"
+                                    onChange={handleOnChangeFile}
                                 />
                                     <label htmlFor="raised-button-file">
                                         <Button 

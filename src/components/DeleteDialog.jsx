@@ -13,7 +13,7 @@ const Transition = React.forwardRef(function Transition(props, ref)
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function DeleteDialog({open, handleClose, handleAction, title, dialogContentText}) 
+export default function DeleteDialog({open, handleClose, handleAction, title, dialogContentText, actionName = 'DELETE'}) 
 {
 
     return (
@@ -37,7 +37,7 @@ export default function DeleteDialog({open, handleClose, handleAction, title, di
                         Cancel
                     </Button>
                     <Button variant='contained' onClick={handleAction} color="secondary">
-                        Delete
+                        {actionName}
                     </Button>
                 </DialogActions>
             </Dialog>

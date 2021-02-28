@@ -1,11 +1,14 @@
 import React, {useState, useEffect, lazy} from 'react';
 import * as ExcelExport from '../../../../services/exports/excel/products'
+import * as CSVExport from '../../../../services/exports/csv/products'
 import DeleteDialog from '../../../../components/DeleteDialog'
 import clsx from 'clsx'
 import * as Product_ from '../../../../services/products/products'
 import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid } from '@material-ui/core';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -17,6 +20,7 @@ const ProductList = () =>
 {
     const classes = dataGridUseStyles();
     const history = useHistory();
+    const [exportMenu, setExportMenu] = useState(null);
 
     const [open, setOpen] = useState(false);
     const [products, setProducts] = useState([]);
@@ -24,6 +28,8 @@ const ProductList = () =>
     const [openAlert, setOpenAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleClickExport = (event) => setExportMenu(event.currentTarget);
 
     const handleCloseAlert = (event, reason) => 
     {
@@ -38,6 +44,11 @@ const ProductList = () =>
         { field: 'id', hide:true },
         { field: 'barcode', headerName: 'Barcode', width: 150 },
         { field: 'name', headerName: 'Product description', width: 205 },
+        { field: 'image', headerName: 'Image', width: 205, 
+            renderCell: (param) => (
+                <img src={`${param.value}`} className={classes.productImgContainer}/>
+            )
+        },
         { field: 'category', headerName: 'Category', width: 200 },
         { field: 'price', headerName: 'Price', width: 130 },
         { field: 'cost', headerName: 'Cost', width: 130 },
@@ -101,11 +112,24 @@ const ProductList = () =>
         setOpenAlert(true);
     }
 
-    const handleExcelExport = async () => 
+    const handleExcelExport = () => 
     {
-        const result = await ExcelExport.generateExcelAsync();
+        ExcelExport.generateExcelAsync();
 
-        console.log(result);
+        setAlertSeverity('info');
+        setAlertMessage('Products exporting.');
+        setOpenAlert(true);
+        setExportMenu(null);
+    }
+
+    const handleCSVExport = () => 
+    {
+        CSVExport.generateCSVAsync();
+
+        setAlertSeverity('info');
+        setAlertMessage('Products exporting.');
+        setOpenAlert(true);
+        setExportMenu(null);
     }
     
 
@@ -166,12 +190,34 @@ const ProductList = () =>
                                         : 
                                            (
                                                 <>
-                                                    <Button variant="text" className={classes.btn}> Import </Button>
                                                     <Button 
                                                         variant="text" 
                                                         className={classes.btn}
-                                                        onClick={handleExcelExport}
-                                                    > Export </Button>
+                                                        onClick={
+                                                            () => history.push('/products/import')
+                                                        }
+                                                    > 
+                                                        Import 
+                                                    </Button>
+                                                    <Button 
+                                                        aria-controls="simple-menu" 
+                                                        aria-haspopup="true" 
+                                                        onClick={handleClickExport}
+                                                        variant="text" 
+                                                        className={classes.btn}
+                                                    >
+                                                        Export
+                                                    </Button>
+                                                    <Menu
+                                                        id="simple-menu"
+                                                        anchorEl={exportMenu}
+                                                        keepMounted
+                                                        open={Boolean(exportMenu)}
+                                                        onClose={() => setExportMenu(null)}
+                                                    >
+                                                        <MenuItem onClick={handleExcelExport}>Excel</MenuItem>
+                                                        <MenuItem onClick={handleCSVExport}>CSV</MenuItem>
+                                                    </Menu>
                                                 </>
                                            )
                                     }

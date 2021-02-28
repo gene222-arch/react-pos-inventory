@@ -1,4 +1,4 @@
-import React,{useState, useEffect, useReducer} from 'react'
+import React,{useState, useEffect, useReducer, lazy} from 'react'
 import * as Discount from '../../../services/products/discounts'
 import * as POS_ from '../../../services/pos/pos'
 import { posUseStyles } from '../../../assets/material-styles/styles'
@@ -14,6 +14,7 @@ import DecrementQuantityIcon from '@material-ui/icons/ExposureNeg1';
 import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import CloseIcon from '@material-ui/icons/Close';
+const AlertPopUpMessage = lazy(() => import('../../../components/AlertMessages/AlertPopUpMessage'));
 
 
 const editOrderReducer = (state, action) => 
@@ -66,7 +67,8 @@ const editOrderReducer = (state, action) =>
 const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCustomerCart }) => 
 {
     const classes = posUseStyles();
-    console.log(payload);
+    const [loading, setLoading] = useState(false);
+
     const EDIT_ORDER_INITIAL_STATE = {
         customer_id: customerId,
         product_id: payload.product_id,
@@ -77,7 +79,21 @@ const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCus
 
     const [discounts, setDiscounts] = useState([]);
     const [editOrderState, dispatchEditOrderState] = useReducer(editOrderReducer, EDIT_ORDER_INITIAL_STATE);
- 
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
+
+
+
     const handleDiscountOnChange = (e, discount_id) => 
     {
         e.target.checked 
@@ -92,14 +108,27 @@ const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCus
     }
 
     const handleQuantityOnChange = (e) => {
-        dispatchEditOrderState({
-            type: 'input-quantity', 
-            payload: {
-                value: parseInt(e.target.value) || 0
-        }})
+
+        const quantity = parseInt(e.target.value) || 0;
+
+        if (Number.isInteger(quantity) === false)
+        {
+            setAlertSeverity('error');
+            setAlertMessage('Please input a valid number');
+            setOpenAlert(true);
+        }
+        else 
+        {
+            dispatchEditOrderState({
+                type: 'input-quantity', 
+                payload: {
+                    value: quantity
+            }})
+        }
     };
 
     const handleIncrementQty = () =>  dispatchEditOrderState({type: 'increment'});
+    
     const handleDecrementQty = () =>  dispatchEditOrderState({type: 'decrement'});
 
 
@@ -116,6 +145,7 @@ const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCus
 
     const updateOrderDiscountQty = async () => 
     {
+        setLoading(true);
         if (!editOrderState.discount_id)
         {
             delete editOrderState.discount_id
@@ -123,12 +153,22 @@ const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCus
 
         const result = await POS_.applyDiscountAddQuantityAsync(editOrderState);
 
-        if (result.status === 'Success')
+        if (result.status === 'Error')
         {
-            alert('Changes applied');
+            setAlertSeverity('error');
+            setAlertMessage(result.message.quantity)
+        }
+        else 
+        {
+            setAlertSeverity('Success');
+            setAlertMessage(result.message);
+
             fetchCustomerCart();
             handleClose();
         }
+
+        setOpenAlert(true);
+        setLoading(false);
     }
 
 
@@ -141,8 +181,14 @@ const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCus
     }, []);
 
 
-    return (
+    return discounts.length > 0 && (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <Dialog 
                 open={openEditProduct} 
                 onClose={handleClose} 
@@ -151,7 +197,7 @@ const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCus
                 disableBackdropClick={true}
             >
                 <DialogTitle id="form-dialog-title">
-                    <Typography variant="subtitle1" color="initial">{payload.product_description}</Typography>
+                    <Typography variant="h4" color="initial">{payload.product_description}</Typography>
                 </DialogTitle>
                 <DialogContent>
                 <Divider />
@@ -213,7 +259,7 @@ const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCus
                                                     inputProps={{ 'aria-label': 'primary checkbox' }}
                                                 />
                                             }
-                                            label={discount.name}
+                                            label={`${discount.percentage}%`}
                                         />
                                     ))
                                 }
@@ -246,6 +292,7 @@ const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCus
                         onClick={handleClose} 
                         color="default" 
                         className={classes.closeBtn}
+                        disabled={loading}
                     >
                         <CloseIcon />
                     </Button>
@@ -255,6 +302,7 @@ const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCus
                         color="default" 
                         className={classes.saveBtn}
                         onClick={updateOrderDiscountQty}
+                        disabled={loading}
                     >
                         Save
                     </Button>
