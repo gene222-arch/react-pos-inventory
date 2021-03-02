@@ -1,13 +1,11 @@
 import axiosInstance from '../../../utils/axiosInstance'
-import * as Helpers from '../../../utils/helpers'
-
 
 export const sendResetLinkEmailAsync = async (payload) => 
 {
     try {
 
         const result = await axiosInstance()
-            .post('/forgot-password/email', Helpers.prepareToFormData(payload));
+            .post('/forgot-password/email', payload);
             
         return result.data;
 
@@ -19,13 +17,12 @@ export const sendResetLinkEmailAsync = async (payload) =>
 
 
 
-
 export const resetPasswordAsync = async(payload) => 
 {
     try {
 
         const result = await axiosInstance()
-            .post('/forgot-password/reset', Helpers.prepareToFormData(payload));
+            .post('/forgot-password/reset', payload);
             
         return result.data;
 
