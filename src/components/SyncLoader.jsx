@@ -1,5 +1,5 @@
 import React from 'react'
-import SyncLoader_ from 'react-spinners/SyncLoader'
+import SYNCLOADER from 'react-spinners/SyncLoader'
 import {css} from '@emotion/react'
 
 const SyncLoader = ({ isLoading = true }) => 
@@ -13,7 +13,7 @@ const SyncLoader = ({ isLoading = true }) =>
 
 	return (
 		<> 
-            <SyncLoader_ css={loaderStyled} size='15' color={ '#90caf9' } loading={isLoading} />
+            <SYNCLOADER css={loaderStyled} size='15' color={ '#90caf9' } loading={isLoading} />
         </>
 	)
 

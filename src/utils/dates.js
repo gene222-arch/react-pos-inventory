@@ -8,16 +8,22 @@ export const currentDateWithFormat = (format) =>
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
     ];
 
+    let currentDate = '';
+
     switch (format) {
         case 'ymd':
-            return today.getFullYear()+' '+(today.getMonth()+1)+', '+today.getDate();
+            currentDate = today.getFullYear()+' '+(today.getMonth()+1)+', '+today.getDate();
             break;
+
         case 'mdy':
-            return `${monthNames[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`
+            currentDate = `${monthNames[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`
             break;
+
         default:
             break;
     }
+
+    return currentDate;
 }
 
 export const prepareRemoveHumanDiff = (month) => 

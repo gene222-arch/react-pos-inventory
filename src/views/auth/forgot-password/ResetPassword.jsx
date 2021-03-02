@@ -1,7 +1,7 @@
 import React, { useState, lazy } from 'react';
 import * as QueryString from '../../../utils/query-string.js'
 import {resetPasswordAsync} from '../../../services/auth/forgot-password/forgotPassword'
-import {NavLink} from 'react-router-dom'
+import {NavLink, useHistory} from 'react-router-dom'
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -26,6 +26,7 @@ const PASSWORD_RESET_PROPS = {
 const ResetPassword = () =>  
 {
     const classes = forgotResetPasswordUseStyles();
+    const history = useHistory();
     const [loading, setLoading] = useState(false);
 
     const [passwordReset, setPasswordReset] = useState(PASSWORD_RESET_PROPS);
@@ -64,7 +65,10 @@ const ResetPassword = () =>
         }
         
         setOpenAlert(true);
-        setTimeout(() => setLoading(false), 2000);
+        setTimeout(() => {
+            history.push('/auth/login');
+            setLoading(false)
+        }, 2000);
     }
 
 

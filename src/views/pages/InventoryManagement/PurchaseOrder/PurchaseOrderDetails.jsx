@@ -11,7 +11,6 @@ import Button from '@material-ui/core/Button';
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import SendMailDialog from './SendMailDialog'

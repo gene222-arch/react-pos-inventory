@@ -1,6 +1,7 @@
 import React, { useState, useEffect, lazy } from 'react';
 import Loading from '../../../../components/Loading'
 import * as Employees_ from '../../../../services/employees/employees'
+import * as Role_ from '../../../../services/roles-permissions/roles'
 import { useHistory } from 'react-router-dom'
 import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider, FormHelperText } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -54,7 +55,7 @@ const EditEmployee = ({match}) =>
 
     const fetchRoles = async () => 
     {
-        const result = await Employees_.fetchAllRolesAsync();
+        const result = await Role_.fetchAllAsync();
 
         if (result.status === 'Success')
         {

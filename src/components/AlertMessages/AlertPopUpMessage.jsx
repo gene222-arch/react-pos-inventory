@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
@@ -14,8 +14,8 @@ const AlertPopUpMessage = ({
         severity = 'success', 
         successMessage = 'Success', 
         errorMessage='Unable to save changes. Please fix the errors and try again',
-        warningMessage='Warning',
-        infoMessage='Info',
+        warningMessage = '',
+        infoMessage = '',
         globalMessage = '',
         hideDuration = 3000
     }) => 

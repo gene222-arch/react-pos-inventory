@@ -63,6 +63,7 @@ const columns = [
 const ProductsImport = () => 
 {
     const classes = productImportUseStyles();
+    const [loading, setLoading] = useState(false);
     const history = useHistory();
 
     const [files, setFiles] = useState([]);    
@@ -90,7 +91,6 @@ const ProductsImport = () =>
         setChecked(newChecked);
     };
 
-
     const handleCloseAlert = (event, reason) => 
     {
         if (reason === 'clickaway') {
@@ -116,35 +116,59 @@ const ProductsImport = () =>
 
     }
 
-
     const handleExcelImport = async (e) => 
     {
-        setAlertSeverity('info');
-        setAlertMessage('Products importing.');
-
         const importFiles = files.filter((file, index) => checked.includes(index)) ;
-        console.log(importFiles);
-        const result = await ExcelImport.importProductsAsync({
-            files: importFiles
-        });
-
-
-        handleCloseAlert();
-
-        if (result.status === 'Error')
+       
+        if (!importFiles.length)
         {
-            setHideDuration(10000);
             setAlertSeverity('error');
-            setAlertMessage(result.message.errorHeader);
-            const errors_ = result.message.errors.map((error, index) => ({...error, id: index}));
-            setErrors(errors_);
-            setFiles([]);
-            setChecked([]);
+            setAlertMessage('Please select a file.');
         }
         else 
         {
-            setAlertSeverity('success');
-            setAlertMessage(result.message);
+            setLoading(true);
+            setAlertSeverity('info');
+            setAlertMessage('Products importing.');
+
+
+            const result = await ExcelImport.importProductsAsync({
+                files: importFiles
+            });
+
+
+            handleCloseAlert();
+
+            if (result.status === 'Error')
+            {
+                setHideDuration(10000);
+                setAlertSeverity('error');
+                setAlertMessage(result.message.errorHeader);
+                
+                const errors_ = result.message.errors.map((error, index) => ({...error, id: index}));
+                setErrors(errors_);
+                setFiles([]);
+                setChecked([]);
+            }
+            else 
+            {
+                setHideDuration(10000);
+                setAlertSeverity('error');
+                setAlertMessage(result.message.errorHeader);
+                setFiles([]);
+                setChecked([]);
+            }
+
+            if (result.status === 'Success') 
+            {
+                setAlertSeverity('success');
+                setAlertMessage(result.message);
+                setTimeout(() => {
+                    history.push('/products');
+                }, 2000)
+            }
+
+            setTimeout(() => setLoading(false), 2000)
         }
 
         setOpenAlert(true);
@@ -272,6 +296,7 @@ const ProductsImport = () =>
                                 variant='contained' 
                                 color="default" 
                                 className={classes.cancelBtn}
+                                disabled={loading}
                             >
                                 Cancel
                             </Button>
@@ -282,6 +307,7 @@ const ProductsImport = () =>
                                 color="default" 
                                 className={classes.addBtn}
                                 onClick={handleExcelImport}
+                                disabled={loading}
                             >
                                 UPLOAD
                             </Button>

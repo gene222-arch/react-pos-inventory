@@ -1,5 +1,4 @@
 import axiosInstance from '../../utils/axiosInstance'
-import * as Helpers from '../../utils/helpers'
 
 
 export const fetchAllAsync = async () => 
@@ -7,19 +6,6 @@ export const fetchAllAsync = async () =>
     try {
         
         const result = await axiosInstance().get('/employees');
-
-        return result.data;
-
-    } catch (error) {
-        return error.response.data;        
-    }
-}
-
-export const fetchAllRolesAsync = async () => 
-{
-    try {
-        
-        const result = await axiosInstance().get('/roles');
 
         return result.data;
 

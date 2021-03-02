@@ -48,6 +48,9 @@ export default (history = null, responseType = null, contentType = null) =>
                 case 500: 
                     alert('Something went wrong')
                     break;
+                    
+                default: 
+                    break;
             }           
 
             return Promise.reject(error);

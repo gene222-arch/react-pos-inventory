@@ -1,8 +1,8 @@
   
-import React, {useState} from 'react';
-import registerAsync from '../../../services/auth/register/register'
-import {prepareSetErrorMessages} from '../../../utils/errorMessages.js'
-import * as Cookie from '../../../utils/cookies'
+import React, { useState, lazy } from 'react';
+import registerAsync from '../../services/auth/register/register'
+import {prepareSetErrorMessages} from '../../utils/errorMessages.js'
+import * as Cookie from '../../utils/cookies'
 import { NavLink, useHistory } from 'react-router-dom'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -14,7 +14,8 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import { registrationFormUseStyles } from '../../../assets/material-styles/styles'
+import { registrationFormUseStyles } from '../../assets/material-styles/styles'
+const AlertPopUpMessage = lazy(() => import('../../components/AlertMessages/AlertPopUpMessage'));
 
 
 
@@ -32,55 +33,77 @@ const Copyright = () => {
 }
 
 
+const REGISTRATION_DEFAULT_PROPS = {
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+};
+
+
 const RegistrationForm = () => 
 {
     const classes = registrationFormUseStyles();
     const history = useHistory();
+    const [loading, setLoading] = useState(false);
 
-    const [ credentials, setCredentials ] = useState({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-        role: 'admin'
-    });
+    const [ credentials, setCredentials ] = useState(REGISTRATION_DEFAULT_PROPS);
+    const [ errorMessages, setErrorMessages ] = useState(REGISTRATION_DEFAULT_PROPS);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
 
-    const [ errorMessages, setErrorMessages ] = useState({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-    });
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
 
     const handleCredentialsOnChange = (e) => setCredentials({...credentials, [e.target.name]: e.target.value})
 
-
-
     const handleCredentialsOnSubmit = async (e) => 
     {
+        setLoading(true);
         e.preventDefault();
 
         const result = await registerAsync(credentials);
         
-        if (result.status === 'Success')
+        if (result.status === 'Error')
         {
-            Cookie.setItem('access_token', result.data.access_token);
-
-            if (Cookie.has('access_token'))
-            {
-                history.push('/');
-            }
+            setAlertSeverity('error');
+            setAlertMessage('Registration failed. Please fix the errors and try again');
+            setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
         }
         else 
         {
-            setErrorMessages(prepareSetErrorMessages(result.errors, errorMessages))
+            setAlertSeverity('success');
+            setAlertMessage('Registered successfully.');
+            Cookie.setItem('access_token', result.data.access_token);
+
+            setTimeout(() => {
+                if (Cookie.has('access_token'))
+                {
+                    history.push('/');
+                }
+            }, 2000);
         }
 
+        setTimeout(() => setLoading(false), 2000);
+        setOpenAlert(true);
     }
 
 
     return (
         <Grid container component="main" className={classes.root}>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <CssBaseline />
             <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
                 <div className={classes.paper}>
@@ -88,7 +111,7 @@ const RegistrationForm = () =>
                         <LockOutlinedIcon />
                     </Avatar>
                     <Typography component="h1" variant="h5">
-                        Admin Sign up
+                        Sign up
                     </Typography>
                     <form className={classes.form} noValidate onSubmit={handleCredentialsOnSubmit}>
                         <TextField
@@ -159,6 +182,7 @@ const RegistrationForm = () =>
                             variant="contained"
                             color="primary"
                             className={classes.submit}
+                            disabled={loading}
                         >
                             Sign up
                         </Button>

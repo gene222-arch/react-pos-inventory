@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy } from 'react';
 import * as Employees_ from '../../../../services/employees/employees'
+import * as Role_ from '../../../../services/roles-permissions/roles'
 import { useHistory } from 'react-router-dom'
 import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider, FormHelperText } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -49,7 +50,6 @@ const CreateEmployee = () =>
 
     const handleEmployeeOnChange = (e) => setEmployee({...employee, [e.target.name]: e.target.value});
 
-
     const createEmployee = async () => 
     {
         setLoading(true);
@@ -75,7 +75,7 @@ const CreateEmployee = () =>
 
     const fetchRoles = async () => 
     {
-        const result = await Employees_.fetchAllRolesAsync();
+        const result = await Role_.fetchAllAsync();
 
         if (result.status === 'Success')
         {

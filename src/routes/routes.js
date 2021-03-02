@@ -5,9 +5,7 @@ import * as Cookie from '../utils/cookies'
 const LoginForm = lazy(() => import('../views/auth/LoginForm'));
 const ForgotPassword = lazy(() => import('../views/auth/forgot-password/ForgotPassword'));
 const ResetPassword = lazy(() => import('../views/auth/forgot-password/ResetPassword'));
-const AdminRegistrationForm = lazy(() => import('../views/auth/admin/RegistrationForm'));
-const ManagerRegistrationForm = lazy(() => import('../views/auth/manager/RegistrationForm'));
-const CashierRegistrationForm = lazy(() => import('../views/auth/cashier/RegistrationForm'));
+const RegisterForm = lazy(() => import('../views/auth/RegistrationForm'));
 const Dashboard = lazy(() => import('../views/pages/Dashboard/Dashboard'))
 const Pos = lazy(() => import('../views/pages/Pos/Pos'))
 const SalesSummary = lazy(() => import('../views/pages/Reports/SalesSummary'))
@@ -90,7 +88,7 @@ export const RenderRoutes = ({routes}) =>
                             {
                                 if (Cookie.has('access_token'))
                                 {
-                                    return <Unauthorized />
+                                    history.push('/');
                                 }
                                 else 
                                 {
@@ -119,6 +117,16 @@ export const globalPublicRoutes = {
         access: '',
         restricted: false
     }],
+    registerRoute: [
+        {
+            path: '/auth/register',
+            name: 'RegisterForm',
+            icon: '',
+            exact: true,
+            component: RegisterForm,
+            access: '',
+            restricted: false
+        }],
     forgotPasswordRoute: [
         {
             path: '/forgot-password/email',
@@ -144,15 +152,7 @@ export const globalPublicRoutes = {
 
 export const adminRoutes = {
     publicRoutes: [
-        {
-            path: '/admin/auth/register',
-            name: 'AdminRegistrationForm',
-            icon: '',
-            exact: true,
-            component: AdminRegistrationForm,
-            access: '',
-            restricted: false 
-        },
+        {},
     ],
     privateRoutes: [
         {
@@ -574,15 +574,7 @@ export const adminRoutes = {
 
 export const managerRoutes = {
     publicRoutes: [
-        {
-            path: '/manager/auth/register',
-            name: 'ManagerRegistrationForm',
-            icon: '',
-            exact: true,
-            component: ManagerRegistrationForm,
-            access: '',
-            restricted: false
-        },
+        {},
     ],
 
     privateRoutes: [
@@ -592,15 +584,7 @@ export const managerRoutes = {
 
 export const cashierRoutes = {
     publicRoutes: [
-        {
-            path: '/auth/register',
-            name: 'CashierRegistrationForm',
-            icon: '',
-            exact: true,
-            component: CashierRegistrationForm,
-            access: '',
-            restricted: false 
-        },
+        {},
     ],
 
     privateRoutes: [
