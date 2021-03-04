@@ -1,8 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import SyncLoader from '../../../components/SyncLoader'
 import ProductSearchField from './ProductSearchField'
-import * as Product from '../../../services/products/products'
-import * as Category from '../../../services/products/categories'
+import * as POS_ from '../../../services/pos/pos'
 import {posUseStyles} from '../../../assets/material-styles/styles'
 import {Grid} from '@material-ui/core'
 import {Card, CardContent, CardActionArea, CardActions, CardMedia, Typography} from '@material-ui/core'
@@ -22,13 +21,17 @@ const ProductList = ({handleAddToCartOnClick}) =>
     {   
         setSelectedCategory(e.target.value);
 
-        const result = await Product.fetchFilteredItemAsync({
+        const result = await POS_.fetchAllProductsAsync({
             category_id: e.target.value
         });
 
         if (result.status === 'Success')
         {
-            setProducts(result.data)
+            setProducts(result.data);
+        }
+        else 
+        {
+            setProducts([]);
         }
     }
 
@@ -37,13 +40,17 @@ const ProductList = ({handleAddToCartOnClick}) =>
     {   
         if (e.keyCode === 13)
         {
-            const result = await Product.fetchFilteredItemAsync({
+            const result = await POS_.fetchAllProductsAsync({
                 productName: e.target.value
             });
     
             if (result.status === 'Success')
             {
-                setProducts(result.data)
+                setProducts(result.data);
+            }
+            else 
+            {
+                setProducts([]);
             }
         }
     }
@@ -55,24 +62,24 @@ const ProductList = ({handleAddToCartOnClick}) =>
 
     const fetchCategories = async () => 
     {
-        const result = await Category.fetchAllAsync();
+        const result = await POS_.fetchAllCategoriesAsync();
 
         if (result.status === 'Success')
         {   
-            let categories_ = result.data;
-            setCategories(categories_);
+            setCategories(result.data);
         }
     }     
 
     const fetchProducts = async () => 
     {
-        const result = await Product.fetchFilteredItemAsync();
+        const result = await POS_.fetchAllProductsAsync();
 
-        if (result.status = 'Success')
+        if (result.status === 'Success')
         {
             setProducts(result.data);
             setLoading(false);
         }
+
     }
 
     useEffect(() => {

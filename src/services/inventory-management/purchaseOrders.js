@@ -16,12 +16,11 @@ export const fetchAllAsync = async () =>
 }
 
 
-export const fetchAllFilteredAsync = async (payload) => 
+export const fetchAllProductsAsync = async () => 
 {
     try {
         
-        const result = await axiosInstance().post('/purchase-orders/filtered',
-            payload);
+        const result = await axiosInstance().get('/purchase-orders/products');
 
         return result.data;
 
@@ -31,12 +30,42 @@ export const fetchAllFilteredAsync = async (payload) =>
 }
 
 
-export const fetchForBadOrdersAsync = async (payload) => 
+export const fetchProductAsync = async (payload) => 
 {
     try {
         
         const result = await axiosInstance()
-            .get('/purchase-orders/request-bad-orders');
+            .post('/purchase-orders/product', Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+export const fetchAllSuppliersAsync = async () => 
+{
+    try {
+        
+        const result = await axiosInstance().get('/purchase-orders/suppliers');
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+
+export const fetchAllFilteredAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance().post('/purchase-orders/filtered',
+            payload);
 
         return result.data;
 
@@ -66,22 +95,6 @@ export const fetchReceivedStocksAsync = async (payload) =>
         
         const result = await axiosInstance()
             .post('/purchase-orders/received-stocks-details', Helpers.prepareToFormData(payload));
-
-        return result.data;
-
-    } catch (error) {
-        return error.response.data;        
-    }
-}
-
-
-export const fetchToBadOrderAsync = async (payload) => 
-{
-    try {
-        
-        const result = await axiosInstance()
-            .post('/purchase-orders/purchase-order-details/to-bad-orders', 
-                Helpers.prepareToFormData(payload));
 
         return result.data;
 

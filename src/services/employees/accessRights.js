@@ -35,7 +35,8 @@ export const storeAsync = async (payload) =>
 {
     try {
         
-        const result = await axiosInstance().post('/access-rights', Helpers.prepareToFormData(payload));
+        const result = await axiosInstance()
+            .post('/access-rights', payload);
 
         return result.data;
 
@@ -50,7 +51,7 @@ export const updateAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .post('/access-rights', Helpers.prepareToFormData(payload, 'PUT'));
+            .put('/access-rights', payload);
 
         return result.data;
 
@@ -65,7 +66,9 @@ export const destroyAsync = async (payload) =>
     try {
         
         const result = await axiosInstance()
-            .delete('/access-rights', Helpers.prepareToFormData(payload));
+            .delete('/access-rights', {
+                data: payload
+            });
 
         return result.data;
 

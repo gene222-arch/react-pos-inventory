@@ -100,6 +100,7 @@ const ResetPassword = () =>
                         autoFocus
                         value={passwordReset.email}
                         onChange={handlePasswordsOnChange}
+                        disabled={true}
                     />
                     <TextField
                         margin="normal"

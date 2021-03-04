@@ -1,5 +1,4 @@
 import React, { useState, lazy } from 'react'
-import SyncLoader from '../../../../components/SyncLoader'
 import {useHistory} from 'react-router-dom'
 import * as POS_ from '../../../../services/pos/pos'
 import {CURRENCY} from '../../../../config/currency'

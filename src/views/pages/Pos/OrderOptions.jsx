@@ -2,7 +2,6 @@ import React, {useState, useEffect, lazy} from 'react'
 import DeleteDialog from '../../../components/DeleteDialog'
 import * as POS_ from '../../../services/pos/pos'
 import ApplyDiscountDialog from './ApplyDiscountDialog'
-import * as Discount from '../../../services/products/discounts'
 import {posUseStyles} from '../../../assets/material-styles/styles'
 import {Grid} from '@material-ui/core'
 import {Button} from '@material-ui/core'
@@ -75,7 +74,7 @@ const OrderOptions = ({
     
     const fetchDiscounts = async () => 
     {
-        const result = await Discount.fetchAllAsync();
+        const result = await POS_.fetchAllDiscountsAsync();
 
         if (result.status === 'Success')
         {

@@ -40,7 +40,9 @@ const SalesReturnList = () =>
         { field: 'customer', headerName: 'Customer', width: 270 },
         { field: 'purchased_at', headerName: 'Date of purchase', width: 250 },
         { field: 'no_of_items', headerName: 'Number of items', width: 240 },
-        { field: 'sales_return', headerName: 'Sales return', width: 240 },
+        { field: 'sales_return', headerName: 'Sales return', width: 240,
+            valueFormatter: param => (param.value).toFixed(2)
+    },
         { field: 'returned_at', headerName: 'Date of return', width: 250 },
     ];
 

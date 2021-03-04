@@ -1,5 +1,4 @@
 import React,{useState, useEffect, useReducer, lazy} from 'react'
-import * as Discount from '../../../services/products/discounts'
 import * as POS_ from '../../../services/pos/pos'
 import { posUseStyles } from '../../../assets/material-styles/styles'
 import Dialog from '@material-ui/core/Dialog';
@@ -134,7 +133,7 @@ const EditOrder = ({ customerId, payload, openEditProduct, handleClose, fetchCus
 
     const fetchDiscounts = async () => 
     {
-        const result = await Discount.fetchAllAsync();
+        const result = await POS_.fetchAllDiscountsAsync();
 
         if (result.status === 'Success')
         {

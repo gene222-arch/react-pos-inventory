@@ -15,6 +15,21 @@ export const fetchAllAsync = async () =>
     }
 }
 
+
+export const fetchAllProductsAsync = async () => 
+{
+    try {
+        
+        const result = await axiosInstance().get('/stocks/stock-adjustments/products');
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
 export const fetchStockToAdjustAsync = async (payload) => 
 {
     try {
@@ -46,12 +61,42 @@ export const fetchAsync = async (payload) =>
 }
 
 
-export const storeAsync = async (payload) => 
+export const receivedItemsAsync = async (payload) => 
 {
     try {
         
         const result = await axiosInstance()
-            .post('/stocks/stock-adjustment', payload);
+            .post('/stocks/stock-adjustment/received-items', payload);
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+export const inventoryCountAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/stocks/stock-adjustment/inventory-count', payload);
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+export const lossOrDamageAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/stocks/stock-adjustment/loss-damage', payload);
 
         return result.data;
 

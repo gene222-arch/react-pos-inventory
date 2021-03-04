@@ -2,7 +2,6 @@ import React, {useState, useEffect, lazy} from 'react';
 import {TAX_RATE} from '../../../config/accounting'
 import Loading from '../../../components/Loading'
 import * as SalesReturn_ from '../../../services/sales-returns/salesReturn'
-import * as POS_ from '../../../services/pos/pos'
 import * as Customer_ from '../../../services/customers/customers'
 import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
@@ -218,10 +217,11 @@ const CreateSalesReturn = () =>
 
     const fetchCustomerOrders = async () => 
     {
-        const result = await Customer_.fetchAllWithOrdersAsync();
+        const result = await SalesReturn_.fetchAllCustomerOrdersAsync();
 
         if (result.status === 'Success')
         {
+            console.log(result)
             setCustomerOrderList(result.data);
             setLoadingData(false);
         }
@@ -240,7 +240,7 @@ const CreateSalesReturn = () =>
         }
         else 
         {
-            const result = await POS_.fetchToSalesReturnAsync({
+            const result = await SalesReturn_.fetchCustomerOrderAsync({
                 pos_id: id 
             })
         
@@ -253,56 +253,64 @@ const CreateSalesReturn = () =>
 
     const createSalesReturn = async () => 
     {
-        setLoading(true);
-        const result = await SalesReturn_.storeAsync(validateData())
-
-        if (result.status === 'Error')
+        if (!determineIsOrderSelected())
         {
-            const hasItems = validateData().posSalesReturnDetails.length;
-            setAlertSeverity('error')
-
-            const hasEmptyFields = validateData()
-                .posSalesReturnDetails
-                .find(posDetail => posDetail.quantity === 0 || posDetail.defect === '');
-
-            if (!hasEmptyFields)
-            {
-                hasItems <= 0 && setAlertMessage(result.message.posSalesReturnDetails);
-                posId === 0 && setAlertMessage('Please select a customer order.');
-            }
-                
+            setAlertSeverity('error');
+            setAlertMessage('Please select a customer order.');
         }
         else 
         {
-            setAlertSeverity('success');
-            setAlertMessage(result.message);
-            setTimeout(() => history.push('/sales-returns'), 2000);
+            setLoading(true);
+            const result = await SalesReturn_.storeAsync(validateData())
+    
+            if (result.status === 'Error')
+            {
+                setAlertSeverity('error');
+            }
+            else 
+            {
+                setAlertSeverity('success');
+                setAlertMessage(result.message);
+                setTimeout(() => history.push('/sales-returns'), 2000);
+            }
+    
+            setTimeout(() => setLoading(false), 2000);
         }
-
         setOpenAlert(true);
-        setTimeout(() => setLoading(false), 2000);
     }
 
     const validateData = () => 
     {
-        const items = customerOrderDetails.items.map(order => ({
-            pos_details_id: order.id,
-            product_id: order.product_id,
-            defect: order.defect,
-            quantity: order.quantity,
-            price: order.price,
-            tax: order.tax,
-            sub_total: order.sub_total,
-            total: order.total,
-            discount: order.discount,
-            unit_of_measurement: order.unit_of_measurement,
-            amount: order.amount,
-        }))
+        const items = customerOrderDetails.items
+            .map(order => ({
+                pos_details_id: order.id,
+                product_id: order.product_id,
+                defect: order.defect,
+                quantity: order.quantity,
+                price: order.price,
+                tax: order.tax,
+                sub_total: order.sub_total,
+                total: order.total,
+                discount: order.discount,
+                unit_of_measurement: order.unit_of_measurement,
+                amount: order.amount,
+            }));
 
         return {
             pos_id: posId,
             posSalesReturnDetails: items
         };
+    }
+
+    const determineIsOrderSelected = () => Boolean(posId);
+
+    const hasItems = () => Boolean(validateData().posSalesReturnDetails.length);
+
+    const determineHasEmptyFields = () => 
+    {
+        return Boolean(validateData()
+            .posSalesReturnDetails
+            .find(posDetail => posDetail.quantity === 0 || posDetail.defect === ''));
     }
 
 
@@ -347,9 +355,9 @@ const CreateSalesReturn = () =>
                                                 
                                                 {
                                                     customerOrderList.map((co, index) => (
-                                                        !index 
+                                                        !index
                                                         ? (
-                                                            <MenuItem value={0}>Select customer order #</MenuItem>
+                                                            <MenuItem key={0} value={0}>Select customer order #</MenuItem>
                                                         )
                                                         : <MenuItem 
                                                             key={co.id}

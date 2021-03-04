@@ -3,8 +3,6 @@ import ReceivedStocks from './ReceivedStocks'
 import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
 import Loading from '../../../../components/Loading'
 import * as PurchaseOrder_ from '../../../../services/inventory-management/purchaseOrders'
-import * as Suppliers_ from '../../../../services/inventory-management/suppliers'
-import * as Product_ from '../../../../services/products/products'
 import { useHistory } from 'react-router-dom'
 import { purchaseOrderUseStyles } from '../../../../assets/material-styles/styles'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
@@ -225,7 +223,7 @@ const PurchaseOrderEdit = ({match}) =>
 
         setProductId(id);
 
-        const result = await Product_.fetchToPurchaseAsync({
+        const result = await PurchaseOrder_.fetchProductAsync({
             product_id: id
         });
 
@@ -249,7 +247,7 @@ const PurchaseOrderEdit = ({match}) =>
 
     const fetchProducts = async () => 
     {
-        const result = await Product_.fetchAllAsync();
+        const result = await PurchaseOrder_.fetchAllProductsAsync();
 
         if (result.status === 'Success')
         {
@@ -259,7 +257,7 @@ const PurchaseOrderEdit = ({match}) =>
 
     const fetchSuppliers = async () => 
     {
-        const result = await Suppliers_.fetchAllAsync();
+        const result = await PurchaseOrder_.fetchAllSuppliersAsync();
 
         if (result.status === 'Success')
         {

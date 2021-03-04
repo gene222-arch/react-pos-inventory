@@ -103,6 +103,7 @@ const PurchaseOrderDetails = ({match}) =>
         setOpenAlert(true);
 
         setLoading(false);
+        handleMenuClose();
     }
 
 
@@ -119,6 +120,7 @@ const PurchaseOrderDetails = ({match}) =>
         setOpenAlert(true);
 
         setLoading(false);
+        handleMenuClose();
     }
     
     const fetchPurchaseOrder = async () => 
@@ -161,6 +163,7 @@ const PurchaseOrderDetails = ({match}) =>
             setTimeout(() =>  history.push('/inventory-mngmt/purchase-orders'), 2000);
         }
 
+        handleMenuClose();
         setTimeout(() => setLoading(false), 2000);
     }
    

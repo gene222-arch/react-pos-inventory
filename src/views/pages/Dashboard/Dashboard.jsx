@@ -20,11 +20,15 @@ import InvoiceIcon from '@material-ui/icons/Receipt';
 import MarginSalesIcon from '@material-ui/icons/DonutSmall';
 import PurchaseReturnIcon from '@material-ui/icons/KeyboardReturn';
 import PurchaseOrdersIcon from '@material-ui/icons/AddShoppingCart';
+import PendingPurchaseOrderIcon from '@material-ui/icons/HourglassFullRounded';
+import PendingInvoiceIcon from '@material-ui/icons/HourglassFullTwoTone';
+import CustomerIcon from '@material-ui/icons/Group';
 import { dashboardUseStyles } from '../../../assets/material-styles/styles'
 import NO_DATA_IMG from '../../../assets/storage/images/dashboard/no_data.svg'
 
 
 HighchartsExporting(Highcharts)
+
 
 const DASHBOARD_DEFAULT_PROPS = {
     salesSummary: {
@@ -33,7 +37,10 @@ const DASHBOARD_DEFAULT_PROPS = {
         sales_return: 0.00,
         net_sales: 0.00,
         margin_sales: 0.00,
-        purchase_return: 0.00
+        purchase_return: 0.00,
+        pending_purchase_orders: 0,
+        pending_invoices: 0,
+        total_no_of_customers: 0
     },
     monthlySales: [],
     pendingInvoices: [],
@@ -99,13 +106,13 @@ const Dashboard = () =>
 
         if (result.status === 'No Content')
         {
-            alert('no content')
             setDashboardData(DASHBOARD_DEFAULT_PROPS);
         }
         else 
         {
             setDashboardData(result.data);
         }
+
         setLoading(false);
     }
 
@@ -113,6 +120,7 @@ const Dashboard = () =>
     useEffect(() => 
     {
         fetchDashboardData();
+
         window.addEventListener('resize', () => {
             setComponentKey((new Date()).toISOString());
         });
@@ -121,6 +129,7 @@ const Dashboard = () =>
             setDashboardData(DASHBOARD_DEFAULT_PROPS);
         };
     }, []);
+
 
 
     return loading
@@ -319,6 +328,103 @@ const Dashboard = () =>
                             </CardActions>
                         </Card>
                     </Grid>                
+
+                {/* Pending Invoices */}
+                <Grid item xs={12} sm={12} md={6} lg={4} className={classes.reportCardContainer}>
+                    <Card>
+                        <CardHeader
+                            avatar={
+                                <Avatar 
+                                    variant='rounded' 
+                                    className={`${classes.cardHeaderIcon} ${classes.pendingInvoicesContainer}`}>
+                                    <PendingInvoiceIcon className={classes.salesReportIcons}/>
+                                </Avatar>
+                            }
+                            title={`${dashboardData.salesSummary.pending_invoices}`}
+                            subheader="Invoices"
+                            titleTypographyProps={{ 
+                                variant: 'h4',
+                                className: classes.title
+                            }}
+                            subheaderTypographyProps={{ 
+                                className: classes.subheader
+                            }}
+                        />
+                        <CardContent>
+                            <Divider />
+                        </CardContent>
+                        <CardActions className={classes.cardActionsContainer}>
+                            <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
+                                <TrendingDownIcon /> {'-$2000'} Last month
+                            </Typography>
+                        </CardActions>
+                    </Card>
+                </Grid>                
+
+                {/* Total no# of customers */}
+                <Grid item xs={12} sm={12} md={6} lg={4} className={classes.reportCardContainer}>
+                    <Card>
+                        <CardHeader
+                            avatar={
+                                <Avatar 
+                                    variant='rounded' 
+                                    className={`${classes.cardHeaderIcon} ${classes.totalCustomersContainer}`}>
+                                    <CustomerIcon className={classes.salesReportIcons}/>
+                                </Avatar>
+                            }
+                            title={`${dashboardData.salesSummary.total_no_of_customers}`}
+                            subheader="Customers"
+                            titleTypographyProps={{ 
+                                variant: 'h4',
+                                className: classes.title
+                            }}
+                            subheaderTypographyProps={{ 
+                                className: classes.subheader
+                            }}
+                        />
+                        <CardContent>
+                            <Divider />
+                        </CardContent>
+                        <CardActions className={classes.cardActionsContainer}>
+                            <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
+                                <TrendingDownIcon /> {'-$2000'} Last month
+                            </Typography>
+                        </CardActions>
+                    </Card>
+                </Grid>                
+
+                {/* Pending purchase orders */}
+                <Grid item xs={12} sm={12} md={6} lg={4} className={classes.reportCardContainer}>
+                    <Card>
+                        <CardHeader
+                            avatar={
+                                <Avatar 
+                                    variant='rounded' 
+                                    className={`${classes.cardHeaderIcon} ${classes.pendingPurchaseOrdersContainer}`}>
+                                    <PendingPurchaseOrderIcon className={classes.salesReportIcons}/>
+                                </Avatar>
+                            }
+                            title={`${dashboardData.salesSummary.pending_purchase_orders}`}
+                            subheader="Purchase orders"
+                            titleTypographyProps={{ 
+                                variant: 'h4',
+                                className: classes.title
+                            }}
+                            subheaderTypographyProps={{ 
+                                className: classes.subheader
+                            }}
+                        />
+                        <CardContent>
+                            <Divider />
+                        </CardContent>
+                        <CardActions className={classes.cardActionsContainer}>
+                            <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
+                                <TrendingDownIcon /> {'-$2000'} Last month
+                            </Typography>
+                        </CardActions>
+                    </Card>
+                </Grid>                
+
 
                     <Grid item xs={12} sm={12} md={11} lg={11}>
                         <Card className={classes.chartContainer}>

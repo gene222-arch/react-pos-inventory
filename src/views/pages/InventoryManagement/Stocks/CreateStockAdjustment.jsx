@@ -1,9 +1,8 @@
 import React, { useState, useEffect, lazy } from 'react';
-import * as Product_ from '../../../../services/products/products'
 import * as StockAdjustment_ from '../../../../services/inventory-management/stockAdjustments'
 import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
-import { Card, CardContent, Grid } from '@material-ui/core';
+import { Card, CardContent, FormHelperText, Grid } from '@material-ui/core';
 import { FormControl, InputLabel, Select, MenuItem, TextField } from '@material-ui/core'
 import Button from '@material-ui/core/Button';
 import { createPageUseStyles } from '../../../../assets/material-styles/styles'
@@ -21,6 +20,8 @@ const CreateStockAdjustment = () =>
     const [productId, setProductId] = useState(0);
     const [products, setProducts] = useState([]);
     const [stockAdjustmentDetails, setStockAdjustmentDetails] = useState([]);
+
+    const [errorMessage, setErrorMessage] = useState('');
     const [openAlert, setOpenAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('');
@@ -244,7 +245,7 @@ const CreateStockAdjustment = () =>
 
     const fetchProducts = async () => 
     {
-        const result = await Product_.fetchAllAsync();
+        const result = await StockAdjustment_.fetchAllProductsAsync();
 
         if (result.status === 'Success')
         {
@@ -255,13 +256,17 @@ const CreateStockAdjustment = () =>
     const fetchStockToAdjust = async (e) => 
     {
         const id = parseInt(e.target.value);
-        setProductId(parseInt(e.target.value));
 
-        const isProductInList = stockAdjustmentDetails.find(stockAdjustment => parseInt(stockAdjustment.product_id) === id);
-        console.log(stockAdjustmentDetails)
+        setProductId(id);
+
+        const isProductInList = stockAdjustmentDetails
+            .find(stockAdjustment => parseInt(stockAdjustment.product_id) === id);
+
         if (isProductInList)
         {
-            alert('Product already exist.')
+            setAlertSeverity('warning');
+            setAlertMessage('Product already exist.');
+            setOpenAlert(true);
         }
         else 
         {
@@ -275,39 +280,92 @@ const CreateStockAdjustment = () =>
                 setProductId(0);
             }
         }
-
     }
 
     const createStockAdjustment = async () => 
     {
-        setLoading(true);
-        const result = await StockAdjustment_.storeAsync(validateData());
-
-        if (result.status === 'Error')
+        if (!validateData().stockAdjustmentDetails.length)
         {
-            setAlertSeverity('error');
+            setErrorMessage('Please add at least one item.');
         }
         else 
         {
-            setAlertSeverity('success');
-            setAlertMessage(result.message);
-            setTimeout(() => history.push('/inventory-mngmt/stock-adjustments'), 2000);
+            setErrorMessage('');
+            setLoading(true);
+
+            const result = await request();
+    
+            if (result.status === 'Error')
+            {
+                setAlertSeverity('error');
+                setAlertMessage('');
+            }
+            else 
+            {
+                setAlertSeverity('success');
+                setAlertMessage(result.message);
+                setTimeout(() => history.push('/inventory-mngmt/stock-adjustments'), 2000);
+            }
+    
+            setOpenAlert(true);
+            setTimeout(() => setLoading(false), 2000);
         }
 
-        setOpenAlert(true);
-        setTimeout(() => setLoading(false), 2000);
     }
 
 
+    const request = async () => 
+    {
+        switch (reason) {
+            case 'Received items':
+                return await StockAdjustment_.receivedItemsAsync(validateData());
+                break;
+
+            case 'Inventory count':
+                return await StockAdjustment_.inventoryCountAsync(validateData());
+                break;
+
+            case 'Loss':
+                case 'Damage':
+                return await StockAdjustment_.lossOrDamageAsync(validateData());
+                break;   
+            default:
+                break;
+        }
+    }
+
     const validateData = () => 
     {
-        const stockAdjustmentDetails_ = stockAdjustmentDetails.map(stock => ({
-            stock_id: stock.id,
-            added_stock: stock.added_stock,
-            removed_stock: stock.removed_stock,
-            counted_stock: stock.counted_stock,
-            stock_after: stock.stock_after
-        }))
+        let stockAdjustmentDetails_ = [];
+
+        switch (reason) {
+            case 'Received items':
+                stockAdjustmentDetails_ = stockAdjustmentDetails.map(stock => ({
+                    stock_id: stock.id,
+                    added_stock: stock.added_stock,
+                    stock_after: stock.stock_after
+                }));
+                break;
+
+            case 'Inventory count':
+                stockAdjustmentDetails_ = stockAdjustmentDetails.map(stock => ({
+                    stock_id: stock.id,
+                    counted_stock: stock.counted_stock
+                }));
+                break;   
+
+            case 'Loss':
+                case 'Damage':
+                stockAdjustmentDetails_ = stockAdjustmentDetails.map(stock => ({
+                    stock_id: stock.id,
+                    removed_stock: stock.removed_stock,
+                    stock_after: stock.stock_after
+                }));
+                break;                     
+            default:
+                break;
+        }
+
 
         return {
             reason: reason,
@@ -359,10 +417,13 @@ const CreateStockAdjustment = () =>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <Grid container justify='center' alignItems='center'>
                                 <Grid item xs={12} sm={12} md={5} lg={5}>
-                                    <FormControl className={classes.formControl}>
+                                    <FormControl 
+                                        className={classes.formControl}
+                                        error={Boolean(errorMessage)}
+                                        >
                                         <InputLabel id="demo-simple-select-label">Add product</InputLabel>
                                         <Select
-                                            name='role'
+                                            name='product'
                                             labelId="demo-simple-select-label"
                                             id="demo-simple-select"
                                             className={classes.selectEmpty}
@@ -380,6 +441,7 @@ const CreateStockAdjustment = () =>
                                             }
                                             
                                         </Select>
+                                        <FormHelperText>{errorMessage && errorMessage}</FormHelperText>
                                     </FormControl>  
                                 </Grid>
                             </Grid>

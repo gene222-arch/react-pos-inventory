@@ -25,7 +25,9 @@ const EditDiscount = lazy(() => import('../views/pages/Products/Discounts/EditDi
 const Customers = lazy(() => import('../views/pages/Customers/Customer'));
 const CreateCustomer = lazy(() => import('../views/pages/Customers/CreateCustomer'));
 const EditCustomer = lazy(() => import('../views/pages/Customers/EditCustomer'));
-const AccessRights = lazy(() => import('../views/pages/Employees/AccessRights'));
+const AccessRights = lazy(() => import('../views/pages/Employees/AccessRights/AccessRights'));
+const CreateAccessRight = lazy(() => import('../views/pages/Employees/AccessRights/CreateAccessRight'));
+const EditAccessRight = lazy(() => import('../views/pages/Employees/AccessRights/EditAccessRight'));
 const EmployeeList = lazy(() => import('../views/pages/Employees/Employees/EmployeeList'));
 const CreateEmployee = lazy(() => import('../views/pages/Employees/Employees/CreateEmployee'));
 const EditEmployee = lazy(() => import('../views/pages/Employees/Employees/EditEmployee'));
@@ -521,7 +523,25 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: AccessRights,
-            access: 'view_employees_access_rights',
+            access: 'manage_access_rights',
+            restricted: true 
+        },
+        {
+            path: '/employees/create-access-right',
+            name: 'CreateAccessRight',
+            icon: '',
+            exact: true,
+            component: CreateAccessRight,
+            access: 'manage_access_rights',
+            restricted: true 
+        },
+        {
+            path: '/employees/access-right/:accessRightId/edit',
+            name: 'EditAccessRight',
+            icon: '',
+            exact: true,
+            component: EditAccessRight,
+            access: 'manage_access_rights',
             restricted: true 
         },
         {

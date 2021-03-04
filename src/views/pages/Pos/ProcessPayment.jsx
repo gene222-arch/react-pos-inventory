@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useReducer} from 'react'
-import * as Customer_ from '../../../services/customers/customers'
+import * as Pos_ from '../../../services/pos/pos'
 import Charge from './PaymentMethods/Charge'
 import CardPayment from './PaymentMethods/Card'
 import Invoice from './PaymentMethods/Invoice'
@@ -115,7 +115,7 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
 
     const fetchCustomer = async () => 
     {
-        const result = await Customer_.fetchAsync({
+        const result = await Pos_.fetchCustomerAsync({
             customer_id: customerId
         });
 

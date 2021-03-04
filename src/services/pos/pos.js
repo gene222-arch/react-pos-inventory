@@ -3,12 +3,11 @@ import * as Helpers from '../../utils/helpers'
 
 
 
-
 export const fetchCartDetails = async (payload) => 
 {
     try {
         const result = await axiosInstance()
-            .post('/pos/cart-details', Helpers.prepareToFormData(payload));
+            .post('/pos/cart-details', payload);
 
         return result.data;
     } catch (error) {
@@ -17,12 +16,70 @@ export const fetchCartDetails = async (payload) =>
 }
 
 
-export const fetchAllFilteredAsync = async (payload) => 
+export const fetchAllCategoriesAsync = async (payload) => 
 {
     try {
         
-        const result = await axiosInstance().post('/pos/order-lists/filtered',
-            payload);
+        const result = await axiosInstance()
+            .post('/pos/categories', Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+export const fetchAllCustomersAsync = async () => 
+{
+    try {
+        
+        const result = await axiosInstance().get('/pos/customers');
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+export const fetchCustomerAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/pos/customer', Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+export const fetchAllDiscountsAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/pos/discounts', Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+export const fetchAllProductsAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/pos/products', Helpers.prepareToFormData(payload));
 
         return result.data;
 
@@ -33,12 +90,12 @@ export const fetchAllFilteredAsync = async (payload) =>
 
 
 
-export const fetchToSalesReturnAsync = async (payload) => 
+export const fetchAllFilteredAsync = async (payload) => 
 {
     try {
         
-        const result = await axiosInstance()
-            .post('/pos/customer-orders/to-sales-return', payload);
+        const result = await axiosInstance().post('/pos/order-lists/filtered',
+            payload);
 
         return result.data;
 

@@ -179,7 +179,6 @@ const CreateBadOrders = () =>
         }
     };
 
-
     const handleOnChangeDefect = (e, data) => 
     {
         let defect = e.target.value;
@@ -215,7 +214,7 @@ const CreateBadOrders = () =>
 
     const fetchPurchaseOrders = async () => 
     {
-        const result = await PurchaseOrder_.fetchForBadOrdersAsync();
+        const result = await BadOrder_.fetchPurchaseOrdersAsync();
 
         if (result.status === 'Success')
         {
@@ -231,7 +230,7 @@ const CreateBadOrders = () =>
         
         setPurchaseOrderId(id);
 
-        const result = await PurchaseOrder_.fetchToBadOrderAsync({
+        const result = await BadOrder_.fetchPurchaseOrderAsync({
             purchase_order_id: id 
         })
     
@@ -244,22 +243,31 @@ const CreateBadOrders = () =>
 
     const createBadOrder = async () => 
     {
-        setLoading(true);
-        const result = await BadOrder_.storeAsync(validateData())
-
-        if (result.status === 'Error')
+        if (purchaseOrderDetails.items.length <= 0)
         {
             setAlertSeverity('error');
+            setAlertMessage('Please add at least one item to the purchase order');
         }
         else 
         {
-            setAlertSeverity('success');
-            setAlertMessage(result.message);
-            setTimeout(() => history.push('/inventory-mngmt/bad-orders'), 2000);
+            setLoading(true);
+            const result = await BadOrder_.storeAsync(validateData())
+
+            if (result.status === 'Error')
+            {
+                setAlertSeverity('error');
+            }
+            else 
+            {
+                setAlertSeverity('success');
+                setAlertMessage(result.message);
+                setTimeout(() => history.push('/inventory-mngmt/bad-orders'), 2000);
+            }
+
+            setTimeout(() => setLoading(false), 2000);
         }
 
         setOpenAlert(true);
-        setTimeout(() => setLoading(false), 2000);
     }
 
 

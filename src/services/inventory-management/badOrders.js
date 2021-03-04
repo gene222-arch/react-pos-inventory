@@ -16,6 +16,38 @@ export const fetchAllAsync = async () =>
 }
 
 
+export const fetchPurchaseOrdersAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .get('/bad-orders/purchase-orders');
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+export const fetchPurchaseOrderAsync = async (payload) => 
+{
+    try {
+        
+        const result = await axiosInstance()
+            .post('/bad-orders/purchase-order', 
+                Helpers.prepareToFormData(payload));
+
+        return result.data;
+
+    } catch (error) {
+        return error.response.data;        
+    }
+}
+
+
+
 export const fetchAsync = async (payload) => 
 {
     try {

@@ -68,8 +68,8 @@ const Customers = () =>
         setAlertSeverity('info');
         setAlertMessage('Customer list exporting.');
         setOpenAlert(true);
-            setExportMenu(null);
-}
+        setExportMenu(null);
+    }
 
 
     const handleClickOpen = () =>  setOpen(true);

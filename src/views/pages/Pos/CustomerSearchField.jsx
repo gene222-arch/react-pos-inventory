@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import * as Customer from '../../../services/customers/customers'
+import * as POS_ from '../../../services/pos/pos'
 import {posUseStyles} from '../../../assets/material-styles/styles'
 import {Grid} from '@material-ui/core'
 import {FormControl, InputLabel, Select, MenuItem} from '@material-ui/core'
@@ -15,7 +15,7 @@ const CustomerSearchField = ({customerId, handleOnChangeCustomerId}) =>
 
     const fetchCustomers = async () => 
     {
-        const result = await Customer.fetchAllForPosAsync();
+        const result = await POS_.fetchAllCustomersAsync();
 
         if (result.status = 'Success')
         {

@@ -72,6 +72,7 @@ export const createPageUseStyles = makeStyles((theme) => ({
     }
 }));
 
+
 export const sendMailDialogUseStyles = makeStyles((theme) => ({
     dialog: {
         padding: theme.spacing(3)
@@ -273,7 +274,7 @@ export const dashboardUseStyles = makeStyles( theme => ({
         fontWeight: '400'
     },
     revenueContainer: {
-        backgroundColor: green[500]
+        backgroundColor: green[400]
     },
     salesReturnContainer: {
         backgroundColor: red[500]
@@ -291,12 +292,21 @@ export const dashboardUseStyles = makeStyles( theme => ({
     netSalesContainer: {
         backgroundColor: yellow[600]
     },
+    pendingInvoicesContainer: {
+        backgroundColor: green[600]
+    },
+    totalCustomersContainer: {
+        backgroundColor: blue[400]
+    },
+    pendingPurchaseOrdersContainer: {
+        backgroundColor: green[600]
+    },
     chartContainer: {
         width: '100%',
         margin: '0 auto'
     },
     pendingOrdersIcon: {
-        backgroundColor: blue[500]
+        backgroundColor: green[600]
     },
     noDataImg: {
         width: '100%'
@@ -410,6 +420,7 @@ export const dataGridUseStyles = makeStyles((theme) => ({
         }
     },
     deleteBtn: {
+        margin: theme.spacing(1),
         '&:hover':{
             color: red[400]
         }

@@ -23,7 +23,7 @@ const OrderDetailsSearchField = ({rowIds, handleAddToCartOnKeyPress, handleOnDel
                     </Grid>
                     <Grid item xs={12} sm={12} md={2} lg={2}>
                     { 
-                        rowIds.length ? (
+                        rowIds.length && (
                             <Button 
                                 variant="text" 
                                 color="default" 
@@ -32,7 +32,7 @@ const OrderDetailsSearchField = ({rowIds, handleAddToCartOnKeyPress, handleOnDel
                             >
                             <DeleteIcon />
                         </Button>
-                        ): ''
+                        )
                     }
                     </Grid>
                 </Grid>
