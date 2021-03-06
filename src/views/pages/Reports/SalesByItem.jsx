@@ -295,7 +295,7 @@ const SalesByItem = () =>
                                                             />
                                                             <ListItemSecondaryAction>
                                                                 <Typography variant="h5" color="initial" gutterBottom={false}>
-                                                                    {`${CURRENCY}${item.net_sales}`}
+                                                                    {`${CURRENCY}${(item.net_sales).toFixed(2)}`}
                                                                 </Typography>
                                                             </ListItemSecondaryAction>
                                                         </ListItem>

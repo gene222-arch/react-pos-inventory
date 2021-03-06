@@ -18,17 +18,24 @@ const SalesByEmployee = () =>
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
 
-    const [salesByEmployees, setSalesByEmployees] = useState([]);
+    const [salesByEmployees, setSalesByEmployees] = useState([{
+        id: 0,
+        cashier: '',
+        gross_sales: 0.00,
+        discount: 0.00,
+        net_sales: 0.00,
+    }]);
     const [errorMessages, setErrorMessages] = useState({
         startDate: '',
         endDate: ''
     })
 
     const columns = [
-        { field: 'cashier', headerName: 'Name', width: 320 },
-        { field: 'gross_sales', headerName: 'Gross sales', width: 310.5, valueFormatter: params => params.value.toFixed(2) },
-        { field: 'discount', headerName: 'Discounts', width: 310.5, valueFormatter: params => params.value.toFixed(2) },
-        { field: 'net_sales', headerName: 'Net sales', width: 310.5, valueFormatter: params => params.value.toFixed(2) },
+        { field: 'cashier', headerName: 'Name', width: 248 },
+        { field: 'gross_sales', headerName: 'Gross sales', width: 248 },
+        { field: 'discounts', headerName: 'Discounts', width: 248, },
+        { field: 'sales_return', headerName: 'Sales Return', width: 248, },
+        { field: 'net_sales', headerName: 'Net sales', width: 248},
     ];
 
     const handleStartDate = (date) => setStartDate(DateHelper.prepareExtractCurDate(date));

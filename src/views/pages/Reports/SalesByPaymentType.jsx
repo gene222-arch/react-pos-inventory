@@ -24,10 +24,11 @@ const SalesByPaymentType = () =>
     })
 
     const columns = [
-        { field: 'payment_type', headerName: 'Payment type', width: 320 },
-        { field: 'gross_sales', headerName: 'Gross sales', width: 310 },
-        { field: 'discounts', headerName: 'Discounts', width: 310 },
-        { field: 'net_sales', headerName: 'Net sales', width: 310 },
+        { field: 'payment_type', headerName: 'Payment type', width: 248 },
+        { field: 'gross_sales', headerName: 'Gross sales', width: 248 },
+        { field: 'discounts', headerName: 'Discounts', width: 248 },
+        { field: 'sales_return', headerName: 'Sales return', width: 248 },
+        { field: 'net_sales', headerName: 'Net sales', width: 248 },
     ];
 
     const handleStartDate = (date) => setStartDate(DateHelper.prepareExtractCurDate(date));

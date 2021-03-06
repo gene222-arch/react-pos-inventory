@@ -1,4 +1,5 @@
 import Axios from 'axios'
+import UnAuthorize from '../views/errors/UnAuthorized'
 import * as Cookie from './cookies'
 
 
@@ -42,7 +43,7 @@ export default (history = null, responseType = null, contentType = null) =>
                     break;
                 
                 case 403: 
-                    alert('Forbidden Access!');
+                    alert('Forbidden')
                     break;
                 
                 case 500: 

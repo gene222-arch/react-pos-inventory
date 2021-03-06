@@ -8,6 +8,7 @@ const ResetPassword = lazy(() => import('../views/auth/forgot-password/ResetPass
 const RegisterForm = lazy(() => import('../views/auth/RegistrationForm'));
 const Dashboard = lazy(() => import('../views/pages/Dashboard/Dashboard'))
 const Pos = lazy(() => import('../views/pages/Pos/Pos'))
+const Receipt = lazy(() => import('../views/pages/Receipts/Receipt'))
 const SalesSummary = lazy(() => import('../views/pages/Reports/SalesSummary'))
 const SalesByItem = lazy(() => import('../views/pages/Reports/SalesByItem'))
 const SalesByCategory = lazy(() => import('../views/pages/Reports/SalesByCategory'))
@@ -77,13 +78,20 @@ export const RenderRoutes = ({routes}) =>
                         render={ props => { 
                             if (route.restricted)
                             {
-                                if (Cookie.has('access_token'))
+                                if (!userPermissions.includes(route.access))
                                 {
-                                    return <route.component {...props} route={route} />
+                                    return <Unauthorized />
                                 }
                                 else 
                                 {
-                                   history.push('/auth/login')
+                                    if (Cookie.has('access_token'))
+                                    {
+                                        return <route.component {...props} route={route} />
+                                    }
+                                    else 
+                                    {
+                                    history.push('/auth/login')
+                                    }
                                 }
                             }
                             else 
@@ -163,7 +171,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: Dashboard,
-            access: 'view_dashboard',
+            access: 'View Dashboard',
             restricted: true
         },
         {
@@ -172,7 +180,16 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: Pos,
-            access: 'view_pos', 
+            access: 'Manage POS', 
+            restricted: true
+        },
+        {
+            path: '/receipts',
+            name: 'Receipt',
+            icon: '',
+            exact: true,
+            component: Receipt,
+            access: 'View All Receipts', 
             restricted: true
         },
         {
@@ -181,7 +198,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: SalesSummary,
-            access: 'view_sales_summary_reports',
+            access: 'View Reports',
             restricted: true 
         },
         {
@@ -190,7 +207,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: SalesByItem,
-            access: 'view_sales_by_item_reports', 
+            access: 'View Reports', 
             restricted: true
         },
         {
@@ -199,7 +216,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: SalesByCategory,
-            access: 'view_sales_by_category_reports',
+            access: 'View Reports',
             restricted: true 
         },
         {
@@ -208,7 +225,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: SalesByEmployee,
-            access: 'view_sales_by_employee_reports',
+            access: 'View Reports',
             restricted: true 
         },
         {
@@ -217,7 +234,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: SalesByPaymentType,
-            access: 'view_sales_by_payment_type_reports',
+            access: 'View Reports',
             restricted: true 
         },
         {
@@ -226,7 +243,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: PurchaseOrderList,
-            access: 'view_purchase_orders',
+            access: 'Manage Purchase Orders',
             restricted: true 
         },
         {
@@ -235,7 +252,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: PurchaseOrder,
-            access: 'create_purchase_orders',
+            access: 'Manage Purchase Orders',
             restricted: true 
         },
         {
@@ -244,7 +261,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: PurchaseOrderDetails,
-            access: 'view_purchase_orders',
+            access: 'Manage Purchase Orders',
             restricted: true 
         },
         {
@@ -253,7 +270,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: PurchaseOrderEdit,
-            access: 'update_purchase_orders',
+            access: 'Manage Purchase Orders',
             restricted: true 
         },
         {
@@ -262,7 +279,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: PurchaseOrderReceive,
-            access: 'receive_purchase_orders',
+            access: 'Manage Purchase Orders',
             restricted: true 
         },
         {
@@ -271,7 +288,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: BadOrderList,
-            access: 'view_bad_orders',
+            access: 'Manage Bad Orders',
             restricted: true 
         },
         {
@@ -280,7 +297,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: BadOrderDetails,
-            access: 'view_bad_orders',
+            access: 'Manage Bad Orders',
             restricted: true 
         },
         {
@@ -289,7 +306,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CreateBadOrders,
-            access: 'create_bad_orders',
+            access: 'Manage Bad Orders',
             restricted: true 
         },
         {
@@ -298,7 +315,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: Suppliers,
-            access: 'view_suppliers',
+            access: 'Manage Suppliers',
             restricted: true 
         },
         {
@@ -307,7 +324,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CreateSupplier,
-            access: 'create_suppliers',
+            access: 'Manage Suppliers',
             restricted: true 
         },
         {
@@ -316,7 +333,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: EditSupplier,
-            access: 'update_suppliers',
+            access: 'Manage Suppliers',
             restricted: true 
         },
         {
@@ -325,7 +342,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: StockAdjustmentList,
-            access: 'view_stock_adjustments',
+            access: 'Manage Stock Adjustments',
             restricted: true 
         },
         {
@@ -334,7 +351,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: StockAdjustmentDetails,
-            access: 'view_stock_adjustments',
+            access: 'Manage Stock Adjustments',
             restricted: true 
         },
         {
@@ -343,7 +360,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CreateStockAdjustment,
-            access: 'create_stock_adjustment',
+            access: 'Manage Stock Adjustments',
             restricted: true 
         },
         {
@@ -352,7 +369,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: SalesReturnList,
-            access: 'view_sales_returns',
+            access: 'Manage Sales Returns',
             restricted: true 
         },
         {
@@ -361,7 +378,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: SalesReturnDetails,
-            access: 'view_sales_returns',
+            access: 'Manage Sales Returns',
             restricted: true 
         },
         {
@@ -370,7 +387,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CreateSalesReturn,
-            access: 'create_sales_returns',
+            access: 'Manage Sales Returns',
             restricted: true 
         },
         {
@@ -379,7 +396,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: ProductList,
-            access: 'view_products',
+            access: 'Manage Products',
             restricted: true 
         },
         {
@@ -388,7 +405,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: ProductsImport,
-            access: 'import_products',
+            access: 'Import Products',
             restricted: true 
         },
         {
@@ -397,7 +414,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CreateProduct,
-            access: 'create_products',
+            access: 'Manage Products',
             restricted: true 
         },
         {
@@ -406,7 +423,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: EditProduct,
-            access: 'update_products',
+            access: 'Manage Products',
             restricted: true 
         },
         {
@@ -415,7 +432,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: Categories,
-            access: 'view_categories',
+            access: 'Manage Categories',
             restricted: true 
         },
         {
@@ -424,7 +441,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CreateCategory,
-            access: 'create_categories',
+            access: 'crManage Categories',
             restricted: true 
         },
         {
@@ -433,7 +450,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: EditCategory,
-            access: 'create_categories',
+            access: 'crManage Categories',
             restricted: true 
         },
         {
@@ -442,7 +459,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: Discounts,
-            access: 'view_discounts',
+            access: 'Manage Discounts',
             restricted: true 
         },
         {
@@ -451,7 +468,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CreateDiscount,
-            access: 'create_discounts',
+            access: 'Manage Discounts',
             restricted: true 
         },
         {
@@ -460,7 +477,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: EditDiscount,
-            access: 'update_discounts',
+            access: 'Manage Discounts',
             restricted: true 
         },
         {
@@ -469,7 +486,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: Customers,
-            access: 'view_customers',
+            access: 'Manage Customers',
             restricted: true 
         },
         {
@@ -478,7 +495,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CreateCustomer,
-            access: 'create_customers',
+            access: 'Manage Customers',
             restricted: true 
         },
         {
@@ -487,7 +504,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: EditCustomer,
-            access: 'update_customers',
+            access: 'Manage Customers',
             restricted: true 
         },
         {
@@ -496,7 +513,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: EmployeeList,
-            access: 'view_employees',
+            access: 'Manage Employees',
             restricted: true 
         },
         {
@@ -505,7 +522,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CreateEmployee,
-            access: 'create_employees',
+            access: 'Manage Employees',
             restricted: true 
         },
         {
@@ -514,7 +531,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: EditEmployee,
-            access: 'update_employees',
+            access: 'Manage Employees',
             restricted: true 
         },
         {
@@ -523,7 +540,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: AccessRights,
-            access: 'manage_access_rights',
+            access: 'Manage Access Rights',
             restricted: true 
         },
         {
@@ -532,7 +549,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CreateAccessRight,
-            access: 'manage_access_rights',
+            access: 'Manage Access Rights',
             restricted: true 
         },
         {
@@ -541,7 +558,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: EditAccessRight,
-            access: 'manage_access_rights',
+            access: 'Manage Access Rights',
             restricted: true 
         },
         {
@@ -550,7 +567,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CustomerOrderTransactions,
-            access: 'view_transactions',
+            access: 'View Transactions',
             restricted: true 
         },
         {
@@ -559,7 +576,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: InvoiceTransactions,
-            access: 'view_transactions',
+            access: 'View Transactions',
             restricted: true 
         },
         {
@@ -568,7 +585,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: PurchaseOrderTransactions,
-            access: 'view_transactions',
+            access: 'View Transactions',
             restricted: true 
         },
         {
@@ -577,7 +594,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: ReceivedStockTransactions,
-            access: 'view_received_stocks',
+            access: 'View Transactions',
             restricted: true 
         },
         {
@@ -586,7 +603,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: Settings,
-            access: 'manage_settings',
+            access: 'Manage Settings',
             restricted: true 
         },
     ]

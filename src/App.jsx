@@ -28,7 +28,9 @@ const App = () =>
 
 				<Route path='/auth/register' exact>
 					<AuthLayout>
-						<RenderRoutes routes={globalPublicRoutes.registerRoute} />
+						<PermissionContext.Provider value={providerUserPermissions}>
+							<RenderRoutes routes={globalPublicRoutes.registerRoute} />
+						</PermissionContext.Provider>
 					</AuthLayout>
 				</Route>
 

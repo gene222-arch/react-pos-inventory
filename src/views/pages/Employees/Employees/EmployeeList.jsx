@@ -129,7 +129,7 @@ const EmployeeList = () =>
                             </Button>
                         </Grid>
                         {
-                            rowIds.length ? (
+                            rowIds.length > 0 && (
                                 <Button 
                                     variant="text" 
                                     color="default" 
@@ -139,10 +139,6 @@ const EmployeeList = () =>
                                     <DeleteIcon /> DELETE
                                 </Button>
                                 ) 
-                                : 
-                                (
-                                    <Button variant="text" className={classes.btn}> Export </Button>
-                                )
                         }
                     </Grid>
                 </CardContent>

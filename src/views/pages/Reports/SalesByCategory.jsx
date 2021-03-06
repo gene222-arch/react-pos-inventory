@@ -27,13 +27,13 @@ const SalesByCategory = () =>
         { field: 'id', hide: true },
         { field: 'category', headerName: 'Category', width: 320 },
         { field: 'items_sold', headerName: 'Items sold', width: 217 },
-        { field: 'sales', headerName: 'Sales', width: 217, valueFormatter: params => params.value.toFixed(2) },
+        { field: 'sales', headerName: 'Sales', width: 217,  },
         { field: 'cost_of_goods_sold', headerName: 'Cost of goods sold', width: 217 },
         { field: 'gross_profit', headerName: 'Gross profit', width: 217,
-            valueFormatter: params => params.value.toFixed(2)
+            
         },
         { field: 'net_sales', headerName: 'Net sales', width: 217,
-        valueFormatter: params => params.value.toFixed(2) },
+         },
     ];
 
     const handleStartDate = (date) => setStartDate(DateHelper.prepareExtractCurDate(date));

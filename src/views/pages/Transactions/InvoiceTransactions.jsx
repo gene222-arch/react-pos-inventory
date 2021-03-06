@@ -186,7 +186,7 @@ const InvoiceTransactions = () =>
             />
             <Card>
                 <CardContent>
-                    <Grid container>
+                    <Grid container alignItems='center'>
                         {
                             rowIds.length ? (
                                 <>

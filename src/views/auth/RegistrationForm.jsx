@@ -1,5 +1,5 @@
   
-import React, { useState, lazy } from 'react';
+import React, { useState, lazy, useContext } from 'react';
 import registerAsync from '../../services/auth/register/register'
 import {prepareSetErrorMessages} from '../../utils/errorMessages.js'
 import * as Cookie from '../../utils/cookies'
@@ -15,6 +15,7 @@ import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { registrationFormUseStyles } from '../../assets/material-styles/styles'
+import { PermissionContext } from './../../hooks/useContext/PermissionContext';
 const AlertPopUpMessage = lazy(() => import('../../components/AlertMessages/AlertPopUpMessage'));
 
 
@@ -43,6 +44,8 @@ const REGISTRATION_DEFAULT_PROPS = {
 
 const RegistrationForm = () => 
 {
+    const {userPermissions, setUserPermissions} = useContext(PermissionContext);
+
     const classes = registrationFormUseStyles();
     const history = useHistory();
     const [loading, setLoading] = useState(false);
@@ -86,7 +89,12 @@ const RegistrationForm = () =>
             setTimeout(() => {
                 if (Cookie.has('access_token'))
                 {
-                    history.push('/');
+                    const {canViewDashboard, permissions} = result.data.data;
+                    setUserPermissions(permissions);
+    
+                    !canViewDashboard 
+                        ? history.push('/pos')
+                        : history.push('/');
                 }
             }, 2000);
         }

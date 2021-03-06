@@ -95,10 +95,12 @@ const LoginForm = () =>
 
             if (Cookie.has('access_token'))
             {
-                const {user, permissions} = result.data.data;
+                const {canViewDashboard, permissions} = result.data.data;
                 setUserPermissions(permissions);
-                
-                history.push('/');
+
+                !canViewDashboard 
+                    ? history.push('/pos')
+                    : history.push('/');
             }
         }
         else 

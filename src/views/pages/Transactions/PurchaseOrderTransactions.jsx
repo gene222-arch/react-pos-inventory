@@ -46,8 +46,9 @@ const PurchaseOrderTransactions = () =>
     
     return (
         <>
-            <div style={{ height: 450, width: '100%' }}>
+            <div style={{ width: '100%' }}>
                 <DataGrid 
+                    autoHeight
                     showToolbar
                     components={{
                         Toolbar: GridToolbar,
@@ -56,7 +57,7 @@ const PurchaseOrderTransactions = () =>
                     rows={po} 
                     columns={columns} 
                     pageSize={5} 
-                    checkboxSelection 
+                    rowsPerPageOptions={[5, 10, 20]}
                     className={classes.dataGrid}
                 />
             </div>

@@ -12,7 +12,7 @@ const OrderDetailsSearchField = ({rowIds, handleAddToCartOnKeyPress, handleOnDel
         <>
             <Card className={classes.deleteBtnContainer}>
                 <Grid container spacing={1} justify='space-between' alignItems='center'>
-                    <Grid item xs={12} sm={12} md={6} lg={8}>
+                    <Grid item xs={12} sm={12} md={10} lg={10}>
                         <TextField
                             id="input-with-icon-textfield"
                             label="Scan barcode"
@@ -23,7 +23,7 @@ const OrderDetailsSearchField = ({rowIds, handleAddToCartOnKeyPress, handleOnDel
                     </Grid>
                     <Grid item xs={12} sm={12} md={2} lg={2}>
                     { 
-                        rowIds.length && (
+                        rowIds.length > 0 && (
                             <Button 
                                 variant="text" 
                                 color="default" 

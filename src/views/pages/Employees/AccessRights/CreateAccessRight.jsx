@@ -52,15 +52,6 @@ const accessRightUseStyles = makeStyles((theme) => ({
     backOfficeIcon: {
         fontSize: '2.5rem'
     },
-    accessRightsCardContainer: {
-        padding: '.5rem',
-        [theme.breakpoints.up('md')]: {
-            width: '50%'
-        },
-        [theme.breakpoints.only('sm')]: {
-            width: '80%'
-        }
-    },
     addBtn: {
         margin: theme.spacing(1),
         backgroundColor: '#4caf50',
@@ -106,7 +97,6 @@ const CreateAccessRight = () =>
     const handleOnChangeAccessRight = (e) =>
     {
         const {name, value, checked} = e.target;
-        let newPermissions = [];
 
         switch (name) 
         {
@@ -115,26 +105,17 @@ const CreateAccessRight = () =>
                 break;
 
             case 'pos':
-                newPermissions = accessRight
-                    .permissions
-                    .filter(permission => permissions.POS.includes(permission));
-
+            
                 setAccessRight({
                     ...accessRight, 
-                    pos: checked,
-                    permissions: newPermissions
+                    pos: checked
                 });
                 break;
 
             case 'back_office':
-                newPermissions = accessRight
-                    .permissions
-                    .filter(permission => permissions.POS.includes(permission));
-
                 setAccessRight({
                     ...accessRight, 
-                    back_office: checked,
-                    permissions: newPermissions
+                    back_office: checked
                 });
                 break;
 
@@ -151,11 +132,12 @@ const CreateAccessRight = () =>
         let currentPermissions = accessRight.permissions;
         const currentIndex = currentPermissions.indexOf(permission);
 
-
         if (currentIndex === -1)
         {
-            currentPermissions.push(permission);
+            currentPermissions = [...currentPermissions, permission];
 
+            console.log(currentPermissions)
+        
             setAccessRight({
                 ...accessRight, 
                 permissions: currentPermissions
@@ -170,8 +152,6 @@ const CreateAccessRight = () =>
                 permissions: currentPermissions
             });
         }
-
-        console.log(currentPermissions)
     }
 
 
@@ -189,8 +169,33 @@ const CreateAccessRight = () =>
 
     const createAccessRight = async () => 
     {
+        let newPermissions = accessRight.permissions;
+
+        console.log(permissions)
+        if (!accessRight.pos)
+        {
+            const posPermissions = permissions.POS.map(per => per.permission);
+
+            newPermissions = accessRight
+                .permissions
+                .filter(permission => !posPermissions.includes(permission));
+        }
+
+        if (!accessRight.back_office)
+        {
+            const backOfficePermissions = permissions.backOffice.map(per => per.permission);
+
+            newPermissions = accessRight
+                .permissions
+                .filter(permission => !backOfficePermissions.includes(permission));
+        }
+
+        
         setLoading(true);
-        const result = await AccessRight_.storeAsync(accessRight);
+        const result = await AccessRight_.storeAsync({
+            ...accessRight,
+            permissions: newPermissions
+        });
 
         if (result.status === 'Error')
         {
@@ -227,127 +232,134 @@ const CreateAccessRight = () =>
                 globalMessage={alertMessage}
                 severity={alertSeverity} 
             />
-            <Card className={classes.accessRightsCardContainer}>
-                <CardContent>
-                    <Grid container spacing={4}>
-                        <Grid item xs={12} sm={12} md={12} lg={12}>
-                            <TextField
-                                error={Boolean(errorMessage.role)}
-                                helperText={errorMessage.role}
-                                name="role"
-                                label="Role"
-                                fullWidth
-                                margin='dense'
-                                value={accessRight.role}
-                                onChange={handleOnChangeAccessRight}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={12} lg={12}>
-                            <Grid container spacing={1} alignItems='center' justify='center'>
-                                <Grid item xs={2} sm={2} md={2} lg={2}>
-                                    <Avatar className={classes.posIconContainer}>
-                                        <POSIcon className={classes.posIcon}/>
-                                    </Avatar>
-                                </Grid>
-                                <Grid item xs={8} sm={8} md={8} lg={8}>
-                                    <ListItemText primary='POS' secondary='Access right list to Point of Sale System'/>
-                                </Grid>
-                                <Grid item xs={2} sm={2} md={2} lg={2}>
-                                    <Switch 
-                                        checked={accessRight.pos} 
-                                        onChange={handleOnChangeAccessRight} 
-                                        name='POS' 
-                                    />                                  
-                                </Grid>
-                                <Grid item xs={12} sm={8} md={8} lg={8}>
-                                    <FormControl component="fieldset">
-                                        <FormGroup aria-label="position">
-                                            {
-                                                (accessRight.pos && permissions.POS.length) && 
-                                                permissions.POS.map((pos, index) => (
-                                                    <FormControlLabel
-                                                        key={index} 
-                                                        value={pos.permission}
-                                                        control={<Checkbox color="primary" />}
-                                                        label={pos.permission}
-                                                        labelPlacement="end"
-                                                        onChange={handlePermissionsOnChange}
-                                                    />
-                                                ))
-                                            }
-                                        </FormGroup>
-                                    </FormControl>  
-                                </Grid>
-                            </Grid>
-
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={12} lg={12}>
-                            <Grid container spacing={1} alignItems='center' justify='center'>
-                                <Grid item xs={2} sm={2} md={2} lg={2}>
-                                    <Avatar className={classes.backOfficeIconContainer}>
-                                        <BackOfficeIcon className={classes.backOfficeIcon}/>
-                                    </Avatar>
-                                </Grid>
-                                <Grid item xs={8} sm={8} md={8} lg={8}>
-                                    <ListItemText primary='Back office' secondary=' Access right list to Back office.'/>
-                                </Grid>
-                                <Grid item xs={2} sm={2} md={2} lg={2}>
-                                    <Switch 
-                                        checked={accessRight.back_office} 
-                                        onChange={handleOnChangeAccessRight} 
-                                        name='backOffice' 
+            <Grid container spacing={1}>
+                <Grid item xs={12} sm={12} md={6} lg={6}>
+                    <Card className={classes.accessRightsCardContainer}>
+                        <CardContent>
+                            <Grid container spacing={4}>
+                                <Grid item xs={12} sm={12} md={12} lg={12}>
+                                    <TextField
+                                        error={Boolean(errorMessage.role)}
+                                        helperText={errorMessage.role}
+                                        name="role"
+                                        label="Role"
+                                        fullWidth
+                                        margin='dense'
+                                        value={accessRight.role}
+                                        onChange={handleOnChangeAccessRight}
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={8} md={8} lg={8}>
-                                    <FormControl component="fieldset">
-                                        <FormGroup aria-label="position">
-                                            {
-                                                (accessRight.back_office && permissions.backOffice.length) &&
-                                                permissions.backOffice.map((bo, index) => (
-                                                    <FormControlLabel
-                                                        key={index}
-                                                        value={bo.permission}
-                                                        control={<Checkbox color="primary" />}
-                                                        label={bo.permission}
-                                                        labelPlacement="end"
-                                                        onChange={handlePermissionsOnChange}
-                                                    />
-                                                ))
-                                            }
-                                        </FormGroup>
-                                    </FormControl>  
+                                <Grid item xs={12} sm={12} md={12} lg={12}>
+                                    <Grid container spacing={1} alignItems='center' justify='center'>
+                                        <Grid item xs={2} sm={2} md={2} lg={2}>
+                                            <Avatar className={classes.posIconContainer}>
+                                                <POSIcon className={classes.posIcon}/>
+                                            </Avatar>
+                                        </Grid>
+                                        <Grid item xs={8} sm={8} md={8} lg={8}>
+                                            <ListItemText primary='POS' secondary='Access right list to Point of Sale System'/>
+                                        </Grid>
+                                        <Grid item xs={2} sm={2} md={2} lg={2}>
+                                            <Switch 
+                                                checked={accessRight.pos} 
+                                                onChange={handleOnChangeAccessRight} 
+                                                name='pos' 
+                                            />                                  
+                                        </Grid>
+                                        <Grid item xs={12} sm={8} md={8} lg={8}>
+                                            <FormControl component="fieldset">
+                                                <FormGroup aria-label="position">
+                                                    {
+                                                        (accessRight.pos && permissions.POS.length) && 
+                                                        permissions.POS.map((pos) => (
+                                                            <FormControlLabel
+                                                                key={pos.id} 
+                                                                checked={accessRight.permissions.includes(pos.permission)}
+                                                                value={pos.permission}
+                                                                control={<Checkbox color="primary" />}
+                                                                label={pos.permission}
+                                                                labelPlacement="end"
+                                                                onChange={handlePermissionsOnChange}
+                                                            />
+                                                        ))
+                                                    }
+                                                </FormGroup>
+                                            </FormControl>  
+                                        </Grid>
+                                    </Grid>
+
+                                </Grid>
+                                <Grid item xs={12} sm={12} md={12} lg={12}>
+                                    <Grid container spacing={1} alignItems='center' justify='center'>
+                                        <Grid item xs={2} sm={2} md={2} lg={2}>
+                                            <Avatar className={classes.backOfficeIconContainer}>
+                                                <BackOfficeIcon className={classes.backOfficeIcon}/>
+                                            </Avatar>
+                                        </Grid>
+                                        <Grid item xs={8} sm={8} md={8} lg={8}>
+                                            <ListItemText primary='Back office' secondary=' Access right list to Back office.'/>
+                                        </Grid>
+                                        <Grid item xs={2} sm={2} md={2} lg={2}>
+                                            <Switch 
+                                                checked={accessRight.back_office} 
+                                                onChange={handleOnChangeAccessRight} 
+                                                name='back_office' 
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={8} md={8} lg={8}>
+                                            <FormControl component="fieldset">
+                                                <FormGroup aria-label="position">
+                                                    {
+                                                        (accessRight.back_office && permissions.backOffice.length) &&
+                                                        permissions.backOffice.map((bo) => (
+                                                            <FormControlLabel
+                                                                key={bo.id}
+                                                                checked={accessRight.permissions.includes(bo.permission)}
+                                                                value={bo.permission}
+                                                                control={<Checkbox color="primary" />}
+                                                                label={bo.permission}
+                                                                labelPlacement="end"
+                                                                onChange={handlePermissionsOnChange}
+                                                            />
+                                                        ))
+                                                    }
+                                                </FormGroup>
+                                            </FormControl>  
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
                             </Grid>
+                        </CardContent>
+                        
+                        <Divider className={classes.divider}/>
+                        <Grid container justify='flex-end'>
+                            <Grid item>
+                                <Button 
+                                    variant='contained' 
+                                    color="default" 
+                                    className={classes.cancelBtn}
+                                    onClick={() => history.push('/employees/access-rights')}
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button 
+                                    variant='contained' 
+                                    color="default" 
+                                    className={classes.addBtn}
+                                    onClick={createAccessRight}
+                                    disabled={loading}
+                                >
+                                    Create
+                                </Button>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </CardContent>
-                
-                <Divider className={classes.divider}/>
-                <Grid container justify='flex-end'>
-                    <Grid item>
-                        <Button 
-                            variant='contained' 
-                            color="default" 
-                            className={classes.cancelBtn}
-                            onClick={() => history.push('/employee')}
-                            disabled={loading}
-                        >
-                            Cancel
-                        </Button>
-                    </Grid>
-                    <Grid item>
-                        <Button 
-                            variant='contained' 
-                            color="default" 
-                            className={classes.addBtn}
-                            onClick={createAccessRight}
-                            disabled={loading}
-                        >
-                            Create
-                        </Button>
-                    </Grid>
+                    </Card>
+                                    
                 </Grid>
-            </Card>
+            </Grid>
         </>
     )
 }

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { fetchAuthUser } from './../../services/auth/auth';
+import { fetchAllAsync } from './../../services/roles-permissions/permissions';
 import {logoutAsync} from '../../services/auth/login/login'
 import { NavLink, useHistory } from 'react-router-dom'
 import clsx from 'clsx';
@@ -34,22 +36,23 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import TransactionsIcon from '@material-ui/icons/ThumbsUpDown';
 import SalesReturnsIcon from '@material-ui/icons/RemoveShoppingCart';
+import ReceiptIcon from '@material-ui/icons/Receipt';
+import UserIcon from '@material-ui/icons/AccountBox';
 import { AdminLayoutUseStyles } from '../../assets/material-styles/styles'
 import * as Cookie from '../../utils/cookies'
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { PermissionContext } from './../../hooks/useContext/PermissionContext';
+import Grid from '@material-ui/core/Grid'
+
+
 
 
 const MainLayout = ({children}) => 
 {
-    const {userPermissions, setUserPermissions } = useContext(PermissionContext);
-
-
-// Styling
     const classes = AdminLayoutUseStyles();
     const theme = useTheme();
     const history = useHistory();
 
-// Buttons
     const [open, setOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const openAccountMenu = Boolean(anchorEl);
@@ -58,13 +61,39 @@ const MainLayout = ({children}) =>
     const [openProduct, setOpenProduct] = useState(false);
     const [openEmployees, setOpenEmployees] = useState(false);
     const [ openTransactions, setOpenTransactions ] = useState(false);
-    const [ selectedItem, setSelectedItem ] = useState('Dashboard');
-    const [ selectedMenu, setSelectedMenu ] = useState('');
+    const [ selectedItem, setSelectedItem ] = useState(localStorage.getItem('selectedItem') || 'Dashboard');
+    const [ selectedDropdown, setSelectedDropdown ] = useState('');
 
-// 
+    /**
+     * User
+     */
+    const {userPermissions, setUserPermissions } = useContext(PermissionContext);
     const [auth, setAuth] = useState(true);
+    const [role, setRole] = useState('');
+    const [user, setUser] = useState({
+        name: ''
+    });
 
-    const userHasPermissionTo = (permission) => userPermissions.includes(permission);
+    const userHasPermissionTo = (permission) => {
+        if (Array.isArray(permission))
+        {
+            let isAnyPermissionFound = false;
+
+            permission.forEach(per => {
+                const hasPermission = userPermissions.includes(per);
+                if (hasPermission)
+                {
+                    isAnyPermissionFound = true;
+                }
+            });
+
+            return isAnyPermissionFound;
+        }
+        else 
+        {
+            return userPermissions.includes(permission);
+        }
+    };
 
     const handleDrawerOpen = () => setOpen(true);
 
@@ -76,77 +105,126 @@ const MainLayout = ({children}) =>
 
     const handleOpenReportDropdown = (path) => 
     {
+        handleDrawerOpen();
         setOpenReport(!openReport);
-        setSelectedMenu(path);
-        closeDropdownExcept(path);
+        closeDropDownExcept(path);
+        setSelectedDropdown(path);
     }; 
 
     const handleOpenProductDropdown = (path) => 
     {
+        handleDrawerOpen();
         setOpenProduct(!openProduct);
-        setSelectedMenu(path);
-        closeDropdownExcept(path);
+        closeDropDownExcept(path);
+        setSelectedDropdown(path);
     }; 
 
     const handleOpenInventoryMngmtDropdown = (path) => 
     {
+        handleDrawerOpen();
         setOpenInventoryMngmt(!openInventoryMngmt);
-        setSelectedMenu(path);
-        closeDropdownExcept(path);
+        closeDropDownExcept(path);
+        setSelectedDropdown(path);
     }; 
 
     const handleOpenEmployeesDropdown = (path) => 
     {
+        handleDrawerOpen();
         setOpenEmployees(!openEmployees);
-        setSelectedMenu(path);
-        closeDropdownExcept(path);
+        closeDropDownExcept(path);
+        setSelectedDropdown(path);
     }; 
 
     const handleOpenTransactionsDropdown = (path) => 
     {
+        handleDrawerOpen();
         setOpenTransactions(!openTransactions);
-        setSelectedMenu(path);
-        closeDropdownExcept(path);
+        closeDropDownExcept(path);
+        setSelectedDropdown(path);
     }; 
 
-    const handleSelectedMenu = (menuName) => {
-        setSelectedItem('');
-        setSelectedMenu(menuName);
-        closeDropdownExcept(menuName);
+    const handleSelectedItem = (selectedItemName, selectedItemDropDown) => 
+    {
+        localStorage.setItem('selectedItem', selectedItemName);
+
+        if (selectedItemDropDown)
+        {
+            handleDrawerOpen();
+        }
+        setSelectedItem(selectedItemName);
+        closeDropDownExcept(selectedItemDropDown);
     };
 
-    const handleSelectedItem = (selectedItemName) => setSelectedItem(selectedItemName);
-
-    const closeDropdownExcept = (path) => {
-        
-        setSelectedItem('');
-
+    const closeDropDownExcept = (path) => 
+    {
         switch (path) {
             case 'Report':
                 setOpenProduct(false);
                 setOpenInventoryMngmt(false);
                 setOpenEmployees(false);
+                setOpenTransactions(false);
                 break;
-            case 'Product': 
+
+            case 'Product':
                 setOpenReport(false);
                 setOpenInventoryMngmt(false);
                 setOpenEmployees(false);
+                setOpenTransactions(false);
                 break;
+
             case 'Inventory Management':
                 setOpenReport(false);
                 setOpenProduct(false);
                 setOpenEmployees(false);
+                setOpenTransactions(false);            
                 break;
+
             case 'Employees':
                 setOpenReport(false);
                 setOpenProduct(false);
                 setOpenInventoryMngmt(false);
+                setOpenTransactions(false);            
                 break;
-            default:                
+
+            case 'Transactions':
+                setOpenReport(false);
+                setOpenProduct(false);
+                setOpenInventoryMngmt(false);
+                setOpenEmployees(false);       
+                break;
+        
+            default:
                 setOpenReport(false);
                 setOpenProduct(false);
                 setOpenInventoryMngmt(false);
                 setOpenEmployees(false);
+                setOpenTransactions(false);
+                break;
+        }
+    }
+
+    const openDropDownExcept = (path) => 
+    {
+        switch (path) {
+            case 'Report':
+                setOpenReport(true);
+                break;
+
+            case 'Product':
+                setOpenProduct(true);
+                break;
+
+            case 'Inventory Management':
+                setOpenInventoryMngmt(true);      
+                break;
+
+            case 'Employees':
+                setOpenEmployees(true);          
+                break;
+
+            case 'Transactions':
+                setOpenTransactions(true);      
+                break;
         }
     }
 
@@ -167,10 +245,38 @@ const MainLayout = ({children}) =>
     }
 
 
-    useEffect(() => {
-        if (open === false) 
+    const fetchAuthenticatedUser = async () => 
+    {
+        const result = await fetchAuthUser();
+  
+        if (result.status === 'Success')
         {
-            closeDropdownExcept('');
+            const {user, role, permissions} = result.data;
+
+            setUser(user)
+            setRole(role);
+            setUserPermissions(permissions)
+        }
+    }
+
+
+
+    useEffect(() => {
+
+        if (Cookie.has('access_token'))
+        {
+            fetchAuthenticatedUser();
+        }
+    }, [])
+
+    useEffect(() => {
+        if (!open)
+        {
+            closeDropDownExcept('');
+        }
+        else 
+        {
+            openDropDownExcept(selectedDropdown);
         }
     }, [open]);
 
@@ -197,7 +303,7 @@ const MainLayout = ({children}) =>
                     <MenuIcon />
                     </IconButton>
                     <Typography variant='h5' noWrap className={classes.title}>
-                        {selectedItem || selectedMenu}
+                        {selectedItem}
                     </Typography>
                     {auth && (
                         <div>
@@ -208,7 +314,7 @@ const MainLayout = ({children}) =>
                                 onClick={handleMenu}
                                 color="inherit"
                             >
-                                <AccountCircle />
+                                <MoreVertIcon />
                             </IconButton>
                             <Menu
                                 id="menu-appbar"
@@ -248,103 +354,124 @@ const MainLayout = ({children}) =>
                 }}
             >
                 <div className={classes.toolbar}>
-                    <IconButton onClick={handleDrawerClose}>
-                    {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                    </IconButton>
+                    <Grid container spacing={1} alignItems='center' justify='space-between'>
+                        <Grid item xs={2} sm={2} md={2} lg={2}>
+                            <UserIcon />
+                        </Grid>
+                        <Grid item xs={8} sm={8} md={8} lg={8}>
+                            <ListItemText primary={user.name} secondary={role} />
+                        </Grid>
+                        <Grid item xs={2} sm={2} md={2} lg={2}>
+                            <IconButton onClick={handleDrawerClose}>
+                                {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                            </IconButton>
+                        </Grid>
+                    </Grid>
+                    
                 </div>
 
                 <Divider />
 
                 <List>
                 {/* Dashboard */}
-                    <NavLink className={classes.navLinks} to={'/'}>
-                        <ListItem 
-                            selected={ selectedMenu === 'Dashboard' }
-                            onClick={ () => handleSelectedMenu( 'Dashboard') }
-                            button
-                        >
-                            <ListItemIcon><Dashboard className={classes.dashboard}/></ListItemIcon>
-                            <ListItemText primary={
-                                <Typography variant='subtitle1' className={classes.dropdownTitle}>
-                                    Dashboard
-                                </Typography>} 
-                            />
-                        </ListItem>
-                    </NavLink>
+                    {
+                        userHasPermissionTo('View Dashboard') && (
+                            <NavLink className={classes.navLinks} to={'/'}>
+                                <ListItem 
+                                    selected={ selectedItem === 'Dashboard' }
+                                    onClick={ () => handleSelectedItem( 'Dashboard') }
+                                    button
+                                >
+                                    <ListItemIcon><Dashboard className={classes.dashboard}/></ListItemIcon>
+                                    <ListItemText primary={
+                                        <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                                            Dashboard
+                                        </Typography>} 
+                                    />
+                                </ListItem>
+                            </NavLink>
+                        )
+                    }
 
                 {/* Report */}
-                    <ListItem 
-                        onClick={() => handleOpenReportDropdown('Report')}
-                        selected={selectedMenu === 'Report'}
-                        button
-                    >
-                            <ListItemIcon><Report className={classes.reports}/></ListItemIcon>
-                            <ListItemText primary={
-                                <Typography variant='subtitle1' className={classes.dropdownTitle}>
-                                    Report
-                                </Typography>} />
-                            {openReport ? <ExpandLess /> : <ExpandMore />}
-                    </ListItem>
-                    <Collapse in={openReport} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding>
-
-                            {/* Sales by item */}
-                            <NavLink className={classes.navLinks} to={'/reports/sales-by-item'}>
+                    {
+                        userHasPermissionTo('View Reports') && (
+                            <>
                                 <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Sales by item' }
-                                    onClick={ e => handleSelectedItem( 'Sales by item') }
+                                    onClick={() => handleOpenReportDropdown('Report')}
+                                    selected={selectedItem === 'Report'}
+                                    button
                                 >
-                                    <ListItemText primary="Sales by item" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>
-
-                            {/* Sales by category */}
-                            <NavLink className={classes.navLinks} to={'/reports/sales-by-category'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Sales by category' }
-                                    onClick={ e => handleSelectedItem( 'Sales by category') }
-                                >
-                                    <ListItemText primary="Sales by category" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>
-
-                            {/* Sales by employee */}
-                            <NavLink className={classes.navLinks} to={'/reports/sales-by-employee'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Sales by employee' }
-                                    onClick={ e => handleSelectedItem( 'Sales by employee') }
-                                >
-                                    <ListItemText primary="Sales by employee" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>
-                            {/* Sales by payment type */}
-                            <NavLink className={classes.navLinks} to={'/reports/sales-by-payment-type'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Sales by payment type' }
-                                    onClick={ e => handleSelectedItem( 'Sales by payment type') }
-                                >
-                                    <ListItemText primary="Sales by payment type" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>
-                        </List>
-                    </Collapse>   
+                                    <ListItemIcon><Report className={classes.reports}/></ListItemIcon>
+                                    <ListItemText primary={
+                                        <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                                            Report
+                                        </Typography>} />
+                                    {openReport ? <ExpandLess /> : <ExpandMore />}
+                            </ListItem>
+                            <Collapse in={openReport} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
+        
+                                    {/* Sales by item */}
+                                    <NavLink className={classes.navLinks} to={'/reports/sales-by-item'}>
+                                        <ListItem 
+                                            button 
+                                            className={classes.dropdownLists} 
+                                            selected={ selectedItem === 'Sales by item' }
+                                            onClick={ e => handleSelectedItem( 'Sales by item', 'Report') }
+                                        >
+                                            <ListItemText primary="Sales by item" className={classes.dropDownItem}/>
+                                        </ListItem>
+                                    </NavLink>
+        
+                                    {/* Sales by category */}
+                                    <NavLink className={classes.navLinks} to={'/reports/sales-by-category'}>
+                                        <ListItem 
+                                            button 
+                                            className={classes.dropdownLists} 
+                                            selected={ selectedItem === 'Sales by category' }
+                                            onClick={ e => handleSelectedItem( 'Sales by category', 'Report') }
+                                        >
+                                            <ListItemText primary="Sales by category" className={classes.dropDownItem}/>
+                                        </ListItem>
+                                    </NavLink>
+        
+                                    {/* Sales by employee */}
+                                    <NavLink className={classes.navLinks} to={'/reports/sales-by-employee'}>
+                                        <ListItem 
+                                            button 
+                                            className={classes.dropdownLists} 
+                                            selected={ selectedItem === 'Sales by employee' }
+                                            onClick={ e => handleSelectedItem( 'Sales by employee', 'Report') }
+                                        >
+                                            <ListItemText primary="Sales by employee" className={classes.dropDownItem}/>
+                                        </ListItem>
+                                    </NavLink>
+                                    {/* Sales by payment type */}
+                                    <NavLink className={classes.navLinks} to={'/reports/sales-by-payment-type'}>
+                                        <ListItem 
+                                            button 
+                                            className={classes.dropdownLists} 
+                                            selected={ selectedItem === 'Sales by payment type' }
+                                            onClick={ e => handleSelectedItem( 'Sales by payment type', 'Report') }
+                                        >
+                                            <ListItemText primary="Sales by payment type" className={classes.dropDownItem}/>
+                                        </ListItem>
+                                    </NavLink>
+                                </List>
+                            </Collapse>   
+                        </>
+                        )
+                    }
                 {/* End of Report */}
 
                 {/* Pos */}
                 {
-                    !userHasPermissionTo('manage_pos') && (
+                    userHasPermissionTo('Manage POS') && (
                         <NavLink className={classes.navLinks} to={'/pos'}>
                             <ListItem 
-                                selected={ selectedMenu === 'POS' }
-                                onClick={ () => handleSelectedMenu( 'POS') }
+                                selected={ selectedItem === 'POS' }
+                                onClick={ () => handleSelectedItem( 'POS') }
                                 button>
                                 <ListItemIcon><Pos /></ListItemIcon>
                                 <ListItemText primary={
@@ -356,156 +483,231 @@ const MainLayout = ({children}) =>
                     )
                 }
                 {/* End of Pos */}
+                
+                {/* Receipt */}
+                {
+                    userHasPermissionTo('View All Receipts') && (
+                        <NavLink className={classes.navLinks} to={'/receipts'}>
+                            <ListItem 
+                                selected={ selectedItem === 'Receipts' }
+                                onClick={ () => handleSelectedItem( 'Receipts') }
+                                button>
+                                <ListItemIcon><ReceiptIcon /></ListItemIcon>
+                                <ListItemText primary={
+                                    <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                                        Receipts
+                                    </Typography>} className={classes.pos}/>
+                            </ListItem>
+                        </NavLink>
+                    )
+                }
+                {/* End of Receipt */}
 
                 {/* Product */}
-                    <ListItem 
-                        onClick={() => handleOpenProductDropdown('Product')}
-                        selected={selectedMenu === 'Product'}
-                        button
-                    >
-                        <ListItemIcon><Product className={classes.product}/></ListItemIcon>
-                        <ListItemText primary={
-                            <Typography variant='subtitle1' className={classes.dropdownTitle}>
-                                Product
-                            </Typography>} />
-                        {openProduct ? <ExpandLess /> : <ExpandMore />}
-                    </ListItem>
-                    <Collapse in={openProduct} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding>
+                {
+                    userHasPermissionTo([
+                        'Manage Products',
+                        'Manage Categories',
+                        'Manage Discounts'
+                    ]) && (
+                        <>                  
+                            <ListItem 
+                                onClick={() => handleOpenProductDropdown('Product')}
+                                selected={selectedItem === 'Product'}
+                                button
+                            >
+                                <ListItemIcon><Product className={classes.product}/></ListItemIcon>
+                                <ListItemText primary={
+                                    <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                                        Product
+                                    </Typography>} />
+                                {openProduct ? <ExpandLess /> : <ExpandMore />}
+                            </ListItem>
+                            <Collapse in={openProduct} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
 
-                            {/*Products */}
-                            <NavLink className={classes.navLinks} to={'/products'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Products' }
-                                    onClick={ e => handleSelectedItem('Products') }
-                                >
-                                    <ListItemText primary="Products" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>
+                                    {/*Products */}
+                                    {
+                                        userHasPermissionTo('Manage Products') && (
+                                            <NavLink className={classes.navLinks} to={'/products'}>
+                                                <ListItem 
+                                                    button 
+                                                    className={classes.dropdownLists} 
+                                                    selected={ selectedItem === 'Products' }
+                                                    onClick={ e => handleSelectedItem('Products', 'Product') }
+                                                >
+                                                    <ListItemText primary="Products" className={classes.dropDownItem}/>
+                                                </ListItem>
+                                            </NavLink>
+                                        )
+                                    }
 
-                            {/* Categories */}
-                            <NavLink className={classes.navLinks} to={'/products/categories'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Categories' }
-                                    onClick={ e => handleSelectedItem( 'Categories') }
-                                >
-                                    <ListItemText primary="Categories" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>
+                                    {/* Categories */}
+                                    {
+                                        userHasPermissionTo('Manage Categories') && (
+                                            <NavLink className={classes.navLinks} to={'/products/categories'}>
+                                                <ListItem 
+                                                    button 
+                                                    className={classes.dropdownLists} 
+                                                    selected={ selectedItem === 'Categories' }
+                                                    onClick={ e => handleSelectedItem( 'Categories', 'Product') }
+                                                >
+                                                    <ListItemText primary="Categories" className={classes.dropDownItem}/>
+                                                </ListItem>
+                                            </NavLink>
+                                        )
+                                    }
 
-                            {/* Discounts */}
-                            <NavLink className={classes.navLinks} to={'/products/discounts'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Discounts' }
-                                    onClick={ e => handleSelectedItem( 'Discounts') }
-                                >
-                                    <ListItemText primary="Discounts" className={classes.dropDownItem}/>
-                                </ListItem>    
-                            </NavLink>                
-                        </List>
-                    </Collapse>   
+                                    {/* Discounts */}
+                                    {
+                                        userHasPermissionTo('Manage Discounts') && (
+                                            <NavLink className={classes.navLinks} to={'/products/discounts'}>
+                                                <ListItem 
+                                                    button 
+                                                    className={classes.dropdownLists} 
+                                                    selected={ selectedItem === 'Discounts' }
+                                                    onClick={ e => handleSelectedItem( 'Discounts', 'Product') }
+                                                >
+                                                    <ListItemText primary="Discounts" className={classes.dropDownItem}/>
+                                                </ListItem>    
+                                            </NavLink>   
+                                        )
+                                    }             
+                                </List>
+                            </Collapse>   
+                
+                        </>
+                    )
+                }
                 {/* End of Product */}
 
                 {/* Inventory Management */}
-                    <ListItem 
-                        onClick={() => handleOpenInventoryMngmtDropdown('Inventory Management')}
-                        selected={selectedMenu === 'Inventory Management'}
-                        button
-                    >
-                        <ListItemIcon>
-                            <InventoryManagement className={classes.inventoryMngmt}/>
-                        </ListItemIcon>
-                        <ListItemText primary={
-                            <Typography variant='subtitle1' className={classes.dropdownTitle}>
-                                Inventory Management
-                            </Typography>} />
-                        {openInventoryMngmt ? <ExpandLess /> : <ExpandMore />}
-                    </ListItem>
-
-                    <Collapse in={openInventoryMngmt} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding>
-
-                            {/*Purchase Orders */}
-                            <NavLink className={classes.navLinks} to={'/inventory-mngmt/purchase-orders'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Purchase Orders' }
-                                    onClick={ 
-                                        e => handleSelectedItem( 'Purchase Orders') 
-                                    }
-                                >
-                                    <ListItemText primary="Purchase Orders" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>
-
-
-                            {/* Suppliers */}
-                            <NavLink className={classes.navLinks} to={'/inventory-mngmt/suppliers'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Suppliers' }
-                                    onClick={ 
-                                        e => handleSelectedItem( 'Suppliers') 
-                                    }
-                                >
-                                    <ListItemText primary="Suppliers" className={classes.dropDownItem}/>
-                                </ListItem>  
-                            </NavLink> 
-
-                            {/*Bad Orders */}
-                            <NavLink className={classes.navLinks} to={'/inventory-mngmt/bad-orders'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Bad Orders' }
-                                    onClick={ 
-                                        e => handleSelectedItem( 'Bad Orders') 
-                                    }
-                                >
-                                    <ListItemText primary="Bad Orders" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>
-
-                            {/* Stock Adjustments */}
-                            <NavLink className={classes.navLinks} to={'/inventory-mngmt/stock-adjustments'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Stock Adjustments' }
-                                    onClick={ 
-                                        e => handleSelectedItem( 'Stock Adjustments') 
-                                    }
-                                >
-                                    <ListItemText primary="Stock Adjustments" className={classes.dropDownItem}/>
-                                </ListItem>  
-                            </NavLink> 
- 
-                        </List>
-                    </Collapse>   
-
-                    {/* Sales Returns */}
-                    <NavLink className={classes.navLinks} to={'/sales-returns'}>
-                            <ListItem 
-                            selected={ selectedMenu === 'Sales Returns' }
-                            onClick={ 
-                                () => handleSelectedMenu( 'Sales Returns') 
-                            }
-                            button>
-                            <ListItemIcon><SalesReturnsIcon className={classes.salesReturnsIcon}/></ListItemIcon>
+                {
+                    userHasPermissionTo([
+                        'Manage Purchase Orders',
+                        'Manage Bad Orders',
+                        'Manage Suppliers',
+                        'Manage Stock Adjustments'
+                    ]) && (
+                        <>
+                        <ListItem 
+                            onClick={() => handleOpenInventoryMngmtDropdown('Inventory Management')}
+                            selected={selectedItem === 'Inventory Management'}
+                            button
+                        >
+                            <ListItemIcon>
+                                <InventoryManagement className={classes.inventoryMngmt}/>
+                            </ListItemIcon>
                             <ListItemText primary={
                                 <Typography variant='subtitle1' className={classes.dropdownTitle}>
-                                    Sales Returns
+                                    Inventory Management
                                 </Typography>} />
+                            {openInventoryMngmt ? <ExpandLess /> : <ExpandMore />}
                         </ListItem>
-                    </NavLink>                
+
+                        <Collapse in={openInventoryMngmt} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+
+                                {/*Purchase Orders */}
+                                {
+                                    userHasPermissionTo('Manage Purchase Orders') && (
+                                        <NavLink className={classes.navLinks} to={'/inventory-mngmt/purchase-orders'}>
+                                            <ListItem 
+                                                button 
+                                                className={classes.dropdownLists} 
+                                                selected={ selectedItem === 'Purchase Orders' }
+                                                onClick={ 
+                                                    e => handleSelectedItem( 'Purchase Orders', 'Inventory Management') 
+                                                }
+                                            >
+                                                <ListItemText primary="Purchase Orders" className={classes.dropDownItem}/>
+                                            </ListItem>
+                                        </NavLink>
+                                    )
+                                }
+
+
+                                {/* Suppliers */}
+                                {
+                                    userHasPermissionTo('Manage Suppliers') && (
+                                        <NavLink className={classes.navLinks} to={'/inventory-mngmt/suppliers'}>
+                                            <ListItem 
+                                                button 
+                                                className={classes.dropdownLists} 
+                                                selected={ selectedItem === 'Suppliers' }
+                                                onClick={ 
+                                                    e => handleSelectedItem( 'Suppliers', 'Inventory Management') 
+                                                }
+                                            >
+                                                <ListItemText primary="Suppliers" className={classes.dropDownItem}/>
+                                            </ListItem>  
+                                        </NavLink> 
+                                    )
+                                }
+
+                                {/*Bad Orders */}
+                                {
+                                    userHasPermissionTo('Manage Bad Orders') && (
+                                        <NavLink className={classes.navLinks} to={'/inventory-mngmt/bad-orders'}>
+                                            <ListItem 
+                                                button 
+                                                className={classes.dropdownLists} 
+                                                selected={ selectedItem === 'Bad Orders' }
+                                                onClick={ 
+                                                    e => handleSelectedItem( 'Bad Orders', 'Inventory Management') 
+                                                }
+                                            >
+                                                <ListItemText primary="Bad Orders" className={classes.dropDownItem}/>
+                                            </ListItem>
+                                        </NavLink>
+                                    )
+                                }
+
+                                {/* Stock Adjustments */}
+                                {
+                                    userHasPermissionTo('Manage Stock Adjustments') && (
+                                        <NavLink className={classes.navLinks} to={'/inventory-mngmt/stock-adjustments'}>
+                                            <ListItem 
+                                                button 
+                                                className={classes.dropdownLists} 
+                                                selected={ selectedItem === 'Stock Adjustments' }
+                                                onClick={ 
+                                                    e => handleSelectedItem( 'Stock Adjustments', 'Inventory Management') 
+                                                }
+                                            >
+                                                <ListItemText primary="Stock Adjustments" className={classes.dropDownItem}/>
+                                            </ListItem>  
+                                        </NavLink> 
+                                    )
+                                }
+    
+                            </List>
+                        </Collapse>   
+
+                        </>
+                    )
+                }
+
+                    {/* Sales Returns */}
+                    {
+                        userHasPermissionTo('Manage Sales Returns') && (
+                            <NavLink className={classes.navLinks} to={'/sales-returns'}>
+                                <ListItem 
+                                    selected={ selectedItem === 'Sales Returns' }
+                                    onClick={ 
+                                        () => handleSelectedItem( 'Sales Returns') 
+                                    }
+                                    button
+                                >
+                                    <ListItemIcon><SalesReturnsIcon className={classes.salesReturnsIcon}/></ListItemIcon>
+                                    <ListItemText primary={
+                                        <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                                            Sales Returns
+                                        </Typography>} />
+                                </ListItem>
+                            </NavLink>   
+                        )
+                    }             
                 </List>
                 {/* End of Inventory Management */}
                     <Divider />
@@ -513,161 +715,195 @@ const MainLayout = ({children}) =>
                 <List>
                 
                 {/* Customer */}
-                    <NavLink className={classes.navLinks} to={'/customers'}>
-                        <ListItem 
-                            selected={ selectedMenu === 'Customers' }
-                            onClick={ 
-                                () => handleSelectedMenu( 'Customers') 
-                            }
-                            button>
-                            <ListItemIcon><Customer className={classes.customers}/></ListItemIcon>
-                            <ListItemText primary={
-                                <Typography variant='subtitle1' className={classes.dropdownTitle}>
-                                    Customers
-                                </Typography>} />
-                        </ListItem>
-                    </NavLink>
-                {/* Employees */}
-                    <ListItem 
-                        onClick={() => handleOpenEmployeesDropdown('Employees')}
-                        selected={selectedMenu === 'Employees'}
-                        classes={{ 
-                            
-                        }}
-                        button
-                    >
-                        <ListItemIcon><Employee className={classes.employees}/></ListItemIcon>
-                        <ListItemText primary={
-                            <Typography variant='subtitle1' className={classes.dropdownTitle}>
-                                Employees
-                            </Typography>} />
-                        {openEmployees ? <ExpandLess /> : <ExpandMore />}
-                    </ListItem>
-                    <Collapse in={openEmployees} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding>
-
-                            {/*Employee list */}
-                            <NavLink className={classes.navLinks} to={'/employees'}>
+                    {
+                        userHasPermissionTo('Manage Customers') && (
+                            <NavLink className={classes.navLinks} to={'/customers'}>
                                 <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Employees list' }
+                                    selected={ selectedItem === 'Customers' }
                                     onClick={ 
-                                        e => handleSelectedItem( 'Employees list') 
+                                        () => handleSelectedItem( 'Customers') 
                                     }
+                                    button
                                 >
-                                    <ListItemText primary="Employee list" className={classes.dropDownItem}/>
+                                    <ListItemIcon><Customer className={classes.customers}/></ListItemIcon>
+                                    <ListItemText primary={
+                                        <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                                            Customers
+                                        </Typography>} />
                                 </ListItem>
                             </NavLink>
+                        )
+                    }
+                {/* Employees */}
+                {
+                    userHasPermissionTo([
+                        'Manage Employees',
+                        'Manage Access Rights'
+                    ]) && (
+                        <>
+                            <ListItem 
+                                onClick={() => handleOpenEmployeesDropdown('Employees')}
+                                selected={selectedItem === 'Employees'}
+                                classes={{ 
+                                    
+                                }}
+                                button
+                            >
+                                <ListItemIcon><Employee className={classes.employees}/></ListItemIcon>
+                                <ListItemText primary={
+                                    <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                                        Employees
+                                    </Typography>} />
+                                {openEmployees ? <ExpandLess /> : <ExpandMore />}
+                            </ListItem>
+                            <Collapse in={openEmployees} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
 
-                            {/* Employee access rights */}
-                            <NavLink className={classes.navLinks} to={'/employees/access-rights'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Access Rights' }
-                                    onClick={ 
-                                        e => handleSelectedItem( 'Access Rights') 
+                                    {/*Employee list */}
+                                    {
+                                        userHasPermissionTo('Manage Employees') && (
+                                            <NavLink className={classes.navLinks} to={'/employees'}>
+                                                <ListItem 
+                                                    button 
+                                                    className={classes.dropdownLists} 
+                                                    selected={ selectedItem === 'Employees list' }
+                                                    onClick={ 
+                                                        e => handleSelectedItem( 'Employees list', 'Employees') 
+                                                    }
+                                                >
+                                                    <ListItemText primary="Employee list" className={classes.dropDownItem}/>
+                                                </ListItem>
+                                            </NavLink>
+                                        )
                                     }
-                                >
-                                    <ListItemText primary="Access Rights" className={classes.dropDownItem}/>
-                                </ListItem>   
-                            </NavLink>             
-                        </List>
-                    </Collapse>   
-                    {/* End of Employees */}
+
+                                    {/* Employee access rights */}
+                                    {
+                                        userHasPermissionTo('Manage Access Rights') && (
+                                            <NavLink className={classes.navLinks} to={'/employees/access-rights'}>
+                                                <ListItem 
+                                                    button 
+                                                    className={classes.dropdownLists} 
+                                                    selected={ selectedItem === 'Access Rights' }
+                                                    onClick={ 
+                                                        e => handleSelectedItem( 'Access Rights', 'Employees') 
+                                                    }
+                                                >
+                                                    <ListItemText primary="Access Rights" className={classes.dropDownItem}/>
+                                                </ListItem>   
+                                            </NavLink> 
+                                        )
+                                    }            
+                                </List>
+                            </Collapse>
+                        </>
+                    )
+                }
+                {/* End of Employees */}
 
 
                 {/* Transactions */}
-                <ListItem 
-                        onClick={() => handleOpenTransactionsDropdown('Transactions')}
-                        selected={selectedMenu === 'Transactions'}
-                        button
-                    >
-                            <ListItemIcon><TransactionsIcon className={classes.transactions}/></ListItemIcon>
-                            <ListItemText primary={
-                                <Typography variant='subtitle1' className={classes.dropdownTitle}>
-                                    Transactions
-                                </Typography>} />
-                            {openTransactions ? <ExpandLess /> : <ExpandMore />}
-                    </ListItem>
-                    <Collapse in={openTransactions} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding>
+                {
+                    userHasPermissionTo('View Transactions') && (
+                        <>
+                            <ListItem 
+                                onClick={() => handleOpenTransactionsDropdown('Transactions')}
+                                selected={selectedItem === 'Transactions'}
+                                button
+                            >
+                                    <ListItemIcon><TransactionsIcon className={classes.transactions}/></ListItemIcon>
+                                    <ListItemText primary={
+                                        <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                                            Transactions
+                                        </Typography>} />
+                                    {openTransactions ? <ExpandLess /> : <ExpandMore />}
+                            </ListItem>
+                        <Collapse in={openTransactions} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
 
-                      {/* Customer order transactions */}
-                            <NavLink className={classes.navLinks} to={'/transactions/customer-orders'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Customer order transactions' }
-                                    onClick={ e => handleSelectedItem( 'Customer order transactions') }
-                                >
-                                    <ListItemText primary="Customer order" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>
+                            {/* Customer order transactions */}
+                                <NavLink className={classes.navLinks} to={'/transactions/customer-orders'}>
+                                    <ListItem 
+                                        button 
+                                        className={classes.dropdownLists} 
+                                        selected={ selectedItem === 'Customer order transactions' }
+                                        onClick={ e => handleSelectedItem( 'Customer order transactions', 'Transactions') }
+                                    >
+                                        <ListItemText primary="Customer order" className={classes.dropDownItem}/>
+                                    </ListItem>
+                                </NavLink>
 
-                        {/* Invoices transactions */}
-                            <NavLink className={classes.navLinks} to={'/transactions/invoices'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Invoices transactions' }
-                                    onClick={ e => handleSelectedItem( 'Invoices transactions') }
-                                >
-                                    <ListItemText primary="Invoices" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>  
+                            {/* Invoices transactions */}
+                                <NavLink className={classes.navLinks} to={'/transactions/invoices'}>
+                                    <ListItem 
+                                        button 
+                                        className={classes.dropdownLists} 
+                                        selected={ selectedItem === 'Invoices transactions' }
+                                        onClick={ e => handleSelectedItem( 'Invoices transactions', 'Transactions') }
+                                    >
+                                        <ListItemText primary="Invoices" className={classes.dropDownItem}/>
+                                    </ListItem>
+                                </NavLink>  
 
-                        {/* Purchase order transactions */}
-                            <NavLink className={classes.navLinks} to={'/transactions/purchase-orders'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Purchase order transactions' }
-                                    onClick={ e => handleSelectedItem( 'Purchase order transactions') }
-                                >
-                                    <ListItemText primary="Purchase order" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>                 
+                            {/* Purchase order transactions */}
+                                <NavLink className={classes.navLinks} to={'/transactions/purchase-orders'}>
+                                    <ListItem 
+                                        button 
+                                        className={classes.dropdownLists} 
+                                        selected={ selectedItem === 'Purchase order transactions' }
+                                        onClick={ e => handleSelectedItem( 'Purchase order transactions', 'Transactions') }
+                                    >
+                                        <ListItemText primary="Purchase order" className={classes.dropDownItem}/>
+                                    </ListItem>
+                                </NavLink>                 
 
-                            {/* Received stocks transactions */}
-                            <NavLink className={classes.navLinks} to={'/transactions/received-stocks'}>
-                                <ListItem 
-                                    button 
-                                    className={classes.dropdownLists} 
-                                    selected={ selectedItem === 'Received stocks transactions' }
-                                    onClick={ e => handleSelectedItem( 'Received stocks transactions') }
-                                >
-                                    <ListItemText primary="Received stocks" className={classes.dropDownItem}/>
-                                </ListItem>
-                            </NavLink>
-                        </List>
-                    </Collapse>   
+                                {/* Received stocks transactions */}
+                                <NavLink className={classes.navLinks} to={'/transactions/received-stocks'}>
+                                    <ListItem 
+                                        button 
+                                        className={classes.dropdownLists} 
+                                        selected={ selectedItem === 'Received stocks transactions' }
+                                        onClick={ e => handleSelectedItem( 'Received stocks transactions', 'Transactions') }
+                                    >
+                                        <ListItemText primary="Received stocks" className={classes.dropDownItem}/>
+                                    </ListItem>
+                                </NavLink>
+                            </List>
+                        </Collapse>
+                    </>   
+                    )
+                }
                 {/* End of Transactions */}
 
                 {/* Settings */}
-                    <NavLink className={classes.navLinks} to={'/settings'}>
-                        <ListItem 
-                            button
-                            selected={ selectedMenu === 'Settings' }
-                            onClick={ 
-                                () => handleSelectedMenu( 'Settings') 
-                            }
-                        >
-                            <ListItemIcon><Settings className={classes.settings}/></ListItemIcon>
-                            <ListItemText primary={
-                                <Typography variant='subtitle1' className={classes.dropdownTitle}>
-                                    Settings
-                                </Typography>}/>
-                        </ListItem>
-                    </NavLink>
+                {
+                    userHasPermissionTo('Manage Settings') && (
+                        <NavLink className={classes.navLinks} to={'/settings'}>
+                            <ListItem 
+                                button
+                                selected={ selectedItem === 'Settings' }
+                                onClick={ 
+                                    () => handleSelectedItem( 'Settings') 
+                                }
+                            >
+                                <ListItemIcon><Settings className={classes.settings}/></ListItemIcon>
+                                <ListItemText primary={
+                                    <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                                        Settings
+                                    </Typography>}/>
+                            </ListItem>
+                        </NavLink>
+                    )
+                }
                 </List>
             </Drawer>
         <main className={classes.content}>
             <div className={classes.toolbar} />
-                <Container maxWidth="xl" className={classes.container}>
-                    {children}
-                </Container>
+                {userPermissions.length > 0 && (
+                    <Container maxWidth="xl" className={classes.container}>
+                        {children}
+                    </Container>
+                )}
             </main>
         </div>
     );

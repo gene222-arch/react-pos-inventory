@@ -83,8 +83,9 @@ const CustomerOrderTransactions = () =>
                 globalMessage={alertMessage}
                 severity={alertSeverity} 
             />
-            <div style={{ height: 450, width: '100%' }}>
+            <div style={{ width: '100%' }}>
                 <DataGrid 
+                    autoHeight
                     showToolbar
                     components={{
                         Toolbar: GridToolbar,
@@ -92,7 +93,7 @@ const CustomerOrderTransactions = () =>
                     rows={customerOrders} 
                     columns={columns} 
                     pageSize={5} 
-                    checkboxSelection 
+                    rowsPerPageOptions={[5, 10, 20]}
                     className={classes.dataGrid}
                 />
             </div>

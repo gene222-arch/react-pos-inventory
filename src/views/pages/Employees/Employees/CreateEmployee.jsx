@@ -203,7 +203,7 @@ const CreateEmployee = () =>
                             variant='contained' 
                             color="default" 
                             className={classes.cancelBtn}
-                            onClick={() => history.push('/employee')}
+                            onClick={() => history.push('/employees')}
                             disabled={loading}
                         >
                             Cancel

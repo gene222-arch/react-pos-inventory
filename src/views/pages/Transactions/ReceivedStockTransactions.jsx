@@ -3,7 +3,6 @@ import * as RSTransactions_ from '../../../services/transactions/receivedStocks'
 import {useHistory} from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { dataGridUseStyles } from '../../../assets/material-styles/styles'
-import Typography from '@material-ui/core/Typography'
 
 
 const ReceivedStockTransactions = () => 
@@ -41,8 +40,9 @@ const ReceivedStockTransactions = () =>
     
     return (
         <>
-            <div style={{ height: 450, width: '100%' }}>
+            <div style={{ width: '100%' }}>
                 <DataGrid 
+                    autoHeight
                     showToolbar
                     components={{
                         Toolbar: GridToolbar,
@@ -50,7 +50,7 @@ const ReceivedStockTransactions = () =>
                     rows={receivedStocks} 
                     columns={columns} 
                     pageSize={5} 
-                    checkboxSelection 
+                    rowsPerPageOptions={[5, 10, 20]}
                     className={classes.dataGrid}
                 />
             </div>
