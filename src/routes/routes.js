@@ -1,5 +1,6 @@
 import React, { lazy, useContext } from 'react'
 import {PermissionContext} from '../hooks/useContext/PermissionContext'
+import {UserContext} from '../hooks/useContext/UserContext'
 import { Route, Switch, useHistory } from "react-router-dom";
 import * as Cookie from '../utils/cookies'
 const LoginForm = lazy(() => import('../views/auth/LoginForm'));
@@ -54,6 +55,7 @@ const CustomerOrderTransactions = lazy(() => import('../views/pages/Transactions
 const InvoiceTransactions = lazy(() => import('../views/pages/Transactions/InvoiceTransactions'));
 const PurchaseOrderTransactions = lazy(() => import('../views/pages/Transactions/PurchaseOrderTransactions'));
 const Settings = lazy(() => import('../views/pages/Settings'))
+const Account = lazy(() => import('../views/pages/Account/Account'))
 const NotFound = lazy(() => import('../views/errors/NotFound'));
 const Unauthorized = lazy(() => import('../views/errors/UnAuthorized'))
 const ProductsImport = lazy(() => import('../views/pages/Imports/Product/ProductsImport'))
@@ -64,7 +66,9 @@ const ProductsImport = lazy(() => import('../views/pages/Imports/Product/Product
 export const RenderRoutes = ({routes}) => 
 {
     const history = useHistory();
+
     const {userPermissions} = useContext(PermissionContext);
+    const {authenticatedUser} = useContext(UserContext);
 
     return (
             <Switch>
@@ -78,20 +82,21 @@ export const RenderRoutes = ({routes}) =>
                         render={ props => { 
                             if (route.restricted)
                             {
-                                if (!userPermissions.includes(route.access))
+                                if (Cookie.has('access_token'))
                                 {
-                                    return <Unauthorized />
+                                    if (userPermissions.length)
+                                    {
+                                        if (!userPermissions.includes(route.access))
+                                        {
+                                            return <Unauthorized />
+                                        }
+                                        
+                                        return <route.component {...props} route={route} />
+                                    }
                                 }
                                 else 
                                 {
-                                    if (Cookie.has('access_token'))
-                                    {
-                                        return <route.component {...props} route={route} />
-                                    }
-                                    else 
-                                    {
                                     history.push('/auth/login')
-                                    }
                                 }
                             }
                             else 
@@ -164,7 +169,16 @@ export const adminRoutes = {
     publicRoutes: [
         {},
     ],
-    privateRoutes: [
+    privateRoutes: [ 
+        {
+            path: '/account',
+            name: 'Account',
+            icon: '',
+            exact: true,
+            component: Account,
+            access: 'Manage Account',
+            restricted: true
+        },
         {
             path: '/',
             name: 'Dashboard',
@@ -189,7 +203,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: Receipt,
-            access: 'View All Receipts', 
+            access: 'View Receipts', 
             restricted: true
         },
         {

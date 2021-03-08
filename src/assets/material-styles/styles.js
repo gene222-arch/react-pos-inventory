@@ -23,7 +23,6 @@ export const notFoundUseStyles = makeStyles({
     }
 });
 
-
 export const createPageUseStyles = makeStyles((theme) => ({
     
     cardContent: {
@@ -71,7 +70,6 @@ export const createPageUseStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(2)
     }
 }));
-
 
 export const sendMailDialogUseStyles = makeStyles((theme) => ({
     dialog: {
@@ -130,6 +128,33 @@ export const salesByUseStyles = makeStyles((theme) => ({
  * Component Styling
  */
 const drawerWidth = 320;
+
+export const accountUseStyles = makeStyles((theme) => ({
+    textFieldContainer: {
+        padding: theme.spacing(1.5)
+    },
+    userIcon: {
+        fontSize: '4rem',
+        color: theme.palette.primary.main,
+        textAlign: 'center',
+        width: '100%'
+    },
+    addBtn: {
+        margin: theme.spacing(1),
+        backgroundColor: '#4caf50',
+        color: '#FFF',
+        '&:hover': {
+            backgroundColor: green[400]
+        }
+    },
+    cancelBtn: {
+        margin: theme.spacing(1),
+        '&:hover': {
+            color: '#FFF',
+            backgroundColor: '#dc3545'
+        }
+    },
+}))
 
 export const AdminLayoutUseStyles = makeStyles((theme) => ({
         
@@ -313,7 +338,6 @@ export const dashboardUseStyles = makeStyles( theme => ({
         width: '100%'
     }
 }));
-
 
 export const loginFormUseStyles = makeStyles((theme) => ({
     root: {

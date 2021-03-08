@@ -6,7 +6,7 @@ export const fetchAuthUser = async () =>
     try {
 
         const result = await axiosInstance()
-            .get('/auth-user');
+            .get('/account/auth-user');
             
         return result.data;
 

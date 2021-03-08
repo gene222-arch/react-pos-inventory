@@ -18,9 +18,8 @@ import Typography from '@material-ui/core/Typography';
 import Alert from '@material-ui/lab/Alert';
 import { loginFormUseStyles } from '../../assets/material-styles/styles';
 import * as Cookie from '../../utils/cookies'
-import * as User from '../../config/auth'
 import { PermissionContext } from './../../hooks/useContext/PermissionContext';
-
+import { UserContext } from './../../hooks/useContext/UserContext';
 
 const Copyright = () => {
     return (
@@ -50,7 +49,9 @@ const DEFAULT_ERROR_MESSAGE_PROPS = {
 
 const LoginForm = () => 
 {
-    const {userPermissions, setUserPermissions} = useContext(PermissionContext);
+    const {setAuthenticatedUser} = useContext(UserContext);
+    const {setUserPermissions} = useContext(PermissionContext);
+
 
     const classes = loginFormUseStyles();
     const history = useHistory();
@@ -95,7 +96,9 @@ const LoginForm = () =>
 
             if (Cookie.has('access_token'))
             {
-                const {canViewDashboard, permissions} = result.data.data;
+                const {user, canViewDashboard, permissions} = result.data.data;
+
+                setAuthenticatedUser(user);
                 setUserPermissions(permissions);
 
                 !canViewDashboard 

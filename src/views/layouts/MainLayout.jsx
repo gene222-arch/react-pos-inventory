@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, lazy } from 'react';
 import { fetchAuthUser } from './../../services/auth/auth';
-import { fetchAllAsync } from './../../services/roles-permissions/permissions';
 import {logoutAsync} from '../../services/auth/login/login'
 import { NavLink, useHistory } from 'react-router-dom'
 import clsx from 'clsx';
@@ -20,7 +19,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Container from '@material-ui/core/Container'
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import Dashboard from '@material-ui/icons/Home';
@@ -42,7 +40,9 @@ import { AdminLayoutUseStyles } from '../../assets/material-styles/styles'
 import * as Cookie from '../../utils/cookies'
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { PermissionContext } from './../../hooks/useContext/PermissionContext';
+import { UserContext } from './../../hooks/useContext/UserContext';
 import Grid from '@material-ui/core/Grid'
+const AlertPopUpMessage = lazy(() => import('../../components/AlertMessages/AlertPopUpMessage'));
 
 
 
@@ -65,14 +65,22 @@ const MainLayout = ({children}) =>
     const [ selectedDropdown, setSelectedDropdown ] = useState('');
 
     /**
+     * Alert Dialog
+     */
+
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+
+ 
+
+    /**
      * User
      */
+    const {authenticatedUser, setAuthenticatedUser } = useContext(UserContext);
     const {userPermissions, setUserPermissions } = useContext(PermissionContext);
     const [auth, setAuth] = useState(true);
-    const [role, setRole] = useState('');
-    const [user, setUser] = useState({
-        name: ''
-    });
 
     const userHasPermissionTo = (permission) => {
         if (Array.isArray(permission))
@@ -101,7 +109,7 @@ const MainLayout = ({children}) =>
 
     const handleMenu = (event) => setAnchorEl(event.currentTarget);
 
-    const handleClose = () => setAnchorEl(null);
+    const handleCloseAccountMenu = () => setAnchorEl(null);
 
     const handleOpenReportDropdown = (path) => 
     {
@@ -228,22 +236,14 @@ const MainLayout = ({children}) =>
         }
     }
 
-    const logout = async () => 
+    const handleCloseAlert = (event, reason) => 
     {
-        const result = await logoutAsync();
-
-        if (result.status = 'Success')
-        {
-            Cookie.removeItem('access_token');
-
-            if (!Cookie.has('access_token'))
-            {
-                setUserPermissions([]);
-                history.push('/auth/login')
-            }
-        }
+        if (reason === 'clickaway') {
+            return;
     }
 
+        setOpenAlert(false);
+    };
 
     const fetchAuthenticatedUser = async () => 
     {
@@ -253,12 +253,44 @@ const MainLayout = ({children}) =>
         {
             const {user, role, permissions} = result.data;
 
-            setUser(user)
-            setRole(role);
+            setAuthenticatedUser({...user, role: role})
             setUserPermissions(permissions)
         }
     }
 
+    const handleAccountOnClick = () => 
+    {
+        localStorage.setItem('selectedItem', 'Account');
+        setSelectedItem('Account');
+        handleCloseAccountMenu();
+        history.push('/account');
+    }
+
+    const logout = async () => 
+    {
+        handleCloseAccountMenu();
+        localStorage.setItem('selectedItem', '');
+
+        const result = await logoutAsync();
+
+        if (result.status = 'Success')
+        {
+            setAlertSeverity('success');
+            setAlertMessage(result.message);
+            setOpenAlert(true);
+
+            setTimeout(() => 
+            {
+                Cookie.removeItem('access_token');
+
+                if (!Cookie.has('access_token'))
+                {
+                    setUserPermissions([]);
+                    history.push('/auth/login');
+                }
+            }, 2000);
+        }
+    }
 
 
     useEffect(() => {
@@ -283,6 +315,12 @@ const MainLayout = ({children}) =>
 
     return (
         <div className={classes.root}>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <CssBaseline />
             <AppBar
                 position="fixed"
@@ -329,10 +367,9 @@ const MainLayout = ({children}) =>
                                 horizontal: 'right',
                                 }}
                                 open={openAccountMenu}
-                                onClose={handleClose}
+                                onClose={handleCloseAccountMenu}
                             >
-                                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={handleAccountOnClick}>My account</MenuItem>
                                 <MenuItem onClick={logout}>Logout</MenuItem>
                             </Menu>
                         </div>
@@ -359,7 +396,7 @@ const MainLayout = ({children}) =>
                             <UserIcon />
                         </Grid>
                         <Grid item xs={8} sm={8} md={8} lg={8}>
-                            <ListItemText primary={user.name} secondary={role} />
+                            <ListItemText primary={authenticatedUser.name} secondary={authenticatedUser.role} />
                         </Grid>
                         <Grid item xs={2} sm={2} md={2} lg={2}>
                             <IconButton onClick={handleDrawerClose}>
@@ -486,7 +523,9 @@ const MainLayout = ({children}) =>
                 
                 {/* Receipt */}
                 {
-                    userHasPermissionTo('View All Receipts') && (
+                    (
+                        userHasPermissionTo('View Receipts')
+                    ) && (
                         <NavLink className={classes.navLinks} to={'/receipts'}>
                             <ListItem 
                                 selected={ selectedItem === 'Receipts' }
@@ -899,11 +938,9 @@ const MainLayout = ({children}) =>
             </Drawer>
         <main className={classes.content}>
             <div className={classes.toolbar} />
-                {userPermissions.length > 0 && (
-                    <Container maxWidth="xl" className={classes.container}>
-                        {children}
-                    </Container>
-                )}
+                <Container maxWidth="xl" className={classes.container}>
+                    {children}
+                </Container>
             </main>
         </div>
     );

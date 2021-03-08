@@ -55,6 +55,7 @@ const Categories = () =>
 
     const deleteCategories = async () => 
     {
+        handleClose();
         const result = await Categories_.destroyAsync({category_ids: rowIds});
 
         if (result.status === 'Error')

@@ -64,6 +64,7 @@ const Suppliers = () =>
 
     const deleteSuppliers = async () => 
     {
+        handleClose();
         const result = await Suppliers_.destroyAsync({supplier_ids: rowIds});
 
         if (result.status === 'Error')

@@ -61,6 +61,7 @@ const Discounts = () =>
 
     const deleteDiscounts = async () => 
     {
+        handleClose();
         const result = await ProductDiscounts.destroyAsync({discount_ids: rowIds});
 
         if (result.status === 'Error')

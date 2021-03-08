@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, lazy} from 'react';
+import * as SalesReceipt from '../../../services/exports/pdf/sales-receipt';
 import {CURRENCY} from '../../../config/currency'
 import * as Receipt_ from '../../../services/receipts/receipt'
 import { makeStyles } from '@material-ui/core/styles';
@@ -14,6 +15,7 @@ import CardContent from '@material-ui/core/CardContent';
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import Grid from '@material-ui/core/Grid'
 import CashIcon from '@material-ui/icons/Money';
+import PrintIcon from '@material-ui/icons/Print';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
 import DateFnsUtils from '@date-io/date-fns';
 import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
@@ -21,6 +23,8 @@ import * as DateHelper from '../../../utils/dates'
 import Typography from '@material-ui/core/Typography'
 import CardHeader from '@material-ui/core/CardHeader'
 import DescriptionIcon from '@material-ui/icons/Description';
+const AlertPopUpMessage = lazy(() => import('../../../components/AlertMessages/AlertPopUpMessage'));
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -110,7 +114,29 @@ const Receipt = () =>
     const [receiptDetails, setReceiptDetails] = useState([]);
     const [salesInfo, setSalesInfo] = useState(SALES_INFO_DEFAULT_PROPS);
     const [date, setDate] = useState(null);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
 
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
+
+    const printReceipt = () => 
+    {
+        SalesReceipt.generatePDFAsync({
+            sales_id: selectedId
+        });
+
+        setAlertSeverity('info');
+        setAlertMessage('Starting exporting receipt.');
+        setOpenAlert(true);
+    } 
 
     const handleDateOnChange = async (paramDate) => 
     {   
@@ -147,7 +173,6 @@ const Receipt = () =>
         }
     }
 
-
     const hanldeOnClickReceipt = async (id) => 
     {
         setSelectedId(id);
@@ -181,6 +206,12 @@ const Receipt = () =>
 
     return (
         <>
+            <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <Grid container spacing={1} justify='space-between'>
                 <Grid item xs={12} sm={12} md={4} lg={4}>
                     <Card className={classes.receiptsContainer}>
@@ -230,6 +261,7 @@ const Receipt = () =>
                     </Card>
                 </Grid>
                 <Grid item item xs={12} sm={12} md={8} lg={8}>
+
                     <Card className={classes.salesInfo}>
                         {
                             !selectedId
@@ -242,6 +274,17 @@ const Receipt = () =>
                             :  (
                                 <>
                                 <CardHeader
+                                    action={
+                                    <IconButton aria-label="">
+                                        {
+                                            salesInfo.customer && (
+                                                <PrintIcon 
+                                                    onClick={printReceipt}
+                                                />
+                                            )
+                                        }
+                                    </IconButton>
+                                    }
                                     avatar={<SalesInfoAvatar text={salesInfo.cashier}/>}
                                     title={salesInfo.cashier}
                                     subheader='Cashier'

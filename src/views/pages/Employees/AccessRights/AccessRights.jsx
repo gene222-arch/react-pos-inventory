@@ -62,6 +62,7 @@ const AccessRights = () =>
 
     const deleteAccessRights = async () => 
     {
+        handleClose();
         const roleHasEmployees = accessRights.filter(accessRight => accessRight.emloyees > 0);
 
         if (roleHasEmployees)
@@ -76,7 +77,7 @@ const AccessRights = () =>
             if (result.status === 'Error')
             {
                 setAlertSeverity('warning');
-                setAlertMessage('Please click the button only once.');
+                setAlertMessage(result.message['access_right_ids.0'][0]);
             }
             else
             {
@@ -90,7 +91,6 @@ const AccessRights = () =>
                 setAlertMessage(result.message);
     
                 setAccessRights(_accessRights);
-                handleClose();
                 setRowIds([]);
             }
         }
@@ -128,19 +128,17 @@ const AccessRights = () =>
                 <CardContent>
                     <Grid container spacing={1}>
                         <Grid item xs={12} sm={12} md={8} lg={8}>
+                            <Button 
+                                variant="contained"
+                                color='primary' 
+                                className={classes.addBtn}
+                                startIcon={<AddIcon />}  
+                                onClick={() => history.push('/employees/create-access-right')}  
+                            >
+                                Add Role
+                            </Button>
                             {
-                                !rowIds.length ? (
-                                    <Button 
-                                        variant="contained"
-                                        color='primary' 
-                                        className={classes.addBtn}
-                                        startIcon={<AddIcon />}  
-                                        onClick={() => history.push('/employees/create-access-right')}  
-                                    >
-                                        Add Role
-                                    </Button>
-                                )
-                                : (
+                                rowIds.length > 0 && (
                                     <Button 
                                         variant="text" 
                                         color="default" 

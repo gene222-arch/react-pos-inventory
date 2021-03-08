@@ -42,12 +42,13 @@ const EmployeeList = () =>
     
     const deleteEmployees = async () => 
     {
+        handleClose();
         const result = await Employees_.destroyAsync({employee_ids: rowIds});
 
         if (result.status === 'Error')
         {
             setAlertSeverity('warning');
-            setAlertMessage('Please click the button only once.');
+            setAlertMessage(result.message['employee_ids.0'][0]);
         }
         else
         {

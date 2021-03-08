@@ -90,6 +90,7 @@ const Customers = () =>
 
     const deleteCustomers = async () => 
     {
+        handleClose();
         const result = await Customers_.destroyAsync({customer_ids: rowIds});
 
         if (result.status === 'Error')
@@ -127,7 +128,7 @@ const Customers = () =>
 
     return (
         <>
-              <AlertPopUpMessage 
+            <AlertPopUpMessage 
                 open={openAlert}
                 handleClose={handleCloseAlert}
                 globalMessage={alertMessage}

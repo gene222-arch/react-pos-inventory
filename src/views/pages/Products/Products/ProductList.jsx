@@ -86,6 +86,7 @@ const ProductList = () =>
 
     const deleteProducts = async () => 
     {
+        handleClose();
         const result = await Product_.destroyAsync({product_ids: rowIds});
 
         if (result.status === 'Error')
