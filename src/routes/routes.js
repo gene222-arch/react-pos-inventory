@@ -445,7 +445,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: CreateCategory,
-            access: 'crManage Categories',
+            access: 'Manage Categories',
             restricted: true 
         },
         {
@@ -454,7 +454,7 @@ export const adminRoutes = {
             icon: '',
             exact: true,
             component: EditCategory,
-            access: 'crManage Categories',
+            access: 'Manage Categories',
             restricted: true 
         },
         {

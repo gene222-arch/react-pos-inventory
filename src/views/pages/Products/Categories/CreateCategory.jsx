@@ -51,11 +51,17 @@ const CreateCategory = () =>
         {
             setAlertSeverity('success');
             setAlertMessage(result.message)
-            setTimeout(() => history.push('/products/categories'), 2000);
+            setTimeout(() => {
+                history.push('/products/categories');
+                setName('');
+                setErrorMessage('');
+            }, 2000);
         }
 
         setOpenAlert(true);
-        setTimeout(() =>  setLoading(false), 2000);
+        setTimeout(() =>  {
+            setLoading(false);
+        }, 2000);
     }
 
 

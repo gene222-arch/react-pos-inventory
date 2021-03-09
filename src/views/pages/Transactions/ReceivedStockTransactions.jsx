@@ -35,7 +35,9 @@ const ReceivedStockTransactions = () =>
     useEffect(() => {
         receivedStocksTransac();
 
-        return () => receivedStocksTransac();
+        return () => {
+            setReceivedStocks([]);
+        };
     }, []);
     
     return (

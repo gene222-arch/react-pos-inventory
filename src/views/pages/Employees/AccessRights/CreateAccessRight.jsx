@@ -287,7 +287,7 @@ const CreateAccessRight = () =>
                                                 <FormHelperText>
                                                    {
                                                        accessRight.pos && (
-                                                           'When View All Receipts is disabled, a cashier can view the last 5 receipts'
+                                                           'When View All Receipts is disabled, a user can view the last 5 receipts'
                                                        )
                                                    }
                                                 </FormHelperText>

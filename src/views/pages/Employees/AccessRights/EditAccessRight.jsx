@@ -3,7 +3,7 @@ import Loading from '../../../../components/Loading'
 import * as Permission_ from '../../../../services/roles-permissions/permissions'
 import * as AccessRight_ from '../../../../services/employees/accessRights'
 import { useHistory } from 'react-router-dom'
-import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider, Avatar } from '@material-ui/core';
+import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider, Avatar, FormHelperText } from '@material-ui/core';
 import ListItemText from '@material-ui/core/ListItemText';
 import Switch from '@material-ui/core/Switch';
 import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
@@ -323,6 +323,13 @@ const EditAccessRight = ({match}) =>
                                                         )
                                                     }
                                                 </FormGroup>
+                                                <FormHelperText>
+                                                   {
+                                                       accessRight.pos && (
+                                                           'When View All Receipts is disabled, a user can view the last 5 receipts'
+                                                       )
+                                                   }
+                                                </FormHelperText>
                                             </FormControl>  
                                         </Grid>
                                     </Grid>

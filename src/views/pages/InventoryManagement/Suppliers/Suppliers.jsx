@@ -57,7 +57,6 @@ const Suppliers = () =>
         if (result.status === 'Success')
         {
             setSuppliers(result.data);
-            console.log(result.data)
         }
     }
 

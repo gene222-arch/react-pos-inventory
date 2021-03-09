@@ -71,7 +71,9 @@ const CustomerOrderTransactions = () =>
     useEffect(() => {
         fetchCustomerOrdersTransac();
 
-        return () => fetchCustomerOrdersTransac();
+        return () => {
+            setCustomerOrders([]);
+        };
     }, []);
 
     

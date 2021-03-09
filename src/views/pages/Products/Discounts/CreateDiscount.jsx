@@ -61,9 +61,14 @@ const CreateDiscount = () =>
         {
             setAlertSeverity('success');
             setAlertMessage(result.message);
-            setTimeout(() => history.push('/products/discounts'), 2000);
+            setTimeout(() => {
+                history.push('/products/discounts');
+                setDiscount(DISCOUNT_DEFAULT);
+                setErrorMessage(DISCOUNT_DEFAULT);
+            }, 2000);
         }
-        
+
+    
         setOpenAlert(true);
         setTimeout(() =>  setLoading(false), 2000);
     }

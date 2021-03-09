@@ -135,7 +135,6 @@ const CreateProduct = () =>
         });
 
         setProduct({...product, image: result.data});
-        console.log(result);
     }
 
     const fetchCategories = async () => 
@@ -282,6 +281,7 @@ const CreateProduct = () =>
                             <FormControlLabel
                                 control={
                                     <Switch 
+                                        value={product.is_for_sale}
                                         checked={product.is_for_sale} 
                                         onChange={handleOnChangeProduct} 
                                         name="is_for_sale" 

@@ -40,7 +40,9 @@ const PurchaseOrderTransactions = () =>
     useEffect(() => {
         purchaseOrderTransac();
 
-        return () => purchaseOrderTransac();
+        return () => {
+            setPo([]);
+        };
     }, []);
     
     
