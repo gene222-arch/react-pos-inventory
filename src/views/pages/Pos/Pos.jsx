@@ -195,7 +195,7 @@ const Pos = () =>
 
 
     return loading 
-        ? <Loading /> 
+        ? <Loading />   
         : (processPayment && orderDetails.length > 0) 
             ?   <ProcessPayment 
                     handleOnProcessPayment={handleOnProcessPayment} 

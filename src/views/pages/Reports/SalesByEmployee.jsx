@@ -107,6 +107,7 @@ const SalesByEmployee = () =>
                                                     id="From"
                                                     label="From"
                                                     format="MM/dd/yyyy"
+                                                    maxDate={endDate}
                                                     value={startDate}
                                                     onChange={handleStartDate}
                                                     KeyboardButtonProps={{
@@ -123,6 +124,7 @@ const SalesByEmployee = () =>
                                                     id="to"
                                                     label="To"
                                                     format="MM/dd/yyyy"
+                                                    minDate={startDate}
                                                     value={endDate}
                                                     onChange={handleEndDate}
                                                     KeyboardButtonProps={{

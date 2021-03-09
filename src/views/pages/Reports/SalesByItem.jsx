@@ -135,7 +135,6 @@ const SalesByItem = () =>
 
         if (result.status === 'Success')
         {
-            console.log(result.data);
             setSalesByItem(result.data);
             handleChartXLabel(result.data.tableData);
         }
@@ -212,6 +211,7 @@ const SalesByItem = () =>
                                                     id="From"
                                                     label="From"
                                                     format="MM/dd/yyyy"
+                                                    maxDate={endDate}
                                                     value={startDate}
                                                     onChange={handleStartDate}
                                                     KeyboardButtonProps={{
@@ -229,6 +229,7 @@ const SalesByItem = () =>
                                                     label="To"
                                                     format="MM/dd/yyyy"
                                                     value={endDate}
+                                                    minDate={startDate}
                                                     onChange={handleEndDate}
                                                     KeyboardButtonProps={{
                                                         'aria-label': 'change date',
