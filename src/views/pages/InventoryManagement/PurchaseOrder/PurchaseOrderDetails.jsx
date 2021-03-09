@@ -335,6 +335,7 @@ const PurchaseOrderDetails = ({match}) =>
                                 {
                                     Boolean(purchaseOrder.total_remaining_ordered_quantity) && (
                                     <>
+                                        <ReceivedStocks purchaseOrderId={purchaseOrderId}/>
                                         <Button
                                             className={classes.btn} 
                                             variant="text" 

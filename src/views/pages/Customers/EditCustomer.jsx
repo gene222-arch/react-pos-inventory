@@ -126,7 +126,7 @@ const EditCustomer = ({match}) => {
                     />
                 </Grid>
                 <CardContent className={classes.cardContent}>
-                <Grid container spacing={1}>
+                <Grid container spacing={2}>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <TextField
                                 error={Boolean(errorMessages.name)}
@@ -269,7 +269,7 @@ const EditCustomer = ({match}) => {
                     </Grid>
                 </CardContent>
                 <Divider className={classes.divider}/>
-                <Grid container justify='flex-end'>
+                <Grid container justify='flex-end' spacing={2}>
                     <Grid item>
                         <Button 
                             variant='contained' 

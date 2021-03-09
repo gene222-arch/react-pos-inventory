@@ -219,8 +219,9 @@ const CreateBadOrders = () =>
         if (result.status === 'Success')
         {
             setPurchaseOrders(result.data);
-            setLoadingData(false);
         }
+
+        setLoadingData(false);
     }
 
     

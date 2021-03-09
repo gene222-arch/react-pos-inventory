@@ -92,6 +92,7 @@ export const RenderRoutes = ({routes}) =>
                                         
                                         return <route.component {...props} route={route} />
                                     }
+                                
                                 }
                                 else 
                                 {

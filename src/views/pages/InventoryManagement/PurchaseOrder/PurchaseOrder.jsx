@@ -35,6 +35,8 @@ const PurchaseOrder = () =>
     const classes = purchaseOrderUseStyles();
     const history = useHistory();
     const [loading, setLoading] = useState(false);
+    const [loadingData, setLoadingData] = useState(true);
+    
     const [openAlert, setOpenAlert] = useState(false);
     const [alertSeverity, setAlertSeverity] = useState('');
     const [alertMessage, setAlertMessage] = useState('');
@@ -241,6 +243,7 @@ const PurchaseOrder = () =>
         {
             setSuppliers(result.data);
         }
+        setLoadingData(false);
     }
 
     const createPurchaseOrder = async () => 
@@ -316,7 +319,7 @@ const PurchaseOrder = () =>
                             >
                                 <InputLabel id="demo-simple-select-label">
                                     {
-                                        suppliers.length <= 0 && (
+                                        loadingData && (
                                             'Loading supplier list...'
                                         )
                                     }
@@ -404,7 +407,7 @@ const PurchaseOrder = () =>
                             >
                                 <InputLabel id="demo-simple-select-label">
                                     {
-                                        products.length <= 0 
+                                        loadingData
                                             ? 'Loading product list...'
                                             : 'Add product'
                                     }

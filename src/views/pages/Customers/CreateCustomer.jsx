@@ -68,7 +68,11 @@ const CreateCustomer = () => {
         {
             setAlertSeverity('success');
             setAlertMessage(result.message)
-            setTimeout(() => history.push('/customers'), 2000);
+            setTimeout(() => {
+                history.push('/customers');
+                setCustomer(CUSTOMER_DEFAULT_PROPS);
+                setErrorMessages(CUSTOMER_DEFAULT_PROPS);
+            }, 2000);
         }
 
         setOpenAlert(true);
@@ -92,7 +96,7 @@ const CreateCustomer = () => {
                     />
                 </Grid>
                 <CardContent className={classes.cardContent}>
-                    <Grid container spacing={1}>
+                    <Grid container spacing={2}>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <TextField
                                 error={Boolean(errorMessages.name)}
@@ -102,7 +106,7 @@ const CreateCustomer = () => {
                                 onChange={handleCustomerOnChange}
                                 label="Name"
                                 fullWidth
-                                margin='normal'
+                                margin='dense'
                             />
                         </Grid>
                         
@@ -115,7 +119,7 @@ const CreateCustomer = () => {
                                 onChange={handleCustomerOnChange}
                                 label="Email"
                                 fullWidth
-                                margin='normal'
+                                margin='dense'
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -153,7 +157,7 @@ const CreateCustomer = () => {
                                 onChange={handleCustomerOnChange}
                                 label="Address"
                                 fullWidth
-                                margin='normal'
+                                margin='dense'
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -164,7 +168,7 @@ const CreateCustomer = () => {
                             />
                         </Grid>
                     </Grid>
-                    <Grid container justify='space-between'>
+                    <Grid container justify='space-between' spacing={2}>
                         <Grid item xs={6} sm={6} md={5} lg={5}>
                             <TextField
                                 error={Boolean(errorMessages.city)}
@@ -174,7 +178,7 @@ const CreateCustomer = () => {
                                 onChange={handleCustomerOnChange}
                                 label="City"
                                 fullWidth
-                                margin='normal'
+                                margin='dense'
                             />
                         </Grid>
                         <Grid item xs={6} sm={6} md={5} lg={5}>
@@ -186,7 +190,7 @@ const CreateCustomer = () => {
                                 onChange={handleCustomerOnChange}
                                 label="Postal/zip code"
                                 fullWidth
-                                margin='normal'
+                                margin='dense'
                             />
                         </Grid>
                     </Grid>
@@ -203,7 +207,7 @@ const CreateCustomer = () => {
                                 value={customer.country}
                                 onChange={handleCustomerOnChange}
                                 fullWidth
-                                margin='normal'
+                                margin='dense'
                             >
                                 {
                                     Helper.countryList.map((country, index) => (
@@ -229,7 +233,7 @@ const CreateCustomer = () => {
                             value={customer.province}
                             onChange={handleCustomerOnChange}
                             label="Region/State/Province"
-                            margin='normal'
+                            margin='dense'
                             fullWidth
                         />
                     </Grid>

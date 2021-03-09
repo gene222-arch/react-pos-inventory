@@ -85,7 +85,7 @@ const ReceivedStocks = ({purchaseOrderId}) =>
 
     return (
         <div>
-        <Button variant="text" color="primary" onClick={handleClickOpen}>
+        <Button variant="text" color="default" onClick={handleClickOpen}>
             Received stocks
         </Button>
         <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>

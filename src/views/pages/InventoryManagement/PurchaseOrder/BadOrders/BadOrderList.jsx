@@ -78,6 +78,10 @@ const BadOrderList = () =>
 
     useEffect(() => {
         fetchAllBadOrders();
+
+        return () => {
+            setBadOrders([]);
+        }
     }, []);
 
 
