@@ -34,6 +34,7 @@ const EditEmployee = ({match}) =>
     const [loading, setLoading] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
     const [roles, setRoles] = useState([]);
+    
     const {employeeId} = match.params;
 
     const [employee, setEmployee] = useState(EMPLOYEE_DEFAULT_PROPS);
@@ -155,7 +156,7 @@ const EditEmployee = ({match}) =>
                                 fullWidth
                                 margin='dense'
                                 inputProps={{
-                                    startAdornment: (
+                                    startadornment: (
                                         <InputAdornment position="start">
                                             <AlternateEmailIcon className={classes.textFieldIcons}/>
                                         </InputAdornment>
@@ -200,11 +201,14 @@ const EditEmployee = ({match}) =>
                                 onChange={handleEmployeeOnChange}
                             >
                                 {
-                                roles.map((role, index) => (
-                                        <MenuItem key={index} value={role.name}>
-                                            {role.name}
-                                        </MenuItem>
-                                    ))
+                                    employeeId !== 1 
+                                        && (
+                                            roles.map((role, index) => (
+                                                <MenuItem key={role.id} value={role.name}>
+                                                    {role.name}
+                                                </MenuItem>
+                                            ))
+                                        )
                                 }
                                 
                             </Select>

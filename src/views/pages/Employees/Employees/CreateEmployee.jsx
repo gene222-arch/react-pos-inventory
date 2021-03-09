@@ -133,7 +133,7 @@ const CreateEmployee = () =>
                                 fullWidth
                                 margin='dense'
                                 inputProps={{
-                                    startAdornment: (
+                                    startadornment: (
                                         <InputAdornment position="start">
                                             <AlternateEmailIcon className={classes.textFieldIcons}/>
                                         </InputAdornment>
@@ -152,7 +152,7 @@ const CreateEmployee = () =>
                                 fullWidth
                                 margin='dense'
                                 InputProps={{
-                                    startAdornment: (
+                                    startadornment: (
                                         <InputAdornment position="start">
                                             <PhoneAndroidIcon className={classes.textFieldIcons}/>
                                         </InputAdornment>

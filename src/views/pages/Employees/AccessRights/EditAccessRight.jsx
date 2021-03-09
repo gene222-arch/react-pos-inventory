@@ -158,7 +158,6 @@ const EditAccessRight = ({match}) =>
             });
         }
 
-        console.log(currentPermissions)
     }
 
 
@@ -193,7 +192,6 @@ const EditAccessRight = ({match}) =>
             setPermissions(result.data);
         }
 
-        console.log(result.data)
         setLoadingData(false);
     }
 
@@ -201,7 +199,6 @@ const EditAccessRight = ({match}) =>
     {
         let newPermissions = accessRight.permissions;
 
-        console.log(permissions)
         if (!accessRight.pos)
         {
             const posPermissions = permissions.POS.map(per => per.permission);

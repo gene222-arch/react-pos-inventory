@@ -135,8 +135,6 @@ const CreateAccessRight = () =>
         if (currentIndex === -1)
         {
             currentPermissions = [...currentPermissions, permission];
-
-            console.log(currentPermissions)
         
             setAccessRight({
                 ...accessRight, 
@@ -171,7 +169,6 @@ const CreateAccessRight = () =>
     {
         let newPermissions = accessRight.permissions;
 
-        console.log(permissions)
         if (!accessRight.pos)
         {
             const posPermissions = permissions.POS.map(per => per.permission);

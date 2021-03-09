@@ -55,7 +55,6 @@ const AccessRights = () =>
         if (result.status === 'Success')
         {
             setAccessRights(result.data);
-            console.log(result.data)
         }
     }
 
