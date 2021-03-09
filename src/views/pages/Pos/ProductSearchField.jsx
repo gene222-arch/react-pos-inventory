@@ -40,7 +40,7 @@ const ProductSearchField = ({
                             className={classes.selectLabel}>
                                 {
                                     categories.length <= 0 
-                                        ? 'Loading category list...'
+                                        ? 'Empty category list...'
                                         : 'All items'
                                 }
                         </InputLabel>

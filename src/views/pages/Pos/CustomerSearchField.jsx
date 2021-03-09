@@ -7,6 +7,7 @@ import {FormControl, InputLabel, Select, MenuItem} from '@material-ui/core'
 const CustomerSearchField = ({customerId, handleOnChangeCustomerId}) => 
 {
     const classes = posUseStyles();
+    const [loading, setLoading] = useState(false);
 
     const [customers, setCustomers] = useState([]);
     /**
@@ -15,13 +16,16 @@ const CustomerSearchField = ({customerId, handleOnChangeCustomerId}) =>
 
     const fetchCustomers = async () => 
     {
+        setLoading(true);
+
         const result = await POS_.fetchAllCustomersAsync();
 
         if (result.status === 'Success')
         {
-            console.log(result)
             setCustomers(result.data);
         }
+
+        setLoading(false);
     };
 
     useEffect(() => {
@@ -40,8 +44,12 @@ const CustomerSearchField = ({customerId, handleOnChangeCustomerId}) =>
                         id="demo-simple-select-label" 
                         className={classes.selectLabel}>
                             {
-                                customers.length <= 0 
-                                    ? 'Loading customer list...'
+                                loading || customers.length <= 0
+                                    ? (
+                                        customers.length <= 0 && loading
+                                            ? 'Loading customer list...'
+                                            : 'Empty customer list...'
+                                    )
                                     : 'Customer'
                             }
                     </InputLabel>

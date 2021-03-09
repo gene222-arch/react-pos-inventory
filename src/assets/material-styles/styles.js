@@ -599,8 +599,15 @@ export const posUseStyles = makeStyles((theme) => ({
             color: '#FFF',
             backgroundColor: red[400]
         }
-    }
-
+    },
+    emptyContainer: {
+        width: '100%',
+        textAlign: 'center'
+    },
+    emptyIcon: {
+        fontSize: '5rem',
+        marginTop: '10rem',
+    },
 }));
 
 export const processPaymentUseStyles = makeStyles((theme) => ({

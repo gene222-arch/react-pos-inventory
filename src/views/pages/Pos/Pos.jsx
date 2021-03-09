@@ -96,11 +96,6 @@ const Pos = () =>
 
             setCustomerIsDiscounted(Boolean(parseFloat(discount) > 0));
         }
-        else 
-        {
-            setOrderDetails([]);
-            setPaymentAmountDetails(PAYMENT_DETAILS);
-        }
 
         setLoading(false);
     }
@@ -126,7 +121,7 @@ const Pos = () =>
 
     const handleAddToCartOnKeyPress = async (e) => 
     {
-        if (e.keyCode === 13)
+        if (e.keyCode === 13 && customerId)
         {
             const result = await POS_.addToCartAsync({
                 customer_id: customerId,
@@ -142,9 +137,15 @@ const Pos = () =>
             {
                 fetchCustomerCart();
             }
-
-            setOpenAlert(true);
         }
+        else 
+        {
+
+            setAlertSeverity('error');
+            setAlertMessage('No customer is selected.');
+        }
+
+        setOpenAlert(true);
     }       
 
     const handleOnDeleteProduct = async (posDetailIds) => 
@@ -184,6 +185,11 @@ const Pos = () =>
 
     useEffect(() => {
         fetchCustomerCart();
+
+        return () => {
+            setOrderDetails([]);
+            setPaymentAmountDetails(PAYMENT_DETAILS);
+        }
     }, [customerId]);
 
 

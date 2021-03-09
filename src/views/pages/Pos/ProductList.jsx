@@ -5,6 +5,7 @@ import * as POS_ from '../../../services/pos/pos'
 import {posUseStyles} from '../../../assets/material-styles/styles'
 import {Grid} from '@material-ui/core'
 import {Card, CardContent, CardActionArea, CardActions, CardMedia, Typography} from '@material-ui/core'
+import EmptyIcon from '@material-ui/icons/HourglassEmpty';
 
 
 const ProductList = ({handleAddToCartOnClick}) => 
@@ -77,9 +78,9 @@ const ProductList = ({handleAddToCartOnClick}) =>
         if (result.status === 'Success')
         {
             setProducts(result.data);
-            setLoading(false);
         }
 
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -112,7 +113,9 @@ const ProductList = ({handleAddToCartOnClick}) =>
                         : (
                             <CardContent>
                                 <Grid container spacing={1}>
-                                    {products.map((product, index) => (
+                                    {
+                                        products.length > 0 ? 
+                                        products.map((product, index) => (
                                         <Grid 
                                             key={index} 
                                             item xs={6} sm={6} md={3} lg={3}
@@ -137,7 +140,20 @@ const ProductList = ({handleAddToCartOnClick}) =>
                                                 </CardActions>
                                             </Card>
                                         </Grid>
-                                    ))}
+                                    ))
+                                    : (
+                                        <div className={classes.emptyContainer}>
+                                            <EmptyIcon className={classes.emptyIcon}/>
+                                            <Typography 
+                                                variant="subtitle1" 
+                                                color="initial"
+                                                className={classes.emptyText}
+                                            >
+                                                Empty data
+                                            </Typography>
+                                        </div>
+                                    )
+                                }
                                 </Grid>
                             </CardContent>
                         )
