@@ -10,7 +10,6 @@ const RegisterForm = lazy(() => import('../views/auth/RegistrationForm'));
 const Dashboard = lazy(() => import('../views/pages/Dashboard/Dashboard'))
 const Pos = lazy(() => import('../views/pages/Pos/Pos'))
 const Receipt = lazy(() => import('../views/pages/Receipts/Receipt'))
-const SalesSummary = lazy(() => import('../views/pages/Reports/SalesSummary'))
 const SalesByItem = lazy(() => import('../views/pages/Reports/SalesByItem'))
 const SalesByCategory = lazy(() => import('../views/pages/Reports/SalesByCategory'))
 const SalesByEmployee = lazy(() => import('../views/pages/Reports/SalesByEmployee'))
@@ -205,15 +204,6 @@ export const adminRoutes = {
             component: Receipt,
             access: 'View Receipts', 
             restricted: true
-        },
-        {
-            path: '/reports/sales-summary',
-            name: 'SalesSummary',
-            icon: '',
-            exact: true,
-            component: SalesSummary,
-            access: 'View Reports',
-            restricted: true 
         },
         {
             path: '/reports/sales-by-item',
