@@ -17,7 +17,7 @@ const CustomerSearchField = ({customerId, handleOnChangeCustomerId}) =>
     {
         const result = await POS_.fetchAllCustomersAsync();
 
-        if (result.status = 'Success')
+        if (result.status === 'Success')
         {
             console.log(result)
             setCustomers(result.data);
