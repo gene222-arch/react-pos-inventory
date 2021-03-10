@@ -139,7 +139,11 @@ const CreateSalesReturn = () =>
     const handleOnChangeQuantity = (e, data) => 
     {
         let noOfItemsToReturn = e.target.value;
-        const {price, ordered_quantity, discount} = data;
+
+        const ordered_quantity = data.ordered_quantity;
+        const price = parseFloat((data.price).replaceAll(',', ''));
+        const discount = parseFloat(data.discount);
+        
         noOfItemsToReturn = parseInt(noOfItemsToReturn) || 0;
 
         if (!Number.isInteger(noOfItemsToReturn))
@@ -158,9 +162,9 @@ const CreateSalesReturn = () =>
             }
             else 
             {
-                const subTotal = (parseFloat(price) * noOfItemsToReturn).toFixed(2);
+                const subTotal = (price * noOfItemsToReturn).toFixed(2);
                 const tax = (subTotal * TAX_RATE).toFixed(2);
-                const total = ((parseFloat(price) * noOfItemsToReturn) + ((parseFloat(price) * noOfItemsToReturn) * TAX_RATE) - discount).toFixed(2);
+                const total = ((price * noOfItemsToReturn) + ((price * noOfItemsToReturn) * TAX_RATE) - discount).toFixed(2);
 
                 const filterData = ({
                     ...data,
@@ -287,7 +291,7 @@ const CreateSalesReturn = () =>
                 product_id: order.product_id,
                 defect: order.defect,
                 quantity: order.quantity,
-                price: order.price,
+                price: parseFloat((order.price).replaceAll(',', '')),
                 tax: order.tax,
                 sub_total: order.sub_total,
                 total: order.total,

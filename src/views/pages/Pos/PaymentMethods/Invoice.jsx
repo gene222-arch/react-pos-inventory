@@ -149,7 +149,7 @@ const Invoice = ({customer, total, paymentProcessState, dispatchPaymentProcessSt
                     </Typography>
                 </Grid>
                 {
-                    customer.email === 'NULL' && (
+                    (customer.email === 'NULL' && paymentProcessState.should_mail) && (
                         <Grid item xs={12} sm={12} md={12} lg={12} >
                         <Grid container justify='center' spacing={2} alignItems='center'>
                             <Grid item xs={10} sm={10} md={10} lg={11}>
@@ -170,8 +170,8 @@ const Invoice = ({customer, total, paymentProcessState, dispatchPaymentProcessSt
                             </Grid>
                             <Grid item xs={10} sm={10} md={10} lg={11}>
                                 <TextField
-                                    error={Boolean(errorMessages.customer_name)}
-                                    helperText={errorMessages.customer_name}
+                                    error={Boolean(errorMessages.customer_email)}
+                                    helperText={errorMessages.customer_email}
                                     label="Email address"  
                                     name='email'
                                     fullWidth

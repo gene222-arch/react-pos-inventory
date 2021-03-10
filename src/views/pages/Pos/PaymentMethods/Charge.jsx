@@ -97,32 +97,23 @@ const Charge = ({change, customer, paymentProcessState, dispatchPaymentProcessSt
     {
         setLoading(true);
 
-        if (Math.sign(change) === -1)
+        const result = await POS_.processPaymentAsync(validatedData());
+
+        if (result.status === 'Error')
         {
+            setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
             setAlertSeverity('error');
-            setAlertMessage(`Cash is not enough, remaining fees: ${CURRENCY}${Math.abs(change)}`);
-        }   
+            setAlertMessage(ALERT_MESSAGES.CANT_PROCESS_PAYMENT);
+        }
         else 
         {
-            const result = await POS_.processPaymentAsync(validatedData());
-
-            if (result.status === 'Error')
-            {
-                setErrorMessages(prepareSetErrorMessages(result.message, errorMessages));
-                setAlertSeverity('error');
-                setAlertMessage(ALERT_MESSAGES.CANT_PROCESS_PAYMENT);
-            }
-            else 
-            {
-                setAlertSeverity('success');
-                setAlertMessage(result.message);
-                setTimeout(() =>  history.go(0), 2000);
-            }
+            setAlertSeverity('success');
+            setAlertMessage(result.message);
+            setTimeout(() =>  history.go(0), 2000);
         }
-
-            setOpenAlert(true);
-            setTimeout(() =>  setLoading(false), 2000);
-
+    
+        setOpenAlert(true);
+        setTimeout(() =>  setLoading(false), 2000);
     }
 
 
@@ -150,7 +141,7 @@ const Charge = ({change, customer, paymentProcessState, dispatchPaymentProcessSt
                     </Typography>
                 </Grid>
                 {
-                    customer.email === 'NULL' && (
+                    (customer.email === 'NULL' && paymentProcessState.should_mail) && (
                         <Grid item xs={12} sm={12} md={12} lg={12} >
                         <Grid container spacing={2} justify='center' alignItems='center'>
                             <Grid item xs={10} sm={10} md={10} lg={11}>

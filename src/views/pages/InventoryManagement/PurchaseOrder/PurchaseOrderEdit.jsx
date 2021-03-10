@@ -201,8 +201,13 @@ const PurchaseOrderEdit = ({match}) =>
     const fetchPurchaseOrder = async () => 
     {
         const result = await PurchaseOrder_.fetchAsync({
-            purchase_order_id: purchaseOrderId 
-        })
+            purchase_order_id: purchaseOrderId,
+            do_filter: true,
+            table_to_filter: 'purchase_order_details',
+            filter_by: 'remaining_ordered_quantity',
+            operator: '>',
+            filter: 0
+        });
 
         if (result.status === 'Success')
         {
@@ -223,21 +228,22 @@ const PurchaseOrderEdit = ({match}) =>
 
         setProductId(id);
 
-        const result = await PurchaseOrder_.fetchProductAsync({
-            product_id: id
-        });
+        const po = purchaseOrderDetails
+            .find(purchaseOrderDetail => purchaseOrderDetail.product_id === id);
 
-        if (result.status === 'Success')
+        if (po)
         {
-            const po = purchaseOrderDetails.find(purchaseOrderDetail => purchaseOrderDetail.id === result.data.id);
-
-            if (po)
-            {
-                setAlertSeverity('warning');
-                setAlertMessage('The product already exist.');
-                setOpenAlert(true);
-            }
-            else 
+            setAlertSeverity('warning');
+            setAlertMessage('The product already exist.');
+            setOpenAlert(true);
+        }
+        else 
+        {
+            const result = await PurchaseOrder_.fetchProductAsync({
+                product_id: id
+            });
+    
+            if (result.status === 'Success')
             {
                 setPurchaseOrderDetails([...purchaseOrderDetails, result.data]);
                 setProductId(0);

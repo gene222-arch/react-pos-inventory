@@ -122,7 +122,9 @@ const SalesByItem = () =>
     };
 
     const handleStartDate = (date) => setStartDate(DateHelper.prepareExtractCurDate(date));
+
     const handleEndDate = (date) => setEndDate(DateHelper.prepareExtractCurDate(date));
+
     const handleRemoveDate = () => {
         setStartDate(null);
         setEndDate(null);
@@ -135,6 +137,7 @@ const SalesByItem = () =>
 
         if (result.status === 'Success')
         {
+            console.log(result)
             setSalesByItem(result.data);
             handleChartXLabel(result.data.tableData);
         }
@@ -296,7 +299,7 @@ const SalesByItem = () =>
                                                             />
                                                             <ListItemSecondaryAction>
                                                                 <Typography variant="h5" color="initial" gutterBottom={false}>
-                                                                    {`${CURRENCY}${(item.net_sales).toFixed(2)}`}
+                                                                    {`${CURRENCY}${(item.net_sales)}`}
                                                                 </Typography>
                                                             </ListItemSecondaryAction>
                                                         </ListItem>

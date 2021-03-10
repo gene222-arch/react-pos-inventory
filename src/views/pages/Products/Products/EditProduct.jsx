@@ -227,6 +227,11 @@ const EditProduct = ({match}) =>
             {
                 delete product[key];
             }
+            
+            if (key === 'image' && product[key] === '')
+            {
+                delete product[key];
+            }
         }
 
         return {
@@ -466,6 +471,12 @@ const EditProduct = ({match}) =>
                                         value={stock.supplier_id}
                                         onChange={handleOnChangeStock}
                                     >
+                                            <MenuItem 
+                                                key={0}
+                                                value={''}
+                                            >
+                                                None
+                                            </MenuItem>
                                         {
                                             suppliers.map((supplier) => (
                                                 <MenuItem 

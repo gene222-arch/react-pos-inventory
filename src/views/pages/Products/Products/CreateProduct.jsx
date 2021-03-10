@@ -33,7 +33,7 @@ const PRODUCT_DEFAULT = {
     sku: '',
     barcode: '',
     name: '',
-    image: 'no_image.svg',
+    image: '',
     category: '',
     sold_by: '',
     price: '',
@@ -182,15 +182,21 @@ const CreateProduct = () =>
 
     const validateData = () => 
     {    
-        for (const key in stock) {
+        for (const key in stock) 
+        {
             if (!stock[key])
             {
                 delete stock[key];
             }
         }
 
-        for (const key in product) {
+        for (const key in product) 
+        {
             if (!product[key] && key !== 'is_for_sale')
+            {
+                delete product[key];
+            }
+            if (key === 'image' && product[key] === '')
             {
                 delete product[key];
             }
@@ -424,6 +430,12 @@ const CreateProduct = () =>
                                     value={stock.supplier_id}
                                     onChange={handleOnChangeStock}
                                 >
+                                        <MenuItem 
+                                            key={0}
+                                            value={''}
+                                        >
+                                            None
+                                        </MenuItem>
                                     {
                                         suppliers.length > 0 && suppliers.map((supplier) => (
                                             <MenuItem 

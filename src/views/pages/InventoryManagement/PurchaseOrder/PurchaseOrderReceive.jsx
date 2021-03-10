@@ -108,16 +108,23 @@ const PurchaseOrderReceive = ({match}) =>
 
     const handleOnClickMarkAllReceived = async () =>
     {
-        const result = await PurchaseOrder_.markAllAsReceivedAsync({
-            purchase_order_id: purchaseOrderId,
-            product_ids: purchaseOrderDetails.map(po => po.product_id)
-        })
+        setLoading(true);
+        handleClose();
+        const result = await PurchaseOrder_.markAllAsReceivedAsync(validateDataMarkAllReceived())
 
         if (result.status === 'Success')
         {
-            history.push(`/inventory-mngmt/purchase-order-details/${purchaseOrderId}`)
+            setAlertSeverity('success');
+            setAlertMessage(result.message);
+            setOpenAlert(true);
 
+            setTimeout(() => {
+                history.push(`/inventory-mngmt/purchase-order-details/${purchaseOrderId}`)
+            }, 2000);
         }
+
+        setTimeout(() => setLoading(false), 2000);
+        
     };
 
 
@@ -143,7 +150,7 @@ const PurchaseOrderReceive = ({match}) =>
     const handleOnReceivePurchase = async () => 
     {
         setLoading(true);
-        const result = await PurchaseOrder_.receiveAsync(validateDate());
+        const result = await PurchaseOrder_.receiveAsync(validateDataToReceive());
 
         if (result.status === 'Error')
         {
@@ -152,7 +159,7 @@ const PurchaseOrderReceive = ({match}) =>
         }
         else 
         {
-            const hasReceivedItems = validateDate()
+            const hasReceivedItems = validateDataToReceive()
                 .items_received_quantities
                 .find(item => item.received_quantity > 0);
             
@@ -176,7 +183,7 @@ const PurchaseOrderReceive = ({match}) =>
     }
 
 
-    const validateDate = () => 
+    const validateDataToReceive = () => 
     {
         delete purchaseOrder.id 
 
@@ -184,6 +191,23 @@ const PurchaseOrderReceive = ({match}) =>
             product_id: purchaseOrderDetail.product_id,
             purchase_order_details_id: purchaseOrderDetail.purchase_order_details_id,
             received_quantity: purchaseOrderDetail.received_quantity
+        }));
+
+        return {
+            ...purchaseOrder,
+            items_received_quantities: itemsReceived
+        };
+    }
+
+
+    const validateDataMarkAllReceived = () => 
+    {
+        delete purchaseOrder.id 
+
+        const itemsReceived = purchaseOrderDetails.map(purchaseOrderDetail => ({
+            product_id: purchaseOrderDetail.product_id,
+            purchase_order_details_id: purchaseOrderDetail.purchase_order_details_id,
+            received_quantity: purchaseOrderDetail.remaining_total_ordered_quantity
         }));
 
         return {

@@ -39,8 +39,7 @@ const columns = [
     { field: 'purchase_cost', headerName: 'Purchase cost', width: 250,
         valueFormatter: param => param.value.toFixed(2)
     },
-    { field: 'amount', headerName: 'Amount', width: 250, 
-    valueFormatter: param => param.value.toFixed(2) },
+    { field: 'amount', headerName: 'Amount', width: 250 },
 ];
 
 

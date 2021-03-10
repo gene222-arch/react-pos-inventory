@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useReducer} from 'react'
+import React, {useState, useEffect, useReducer, lazy} from 'react'
 import * as Pos_ from '../../../services/pos/pos'
 import Charge from './PaymentMethods/Charge'
 import CardPayment from './PaymentMethods/Card'
@@ -11,6 +11,8 @@ import { Grid, Typography, Divider, Card, CardContent, TextField, Button, Avatar
 import { ReceiptRounded, CardMembership, Money, ArrowBackIos, Clear, MoreVert as MoreVertIcon } from '@material-ui/icons'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+const AlertPopUpMessage = lazy(() => import('../../../components/AlertMessages/AlertPopUpMessage'));
+
 
 const paymentReducer = (state, action) => 
 {
@@ -61,6 +63,8 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
 {
     const classes = processPaymentUseStyles();
 
+    const TO_PAY = parseFloat(paymentAmountDetails.total.replaceAll(',', '')).toFixed(2);
+
     const [paymentProcessState, dispatchPaymentProcessState] = useReducer(paymentReducer, {
         customer_id: customerId,
         customer_email: '',
@@ -70,15 +74,42 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
         cash: 0.00,
         number_of_days: 30,
     });
-
     const [customer, setCustomer] = useState(CUSTOMER_DEFAULT_PROPS);
 
-    const handlePaymentMethod = (paymentMethod) => dispatchPaymentProcessState({
-        type: 'set-payment-type',
-        payload: {
-            paymentMethod: paymentMethod
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('');
+
+    const handleCloseAlert = (event, reason) => 
+    {
+        if (reason === 'clickaway') {
+            return;
+    }
+
+        setOpenAlert(false);
+    };
+
+    const handlePaymentMethod = (paymentMethod) => 
+    {
+        const change = paymentProcessState.cash - TO_PAY;
+
+        if (paymentMethod === 'cash' && Math.sign(change) === -1) 
+        {
+            setAlertSeverity('error');
+            setAlertMessage(`Cash is not enough, remaining fees: ${CURRENCY}${Math.abs(change)}`);
+            setOpenAlert(true);
         }
-    });
+        else 
+        {
+            dispatchPaymentProcessState({
+                type: 'set-payment-type',
+                payload: {
+                    paymentMethod: paymentMethod
+                }
+            })
+        }
+
+};
 
     const handleOnChargeAmount = (e, amount) => 
     {
@@ -87,7 +118,7 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
             dispatchPaymentProcessState({
                 type: 'set-cash',
                 payload: {
-                    cash: e.target.value
+                    cash: parseFloat(e.target.value)
                 }
             });
         }
@@ -213,6 +244,12 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
 
     return (
         <>
+           <AlertPopUpMessage 
+                open={openAlert}
+                handleClose={handleCloseAlert}
+                globalMessage={alertMessage}
+                severity={alertSeverity} 
+            />
             <Grid container spacing={1}>
                 <Grid item xs={12} sm={12} md={4} lg={4}>
                     <Grid container>
@@ -324,7 +361,9 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
                             (   paymentProcessState.payment_method.length > 0 &&
                                 paymentProcessState.payment_method === 'cash') && (
                                 <Charge 
-                                    change={(paymentProcessState.cash - paymentAmountDetails.total).toFixed(2)}
+                                    change={
+                                        (paymentProcessState.cash - TO_PAY).toFixed(2)
+                                    }
                                     customer={customer}
                                     paymentProcessState={paymentProcessState}
                                     dispatchPaymentProcessState={dispatchPaymentProcessState}

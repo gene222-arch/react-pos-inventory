@@ -294,7 +294,7 @@ const Receipt = () =>
                                         <ListItem>
                                             <ListItemText primary={salesInfo.customer} secondary={salesInfo.paid_at} />
                                             <ListItemSecondaryAction>
-                                                # {salesInfo.id}
+                                                # {selectedId}
                                             </ListItemSecondaryAction>
                                         </ListItem>
                                     </List>
