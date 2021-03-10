@@ -29,10 +29,10 @@ const CustomerOrderTransactions = () =>
 
     const columns = [
         { field: 'id', headerName: 'Order #', width: 115 },
-        { field: 'ordered_at', headerName: 'Date', width: 210 },
+        { field: 'ordered_at', headerName: 'Date', width: 250 },
         { field: 'customer', headerName: 'Customer', width: 250 },
-        { field: 'customer_address', headerName: 'Address', width: 460 },
-        { field: 'number_of_items', headerName: 'Number of items', width: 170 },
+        { field: 'payment_type', headerName: 'Payment type', width: 250 },
+        { field: 'number_of_items', headerName: 'Number of items', width: 250 },
     
     ];
 

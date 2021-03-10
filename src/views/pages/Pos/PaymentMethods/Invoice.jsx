@@ -102,7 +102,7 @@ const Invoice = ({customer, total, paymentProcessState, dispatchPaymentProcessSt
             dispatchPaymentProcessState({
                 type: 'set-number-of-days',
                 payload: {
-                    name: value
+                    numberOfDays: value
                 }
             })
         }
