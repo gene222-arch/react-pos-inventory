@@ -61,6 +61,7 @@ const ProductSearchField = ({
                                             !index 
                                                 ? (
                                                     <MenuItem  
+                                                        key={0}
                                                         value={0}>All items
                                                     </MenuItem>
                                                 ) 

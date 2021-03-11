@@ -238,7 +238,6 @@ const OrderOptions = ({
                                                 key={discount.id}
                                                 item xs={12} sm={12} md={3} lg={3}>
                                                 <Button 
-                                                    size="contained" 
                                                     color="default" 
                                                     className={classes.itemListOptionsBtn}
                                                     onClick={
@@ -258,7 +257,6 @@ const OrderOptions = ({
                                     <Grid 
                                         item xs={12} sm={12} md={3} lg={3}>
                                         <Button 
-                                            size="contained" 
                                             color="default" 
                                             className={classes.itemListOptionsBtn}
                                             onClick={handleClickOpenRemoveDiscount}
@@ -273,7 +271,6 @@ const OrderOptions = ({
                                 {
                                     (orderDetails.length > 0 ) && (
                                         <Button 
-                                            size="contained" 
                                             color="default" 
                                             className={classes.itemListOptionsBtn}
                                             onClick={handleClickOpenCancelOrderDialog}
