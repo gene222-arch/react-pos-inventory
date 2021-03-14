@@ -166,11 +166,7 @@ const Dashboard = () =>
                             <CardContent>
                                 <Divider />
                             </CardContent>
-                            <CardActions className={classes.cardActionsContainer}>
-                                <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                    <TrendingUpIcon /> {'$2000'} Last month
-                                </Typography>
-                            </CardActions>
+
                         </Card>
                     </Grid>                
                     
@@ -198,11 +194,7 @@ const Dashboard = () =>
                             <CardContent>
                                 <Divider />
                             </CardContent>
-                            <CardActions className={classes.cardActionsContainer}>
-                                <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                    <TrendingUpIcon /> {'$2000'} Last month
-                                </Typography>
-                            </CardActions>
+
                         </Card>
                     </Grid>          
 
@@ -230,11 +222,7 @@ const Dashboard = () =>
                             <CardContent>
                                 <Divider />
                             </CardContent>
-                            <CardActions className={classes.cardActionsContainer}>
-                                <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                    <TrendingUpIcon /> {'$2000'} Last month
-                                </Typography>
-                            </CardActions>
+
                         </Card>
                     </Grid>     
 
@@ -262,11 +250,7 @@ const Dashboard = () =>
                             <CardContent>
                                 <Divider />
                             </CardContent>
-                            <CardActions className={classes.cardActionsContainer}>
-                                <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                    <TrendingUpIcon /> {'$2000'} Last month
-                                </Typography>
-                            </CardActions>
+
                         </Card>
                     </Grid>                
                 
@@ -294,11 +278,7 @@ const Dashboard = () =>
                             <CardContent>
                                 <Divider />
                             </CardContent>
-                            <CardActions className={classes.cardActionsContainer}>
-                                <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                    <TrendingDownIcon /> {'-$2000'} Last month
-                                </Typography>
-                            </CardActions>
+
                         </Card>
                     </Grid>                
         
@@ -326,11 +306,7 @@ const Dashboard = () =>
                             <CardContent>
                                 <Divider />
                             </CardContent>
-                            <CardActions className={classes.cardActionsContainer}>
-                                <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                    <TrendingDownIcon /> {'-$2000'} Last month
-                                </Typography>
-                            </CardActions>
+
                         </Card>
                     </Grid>                
 
@@ -358,11 +334,7 @@ const Dashboard = () =>
                         <CardContent>
                             <Divider />
                         </CardContent>
-                        <CardActions className={classes.cardActionsContainer}>
-                            <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                <TrendingDownIcon /> {'-$2000'} Last month
-                            </Typography>
-                        </CardActions>
+
                     </Card>
                 </Grid>                
 
@@ -390,11 +362,7 @@ const Dashboard = () =>
                         <CardContent>
                             <Divider />
                         </CardContent>
-                        <CardActions className={classes.cardActionsContainer}>
-                            <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                <TrendingDownIcon /> {'-$2000'} Last month
-                            </Typography>
-                        </CardActions>
+
                     </Card>
                 </Grid>                
 
@@ -422,11 +390,7 @@ const Dashboard = () =>
                         <CardContent>
                             <Divider />
                         </CardContent>
-                        <CardActions className={classes.cardActionsContainer}>
-                            <Typography variant="subtitle2" color="initial" className={classes.additionalInfo}>
-                                <TrendingDownIcon /> {'-$2000'} Last month
-                            </Typography>
-                        </CardActions>
+
                     </Card>
                 </Grid>                
 
