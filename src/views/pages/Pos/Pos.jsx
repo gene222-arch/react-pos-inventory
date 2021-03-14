@@ -100,6 +100,7 @@ const Pos = () =>
         {
             setOrderDetails([]);
             setPaymentAmountDetails(PAYMENT_DETAILS);
+            setCustomerIsDiscounted(false)
         }
 
         setLoading(false);

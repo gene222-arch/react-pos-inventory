@@ -1,6 +1,5 @@
 import React, {useState, useEffect, lazy} from 'react';
 import * as SalesReceipt from '../../../services/exports/pdf/sales-receipt';
-import {CURRENCY} from '../../../config/currency'
 import * as Receipt_ from '../../../services/receipts/receipt'
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
@@ -23,7 +22,9 @@ import * as DateHelper from '../../../utils/dates'
 import Typography from '@material-ui/core/Typography'
 import CardHeader from '@material-ui/core/CardHeader'
 import DescriptionIcon from '@material-ui/icons/Description';
+import { CURRENCY } from './../../../config/currency';
 const AlertPopUpMessage = lazy(() => import('../../../components/AlertMessages/AlertPopUpMessage'));
+
 
 
 
@@ -65,8 +66,14 @@ const columns = [
         valueFormatter: param => (param.value).toFixed(2) 
     },
     { 
+        field: 'discount', 
+        headerName: 'Discount', 
+        width: 189,
+        valueFormatter: param => (param.value).toFixed(2)
+    },
+    { 
         field: 'amount', 
-        headerName: 'Amount', 
+        headerName: 'Sub total', 
         width: 189,
         valueFormatter: param => (param.value).toFixed(2)
     },
@@ -102,7 +109,11 @@ const SalesInfoAvatar = ({text}) =>
 const SALES_INFO_DEFAULT_PROPS = {
     customer: '',
     cashier: '',
-    paid_at: ''
+    paid_at: '',
+    sub_total: 0.00,
+    total_discount: 0.00,
+    total_tax: 0.00, 
+    total: 0.00
 };
 
 const Receipt = () => 
@@ -201,6 +212,7 @@ const Receipt = () =>
             setSelectedId(0);
             setReceipts([]);
             setReceiptDetails([]);
+            setSalesInfo(SALES_INFO_DEFAULT_PROPS);
         }
     }, []);
 
@@ -212,7 +224,7 @@ const Receipt = () =>
                 globalMessage={alertMessage}
                 severity={alertSeverity} 
             />
-            <Grid container spacing={1} justify='space-between'>
+            <Grid container  justify='space-between' spacing={1}>
                 <Grid item xs={12} sm={12} md={4} lg={4}>
                     <Card className={classes.receiptsContainer}>
                         <CardContent>
@@ -298,6 +310,36 @@ const Receipt = () =>
                                             </ListItemSecondaryAction>
                                         </ListItem>
                                     </List>
+                                    <List>
+                                        <Grid container  direction='column'>
+                                            <Grid item>
+                                                <ListItem>
+                                                    <Grid container  justify='space-between'>
+                                                        <Grid item>
+                                                            <ListItemText 
+                                                                primary={salesInfo.sub_total} 
+                                                                secondary='Sub total' 
+                                                            />
+                                                        </Grid>
+                                                        <Grid item>
+                                                            <ListItemText 
+                                                                primary={salesInfo.total_tax} 
+                                                                secondary='Tax' 
+                                                            />
+                                                        </Grid>
+                                                    </Grid>
+                                                </ListItem>
+                                            </Grid>
+                                            <Grid item>
+                                                <ListItem>
+                                                    <ListItemText primary={salesInfo.total_discount} secondary='Discount' />
+                                                </ListItem>
+                                            </Grid>
+                                        </Grid>
+                                    </List>
+                                    <Typography variant="h4" color="initial" align='center'>
+                                        {`${CURRENCY}${salesInfo.total}`}
+                                    </Typography>
                                 </CardContent>
                                 </>
                                 )
