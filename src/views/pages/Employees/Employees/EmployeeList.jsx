@@ -112,7 +112,7 @@ const EmployeeList = () =>
                 open={open} 
                 handleClose={handleClose} 
                 handleAction={deleteEmployees}
-                title={'Delete employees?'}
+                title={'Delete employees with its associated account?'}
                 dialogContentText={'Are you sure you want to delete the employees'}
             />
             <Card>
