@@ -6,7 +6,8 @@ import * as PurchaseOrder_ from '../../../../services/inventory-management/purch
 import { useHistory } from 'react-router-dom'
 import { purchaseOrderUseStyles } from '../../../../assets/material-styles/styles'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
-import { Card, CardContent, Grid, TextField, Button, InputLabel } from '@material-ui/core';
+import { CURRENCY } from './../../../../config/currency';
+import { Card, CardContent, Grid, TextField, Button, InputLabel, Typography } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
@@ -444,49 +445,6 @@ const PurchaseOrderEdit = ({match}) =>
                     </Grid>
                 </CardContent>
             </Card>
-            <Card className={classes.purchaseOrderCard}>
-                <CardContent>
-                    <Grid container spacing={1} alignItems='center' justify='space-between'>
-                        <Grid item>
-                        <Grid container spacing={1}>
-                            <Grid item>
-                                <FormControl 
-                                    className={classes.formControl}
-                                    error={Boolean(errorMessages.items !== '')}
-                                >
-                                    <InputLabel id="demo-simple-select-label">Add product</InputLabel>
-                                    <Select
-                                        name='role'
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        className={classes.selectEmpty}
-                                        fullWidth
-                                        margin='dense'
-                                        value={productId}
-                                        onChange={fetchProductToPurchase}
-                                    >
-                                        {
-                                            products.length > 0 && products.map((product) => (
-                                                <MenuItem key={product.id} value={product.id}>
-                                                    {product.name}
-                                                </MenuItem>
-                                            ))
-                                        }
-                                        
-                                    </Select>
-                                    <FormHelperText>{errorMessages.items}</FormHelperText>
-                                </FormControl>  
-                            </Grid>
-                        
-                        </Grid>
-                    
-                        </Grid>
-                        <Grid item>
-                            <ReceivedStocks purchaseOrderId={purchaseOrderId}/>
-                        </Grid>
-                    </Grid>
-                </CardContent>
-            </Card>
             <div style={{ width: '100%' }}>
                 <DataGrid
                     autoHeight 
@@ -501,6 +459,54 @@ const PurchaseOrderEdit = ({match}) =>
                     className={classes.dataGrid}
                 />
             </div>
+           
+            <Card className={classes.purchaseOrderCard}>
+                <CardContent>
+                    <Grid container spacing={1} alignItems='center' justify='space-between'>
+                        <Grid item>
+                            <Grid container spacing={1}>
+                                <Grid item>
+                                    <FormControl 
+                                        className={classes.formControl}
+                                        error={Boolean(errorMessages.items !== '')}
+                                    >
+                                        <InputLabel id="demo-simple-select-label">Add product</InputLabel>
+                                        <Select
+                                            name='role'
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            className={classes.selectEmpty}
+                                            fullWidth
+                                            margin='dense'
+                                            value={productId}
+                                            onChange={fetchProductToPurchase}
+                                        >
+                                            {
+                                                products.length > 0 && products.map((product) => (
+                                                    <MenuItem key={product.id} value={product.id}>
+                                                        {product.name}
+                                                    </MenuItem>
+                                                ))
+                                            }
+                                            
+                                        </Select>
+                                        <FormHelperText>{errorMessages.items}</FormHelperText>
+                                    </FormControl>  
+                                </Grid>
+                            
+                            </Grid>
+                        </Grid>
+                        <Grid item >
+                            <ReceivedStocks purchaseOrderId={purchaseOrderId}/>
+                        </Grid>
+                        <Grid item >
+                            <Typography variant="h4" color="initial">
+                                {`${CURRENCY}${(purchaseOrderDetails.map(po => po.amount).reduce((total, cur) => total + cur, 0)).toFixed(2)}` }
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                </CardContent>
+            </Card>
             <Grid container justify='flex-end'>
                 <Grid item>
                     <Button 

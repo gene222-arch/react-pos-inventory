@@ -1,10 +1,11 @@
 import React, { useState, useEffect, lazy } from 'react';
+import { CURRENCY } from './../../../../config/currency';
 import {prepareSetErrorMessages} from '../../../../utils/errorMessages'
 import * as PurchaseOrder_ from '../../../../services/inventory-management/purchaseOrders'
 import { useHistory } from 'react-router-dom'
 import { purchaseOrderUseStyles } from '../../../../assets/material-styles/styles'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
-import { Card, CardContent, Grid, TextField, Button, InputLabel } from '@material-ui/core';
+import { Card, CardContent, Grid, TextField, Button, InputLabel, Typography } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
@@ -14,6 +15,7 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers';
 import * as DateHelper from '../../../../utils/dates'
 const AlertPopUpMessage = lazy(() => import('../../../../components/AlertMessages/AlertPopUpMessage'))
+
 
 
 const PURCHASE_ORDER_DEFAULT = {
@@ -47,7 +49,7 @@ const PurchaseOrder = () =>
     const [products, setProducts] = useState([]);
     const [productId, setProductId] = useState(0);
     const [errorMessages, setErrorMessages] = useState(PURCHASE_ORDER_ERROR_DEFAULT);
- 
+
     const columns = [
         { field: 'id', hide: true},
         { field: 'product_id', hide: true},
@@ -397,9 +399,23 @@ const PurchaseOrder = () =>
                     </Grid>
                 </CardContent>
             </Card>
+            <div style={{ width: '100%' }}>
+                <DataGrid
+                    autoHeight 
+                    showToolbar
+                    components={{
+                        Toolbar: GridToolbar,
+                    }}
+                    rows={purchaseOrderDetails} 
+                    columns={columns} 
+                    pageSize={5} 
+                    rowsPerPageOptions={[5, 10, 20]}
+                    className={classes.dataGrid}
+                />
+            </div>
             <Card className={classes.purchaseOrderCard}>
                 <CardContent>
-                    <Grid container spacing={1}>
+                    <Grid container spacing={1} justify='space-between'>
                         <Grid item>
                             <FormControl 
                                 className={classes.formControl}
@@ -436,24 +452,15 @@ const PurchaseOrder = () =>
                                 <FormHelperText>{errorMessages.items}</FormHelperText>
                             </FormControl>  
                         </Grid>
+                        <Grid item>
+                            <Typography variant="h4" color="initial">
+                                {`${CURRENCY}${(purchaseOrderDetails.map(po => po.amount).reduce((total, cur) => total + cur, 0)).toFixed(2)}` }
+                            </Typography>
+                        </Grid>
                     </Grid>
                 
                 </CardContent>
             </Card>
-            <div style={{ width: '100%' }}>
-                <DataGrid
-                    autoHeight 
-                    showToolbar
-                    components={{
-                        Toolbar: GridToolbar,
-                    }}
-                    rows={purchaseOrderDetails} 
-                    columns={columns} 
-                    pageSize={5} 
-                    rowsPerPageOptions={[5, 10, 20]}
-                    className={classes.dataGrid}
-                />
-            </div>
             <Grid container justify='flex-end'>
                 <Grid item>
                     <Button 

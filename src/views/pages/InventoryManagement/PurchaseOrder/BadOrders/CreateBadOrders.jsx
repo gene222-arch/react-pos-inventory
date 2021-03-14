@@ -1,7 +1,7 @@
 import React, {useState, useEffect, lazy} from 'react';
 import Loading from '../../../../../components/Loading'
 import * as BadOrder_ from '../../../../../services/inventory-management/badOrders'
-import * as PurchaseOrder_ from '../../../../../services/inventory-management/purchaseOrders'
+import { CURRENCY } from './../../../../../config/currency';
 import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, Grid } from '@material-ui/core';
@@ -48,6 +48,8 @@ const CreateBadOrders = () =>
     const [openAlert, setOpenAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('');
+
+    console.log(purchaseOrderDetails)
 
     const handleCloseAlert = (event, reason) => 
     {
@@ -140,7 +142,6 @@ const CreateBadOrders = () =>
         }
     ];
     
-
     const handleOnChangeQuantity = (e, data) => 
     {
         let noOfItemsToReturn = e.target.value;
@@ -370,6 +371,24 @@ const CreateBadOrders = () =>
                             />
                         </div>
                         <Grid container justify='flex-end'>
+                            <Grid item xs={12} sm={12} md={12} lg={12}>
+                                <Card>
+                                    <CardContent>
+                                        <Typography variant="h4" color="initial" align='right'>
+                                            {`${CURRENCY}
+                                            ${
+                                                !(purchaseOrderDetails.items.length > 0) 
+                                                ? (0).toFixed(2) 
+                                                : 
+                                                (purchaseOrderDetails
+                                                    .items
+                                                    .map(po => parseFloat(po.amount))
+                                                    .reduce((total, cur) => total + cur, 0)).toFixed(2)
+                                            }` }
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
                             <Grid item>
                                 <Button 
                                     variant='contained' 
