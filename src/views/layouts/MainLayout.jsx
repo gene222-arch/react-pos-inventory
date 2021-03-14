@@ -916,23 +916,23 @@ const MainLayout = ({children}) =>
 
                 {/* Settings */}
                 {
-                    userHasPermissionTo('Manage Settings') && (
-                        <NavLink className={classes.navLinks} to={'/settings'}>
-                            <ListItem 
-                                button
-                                selected={ selectedItem === 'Settings' }
-                                onClick={ 
-                                    () => handleSelectedItem( 'Settings') 
-                                }
-                            >
-                                <ListItemIcon><Settings className={classes.settings}/></ListItemIcon>
-                                <ListItemText primary={
-                                    <Typography variant='subtitle1' className={classes.dropdownTitle}>
-                                        Settings
-                                    </Typography>}/>
-                            </ListItem>
-                        </NavLink>
-                    )
+                    // userHasPermissionTo('Manage Settings') && (
+                    //     <NavLink className={classes.navLinks} to={'/settings'}>
+                    //         <ListItem 
+                    //             button
+                    //             selected={ selectedItem === 'Settings' }
+                    //             onClick={ 
+                    //                 () => handleSelectedItem( 'Settings') 
+                    //             }
+                    //         >
+                    //             <ListItemIcon><Settings className={classes.settings}/></ListItemIcon>
+                    //             <ListItemText primary={
+                    //                 <Typography variant='subtitle1' className={classes.dropdownTitle}>
+                    //                     Settings
+                    //                 </Typography>}/>
+                    //         </ListItem>
+                    //     </NavLink>
+                    // )
                 }
                 </List>
             </Drawer>

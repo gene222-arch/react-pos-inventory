@@ -27,6 +27,7 @@ const ReceivedStockTransactions = () =>
 
         if (result.status === 'Success')
         {
+            console.log(result)
             setReceivedStocks(result.data);
         }
     }
