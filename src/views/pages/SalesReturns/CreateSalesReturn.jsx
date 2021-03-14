@@ -227,9 +227,9 @@ const CreateSalesReturn = () =>
         {
             console.log(result)
             setCustomerOrderList(result.data);
-            setLoadingData(false);
         }
 
+        setLoadingData(false);
     }
 
     const handleOnPurchaseOrder = async (e) => 
@@ -356,14 +356,10 @@ const CreateSalesReturn = () =>
                                                 value={posId}
                                                 onChange={handleOnPurchaseOrder}
                                             >
-                                                
+                                                <MenuItem key={0} value={0}>Select customer order #</MenuItem>
                                                 {
                                                     customerOrderList.map((co, index) => (
-                                                        !index
-                                                        ? (
-                                                            <MenuItem key={0} value={0}>Select customer order #</MenuItem>
-                                                        )
-                                                        : <MenuItem 
+                                                        <MenuItem 
                                                             key={co.id}
                                                             value={co.id}>CO{co.id}
                                                         </MenuItem>

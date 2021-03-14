@@ -79,13 +79,13 @@ export const RenderRoutes = ({routes}) =>
                         strict={route.strict}
                         exact={route.exact}
                         render={ props => { 
-                            if (route.restricted)
+                            if (route.restricted) // Private routes
                             {
-                                if (Cookie.has('access_token'))
+                                if (Cookie.has('access_token')) // determine if user is authenticated
                                 {
-                                    if (userPermissions.length)
+                                    if (userPermissions.length) // determine if user have permissions
                                     {
-                                        if (!userPermissions.includes(route.access))
+                                        if (!userPermissions.includes(route.access)) // user has no permissions
                                         {
                                             return <Unauthorized />
                                         }
@@ -99,7 +99,7 @@ export const RenderRoutes = ({routes}) =>
                                     history.push('/auth/login')
                                 }
                             }
-                            else 
+                            else // Public routes
                             {
                                 if (Cookie.has('access_token'))
                                 {

@@ -96,6 +96,11 @@ const Pos = () =>
 
             setCustomerIsDiscounted(Boolean(parseFloat(discount) > 0));
         }
+        else 
+        {
+            setOrderDetails([]);
+            setPaymentAmountDetails(PAYMENT_DETAILS);
+        }
 
         setLoading(false);
     }
@@ -163,6 +168,7 @@ const Pos = () =>
                 _orderDetails = _orderDetails.filter((order) => id != order.pos_details_id)
             });
 
+            setRowIds([]);
             setOrderDetails(_orderDetails);
         }
     }
@@ -187,6 +193,7 @@ const Pos = () =>
         fetchCustomerCart();
 
         return () => {
+            setRowIds([]);
             setOrderDetails([]);
             setPaymentAmountDetails(PAYMENT_DETAILS);
         }

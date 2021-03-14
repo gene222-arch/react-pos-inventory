@@ -1,4 +1,4 @@
-import React, { useState, lazy } from 'react';
+import React, { useState, useEffect, lazy } from 'react';
 import * as Customers_ from '../../../services/customers/customers'
 import { useHistory } from 'react-router-dom'
 import { Card, CardContent, Grid, CardHeader, TextField, Button, Divider, FormHelperText } from '@material-ui/core';
@@ -70,14 +70,20 @@ const CreateCustomer = () => {
             setAlertMessage(result.message)
             setTimeout(() => {
                 history.push('/customers');
-                setCustomer(CUSTOMER_DEFAULT_PROPS);
-                setErrorMessages(CUSTOMER_DEFAULT_PROPS);
             }, 2000);
         }
 
         setOpenAlert(true);
         setTimeout(() =>  setLoading(false), 2000);
     }
+
+
+    useEffect (() => {
+        return () => {
+            setCustomer(CUSTOMER_DEFAULT_PROPS);
+            setErrorMessages(CUSTOMER_DEFAULT_PROPS);
+        }
+    }, []);
 
     return (
         <>

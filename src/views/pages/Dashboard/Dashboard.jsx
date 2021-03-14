@@ -83,19 +83,24 @@ const Dashboard = () =>
         yAxis: {
             title: {
                 text: 'Sales'
-            }
+            },
         },
         xAxis: {
             categories: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
         },
         tooltip: {
             formatter: function() {
-                return `Sales in <strong>${this.x}:</strong> ${CURRENCY.CURRENCY} ${this.y}`
+                return `Sales in <strong>${this.x}:</strong> ${CURRENCY.CURRENCY} ${Highcharts.numberFormat(this.y, 2)}`
             }
         },
         series: [{
             name: 'Sales',
-            data: dashboardData.monthlySales
+            data: dashboardData.monthlySales,
+            labels: {
+                formatter: function () {
+                    return Highcharts.numberFormat(this.value, 2);
+                }
+            }
         }]
     };
     

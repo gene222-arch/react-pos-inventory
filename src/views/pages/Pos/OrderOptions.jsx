@@ -154,25 +154,17 @@ const OrderOptions = ({
     {
         const result = await POS_.cancelOrdersAsync({customer_id: customerId});
 
-        if (orderDetails.length <= 0)
+        if (result.status === 'Error')
         {
             setAlertSeverity('error');
-            setAlertMessage(ALERT_MESSAGES.CANT_REMOVE_DISCOUNT);
+            setAlertMessage(result.message);
         }
         else 
         {
-            if (result.status === 'Error')
-            {
-                setAlertSeverity('error');
-                setAlertMessage(result.message);
-            }
-            else 
-            {
-                setAlertSeverity('success');
-                setAlertMessage(result.message);
+            setAlertSeverity('success');
+            setAlertMessage(result.message);
 
-                fetchCustomerCart();
-            }
+            fetchCustomerCart();
         }
 
         setOpenAlert(true);

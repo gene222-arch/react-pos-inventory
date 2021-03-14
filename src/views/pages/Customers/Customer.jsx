@@ -47,7 +47,7 @@ const Customers = () =>
         { field: 'last_visit', headerName: 'Last visit', width: 242.5 },
         { field: 'total_visits', headerName: 'Total visits', width: 242.5 },
         { field: 'total_spent', headerName: 'Total spent', width: 242.5,
-            valueFormatter: (params) => `P ${params.value.toFixed(2)}`,
+            valueFormatter: (params) => params.value.toFixed(2),
         },
     ];
 

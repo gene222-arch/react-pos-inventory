@@ -1,5 +1,4 @@
 import Axios from 'axios'
-import UnAuthorize from '../views/errors/UnAuthorized'
 import * as Cookie from './cookies'
 
 

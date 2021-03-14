@@ -275,42 +275,45 @@ const PurchaseOrderEdit = ({match}) =>
     {
         setLoading(true);
 
-        const deleteResult = await PurchaseOrder_.destroyPurchaseProductsAsync({
-            purchase_order_id: purchaseOrderId,
-            product_ids: productIds
-        });
+        if (productIds.length)
+        {
+            const deleteResult = await PurchaseOrder_.destroyPurchaseProductsAsync({
+                purchase_order_id: purchaseOrderId,
+                product_ids: Array.from(new Set(productIds)),
+                remaining_items: purchaseOrderDetails.length,
+            });
+    
+            if (deleteResult.status === 'Error')
+            {
+                setAlertSeverity('error');
+                deleteResult.message.items && setAlertMessage(
+                    deleteResult.message.items[0]
+                )
+                setOpenAlert(true);
+            }
+        }
 
-        if (deleteResult.status === 'Error')
+        const upsertResult = await PurchaseOrder_.upsertAsync(validateData());
+    
+        if (upsertResult.status === 'Error')
         {
             setAlertSeverity('error');
+            setOpenAlert(true);
             setAlertMessage(
                 'Unable to save changes. Please fix the errors and try again'
             )
-            setOpenAlert(true);
+            setErrorMessages(prepareSetErrorMessages(upsertResult.message, errorMessages));
         }
         else 
         {
-            const upsertResult = await PurchaseOrder_.upsertAsync(validateData());
-        
-            if (upsertResult.status === 'Error')
-            {
-                setAlertSeverity('error');
-                setOpenAlert(true);
-                setAlertMessage(
-                    'Unable to save changes. Please fix the errors and try again'
-                )
-                setErrorMessages(prepareSetErrorMessages(upsertResult.message, errorMessages));
-            }
-            else 
-            {
-                setAlertSeverity('success');
-                setAlertMessage(upsertResult.message)
-                setOpenAlert(true);
-                setTimeout(() =>  history.push(`/inventory-mngmt/purchase-order-details/${purchaseOrderId}`), 2000);
-            }
-
-            setTimeout(() => setLoading(false), 2000);
+            setAlertSeverity('success');
+            setAlertMessage(upsertResult.message)
+            setOpenAlert(true);
+            setTimeout(() =>  history.push(`/inventory-mngmt/purchase-order-details/${purchaseOrderId}`), 2000);
         }
+    
+
+        setTimeout(() => setLoading(false), 2000);
     }
 
     const validateData = () => 

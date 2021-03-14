@@ -216,8 +216,8 @@ const CreateSupplier = () => {
                                 
                             </Select>
                             <FormHelperText>{
-                                Boolean(errorMessages.name)
-                                    ? errorMessages.name
+                                Boolean(errorMessages.country)
+                                    ? errorMessages.country
                                     : ''
                                 }</FormHelperText>
                         </FormControl>

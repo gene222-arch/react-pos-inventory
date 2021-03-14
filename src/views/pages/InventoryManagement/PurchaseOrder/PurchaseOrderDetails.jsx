@@ -177,9 +177,7 @@ const PurchaseOrderDetails = ({match}) =>
         }
     }, [])
 
-    return !purchaseOrderDetails.length 
-        ? <Loading />
-        : (
+    return (
         <>
             <AlertPopUpMessage 
                 open={openAlert}

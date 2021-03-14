@@ -1,4 +1,4 @@
-import React, {useState, lazy} from 'react'
+import React, {useState, useEffect, lazy} from 'react'
 import * as Discount_ from '../../../../services/products/discounts'
 import { useHistory } from 'react-router-dom'
 import { 
@@ -63,8 +63,6 @@ const CreateDiscount = () =>
             setAlertMessage(result.message);
             setTimeout(() => {
                 history.push('/products/discounts');
-                setDiscount(DISCOUNT_DEFAULT);
-                setErrorMessage(DISCOUNT_DEFAULT);
             }, 2000);
         }
 
@@ -73,6 +71,10 @@ const CreateDiscount = () =>
         setTimeout(() =>  setLoading(false), 2000);
     }
 
+    useEffect(() => {
+        setDiscount(DISCOUNT_DEFAULT);
+        setErrorMessage(DISCOUNT_DEFAULT);
+    }, []);
 
     return (
             <>
