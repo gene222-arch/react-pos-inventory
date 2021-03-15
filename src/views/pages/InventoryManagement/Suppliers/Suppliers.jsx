@@ -64,6 +64,15 @@ const Suppliers = () =>
     const deleteSuppliers = async () => 
     {
         handleClose();
+
+        let _suppliers = [...suppliers];
+
+        rowIds.forEach(rowId => {
+            _suppliers = _suppliers.filter(supplier => supplier.id !== parseInt(rowId) )
+        });
+        
+        setSuppliers(_suppliers);
+
         const result = await Suppliers_.destroyAsync({supplier_ids: rowIds});
 
         if (result.status === 'Error')
@@ -73,16 +82,9 @@ const Suppliers = () =>
         }
         else
         {
-            let _suppliers = [...suppliers];
-
-            rowIds.forEach(rowId => {
-                _suppliers = _suppliers.filter(supplier => supplier.id !== parseInt(rowId) )
-            });
-
             setAlertSeverity('success');
-            setAlertMessage('Products deleted successfully.');
+            setAlertMessage(result.message);
 
-            setSuppliers(_suppliers);
             setOpen(false);
             setRowIds([]);
         }

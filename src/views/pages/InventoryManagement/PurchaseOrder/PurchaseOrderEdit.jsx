@@ -59,7 +59,7 @@ const PurchaseOrderEdit = ({match}) =>
         { field: 'in_stock', headerName: 'In stock', width: 160 },
         { field: 'incoming', headerName: 'Incoming', width: 160 },
         { 
-            field: 'ordered_quantity', 
+            field: 'remaining_ordered_quantity', 
             headerName: 'Quantity', 
             width: 160,
             renderCell: (params) => (
@@ -91,7 +91,7 @@ const PurchaseOrderEdit = ({match}) =>
         { field: 'amount', headerName: 'Amount', width: 160,
             valueFormatter: (params) => {
                const po = purchaseOrderDetails.find(po => po.id === params.row.id);
-               return (po.ordered_quantity * po.purchase_cost).toFixed(2);
+               return (po.remaining_ordered_quantity * po.purchase_cost).toFixed(2);
             }
         },
         {
@@ -138,7 +138,7 @@ const PurchaseOrderEdit = ({match}) =>
                 (purchaseOrderDetail.id === poId)
                     ? {
                         ...purchaseOrderDetail, 
-                        ordered_quantity: value, 
+                        remaining_ordered_quantity: value, 
                         amount: (value * parseFloat(purchaseOrderDetail.purchase_cost))}
                     : purchaseOrderDetail
             );
@@ -166,7 +166,7 @@ const PurchaseOrderEdit = ({match}) =>
                     ? {
                         ...purchaseOrderDetail, 
                         purchase_cost: value,
-                        amount: (value * parseInt(purchaseOrderDetail.ordered_quantity))
+                        amount: (value * parseInt(purchaseOrderDetail.remaining_ordered_quantity))
                     }
                     : purchaseOrderDetail
             );
@@ -328,8 +328,8 @@ const PurchaseOrderEdit = ({match}) =>
 
         const filterPurchaseOrderDetails = purchaseOrderDetails.map(purchaseOrderDetail => ({
             product_id: purchaseOrderDetail.product_id,
-            ordered_quantity: purchaseOrderDetail.ordered_quantity, 
-            remaining_ordered_quantity: purchaseOrderDetail.ordered_quantity,
+            ordered_quantity: purchaseOrderDetail.remaining_ordered_quantity, 
+            remaining_ordered_quantity: purchaseOrderDetail.remaining_ordered_quantity,
             purchase_cost: purchaseOrderDetail.purchase_cost, 
             amount: purchaseOrderDetail.amount
         }));

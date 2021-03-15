@@ -62,6 +62,14 @@ const Discounts = () =>
     const deleteDiscounts = async () => 
     {
         handleClose();
+        let _discounts = [...discounts];
+
+        rowIds.forEach(rowId => {
+            _discounts = _discounts.filter(discount => discount.id !== parseInt(rowId) )
+        });
+
+        setDiscounts(_discounts);
+        
         const result = await ProductDiscounts.destroyAsync({discount_ids: rowIds});
 
         if (result.status === 'Error')
@@ -71,16 +79,9 @@ const Discounts = () =>
         }
         else
         {
-            let _discounts = [...discounts];
-
-            rowIds.forEach(rowId => {
-                _discounts = _discounts.filter(discount => discount.id !== parseInt(rowId) )
-            });
-
             setAlertSeverity('success');
             setAlertMessage(result.message);
 
-            setDiscounts(_discounts);
             setOpen(false);
             setRowIds([]);
         }

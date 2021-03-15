@@ -297,6 +297,7 @@ const ProductsImport = () =>
                                 color="default" 
                                 className={classes.cancelBtn}
                                 disabled={loading}
+                                onClick={() => history.push('/products')}
                             >
                                 Cancel
                             </Button>

@@ -11,6 +11,11 @@ import * as DateHelper from '../../../utils/dates'
 import {prepareSetErrorMessages} from '../../../utils/errorMessages'
 
 
+const ERR_MESSAGE_DEF_PROPS = {
+    startDate: '',
+    endDate: ''
+};
+
 const SalesByEmployee = () => 
 {
     const classes = salesByUseStyles();
@@ -18,17 +23,8 @@ const SalesByEmployee = () =>
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
 
-    const [salesByEmployees, setSalesByEmployees] = useState([{
-        id: 0,
-        cashier: '',
-        gross_sales: 0.00,
-        discount: 0.00,
-        net_sales: 0.00,
-    }]);
-    const [errorMessages, setErrorMessages] = useState({
-        startDate: '',
-        endDate: ''
-    })
+    const [salesByEmployees, setSalesByEmployees] = useState([]);
+    const [errorMessages, setErrorMessages] = useState(ERR_MESSAGE_DEF_PROPS)
 
     const columns = [
         { field: 'cashier', headerName: 'Name', width: 248 },
@@ -39,7 +35,9 @@ const SalesByEmployee = () =>
     ];
 
     const handleStartDate = (date) => setStartDate(DateHelper.prepareExtractCurDate(date));
+
     const handleEndDate = (date) => setEndDate(DateHelper.prepareExtractCurDate(date));
+
     const handleRemoveDate = () => {
         setStartDate(null);
         setEndDate(null);

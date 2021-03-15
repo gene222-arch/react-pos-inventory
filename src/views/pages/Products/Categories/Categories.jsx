@@ -56,6 +56,13 @@ const Categories = () =>
     const deleteCategories = async () => 
     {
         handleClose();
+        let _categories = [...categories];
+
+        rowIds.forEach(rowId => {
+            _categories = _categories.filter(category => category.id !== parseInt(rowId) )
+        });
+        setCategories(_categories);
+        
         const result = await Categories_.destroyAsync({category_ids: rowIds});
 
         if (result.status === 'Error')
@@ -65,16 +72,9 @@ const Categories = () =>
         }
         else
         {
-            let _categories = [...categories];
-
-            rowIds.forEach(rowId => {
-                _categories = _categories.filter(category => category.id !== parseInt(rowId) )
-            });
-
             setAlertSeverity('success');
-            setAlertMessage('Products deleted successfully.');
+            setAlertMessage(result.message);
 
-            setCategories(_categories);
             setOpen(false);
             setRowIds([]);
         }

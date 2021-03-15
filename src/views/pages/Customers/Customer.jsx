@@ -91,6 +91,15 @@ const Customers = () =>
     const deleteCustomers = async () => 
     {
         handleClose();
+
+        let _customers = [...customers];
+
+        rowIds.forEach(rowId => {
+            _customers = _customers.filter(customer => customer.id !== parseInt(rowId) )
+        });
+
+        setCustomers(_customers);
+
         const result = await Customers_.destroyAsync({customer_ids: rowIds});
 
         if (result.status === 'Error')
@@ -100,16 +109,9 @@ const Customers = () =>
         }
         else
         {
-            let _customers = [...customers];
-
-            rowIds.forEach(rowId => {
-                _customers = _customers.filter(customer => customer.id !== parseInt(rowId) )
-            });
-
             setAlertSeverity('success');
             setAlertMessage(result.message);
 
-            setCustomers(_customers);
             setOpen(false);
             setRowIds([]);
         }

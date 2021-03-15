@@ -87,6 +87,15 @@ const ProductList = () =>
     const deleteProducts = async () => 
     {
         handleClose();
+
+        let _products = [...products];
+
+        rowIds.forEach(rowId => {
+            _products = _products.filter(product => product.id !== parseInt(rowId) )
+        });
+
+        setProducts(_products);
+        
         const result = await Product_.destroyAsync({product_ids: rowIds});
 
         if (result.status === 'Error')
@@ -96,16 +105,9 @@ const ProductList = () =>
         }
         else
         {
-            let _products = [...products];
-
-            rowIds.forEach(rowId => {
-                _products = _products.filter(product => product.id !== parseInt(rowId) )
-            });
-
             setAlertSeverity('success');
             setAlertMessage('Products deleted successfully.');
 
-            setProducts(_products);
             setOpen(false);
             setRowIds([]);
         }

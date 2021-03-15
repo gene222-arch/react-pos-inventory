@@ -35,7 +35,7 @@ const CreateSalesReturn = () =>
     const classes = createBadOrdersSalesReturnUseStyles();
     const history = useHistory();
     const [loading, setLoading] = useState(false);
-    const [loadingData, setLoadingData] = useState(false);
+    const [loadingData, setLoadingData] = useState(true);
 
     const [posId, setPosId] = useState(0);
     const [customerOrderList, setCustomerOrderList] = useState([]);
@@ -161,16 +161,16 @@ const CreateSalesReturn = () =>
             }
             else 
             {
-                const subTotal = (price * noOfItemsToReturn).toFixed(2);
-                const tax = (subTotal * TAX_RATE).toFixed(2);
-                const total = ((price * noOfItemsToReturn) + ((price * noOfItemsToReturn) * TAX_RATE) - discount).toFixed(2);
+                const subTotal = (price * noOfItemsToReturn);
+                const tax = (subTotal * TAX_RATE);
+                const total = ((subTotal + tax) - discount);
 
                 const filterData = ({
                     ...data,
                     quantity: noOfItemsToReturn,
                     sub_total: subTotal,
                     tax: tax,
-                    total: total
+                    total: total <= 0 ? 0.00 : total
                 });
 
                 const newOrderDetails = customerOrderDetails.items.map(item => 
@@ -306,16 +306,6 @@ const CreateSalesReturn = () =>
 
     const determineIsOrderSelected = () => Boolean(posId);
 
-    const hasItems = () => Boolean(validateData().posSalesReturnDetails.length);
-
-    const determineHasEmptyFields = () => 
-    {
-        return Boolean(validateData()
-            .posSalesReturnDetails
-            .find(posDetail => posDetail.quantity === 0 || posDetail.defect === ''));
-    }
-
-
     useEffect(() => {
         fetchCustomerOrders();
 
@@ -342,7 +332,7 @@ const CreateSalesReturn = () =>
                 <CardContent>
                     <Grid container spacing={1}>
                         <Grid item xs={12} sm={12} md={12} lg={12}>
-                            {customerOrderList.length > 0 
+                            {customerOrderList.length > 0 && !loadingData
                                 ? (
                                     <FormControl className={classes.formControl}>
                                         <InputLabel id="demo-simple-select-label">Customer order #</InputLabel>
@@ -419,7 +409,7 @@ const CreateSalesReturn = () =>
                                     variant='contained' 
                                     color="default" 
                                     className={classes.cancelBtn}
-                                    onClick={() => history.push('/inventory-mngmt/purchase-orders')}
+                                    onClick={() => history.push('/sales-returns')}
                                     disabled={loading}
                                 >
                                     Cancel

@@ -3,7 +3,7 @@ import * as StockAdjustment_ from '../../../../services/inventory-management/sto
 import { useHistory } from 'react-router-dom'
 import { DataGrid, GridToolbar } from '@material-ui/data-grid';
 import { Card, CardContent, FormHelperText, Grid } from '@material-ui/core';
-import { FormControl, InputLabel, Select, MenuItem, TextField } from '@material-ui/core'
+import { FormControl, InputLabel, Select, MenuItem, TextField, Typography } from '@material-ui/core'
 import Button from '@material-ui/core/Button';
 import { createPageUseStyles } from '../../../../assets/material-styles/styles'
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
@@ -15,6 +15,7 @@ const CreateStockAdjustment = () =>
     const classes = createPageUseStyles();
     const history = useHistory();
     const [loading, setLoading] = useState(false);
+    const [loadingData, setLoadingData] = useState(true);
 
     const [reason, setReason] = useState('Received items');
     const [productId, setProductId] = useState(0);
@@ -221,19 +222,28 @@ const CreateStockAdjustment = () =>
         let value = e.target.value;
         value = parseInt(value) || 0;
 
-        let filterData = ({
-            ...data,
-            removed_stock: value,
-            stock_after: data.in_stock - value
-        });
-
-        const newAdjustments = stockAdjustmentDetails.map(stockAdjustmentDetail => {
-            return stockAdjustmentDetail.stock_id === filterData.stock_id 
-                ? filterData
-                : stockAdjustmentDetail
-        });
-
-        setStockAdjustmentDetails(newAdjustments);
+        if (value > data.in_stock)
+        {
+            setAlertSeverity('error')
+            setAlertMessage('Stock to be removed exceeded the product current stocks.');
+            setOpenAlert(true);
+        }
+        else 
+        {
+            let filterData = ({
+                ...data,
+                removed_stock: value,
+                stock_after: data.in_stock - value
+            });
+    
+            const newAdjustments = stockAdjustmentDetails.map(stockAdjustmentDetail => {
+                return stockAdjustmentDetail.stock_id === filterData.stock_id 
+                    ? filterData
+                    : stockAdjustmentDetail
+            });
+    
+            setStockAdjustmentDetails(newAdjustments);
+        }
     };
 
     const handleOnRemoveProduct = (stockId) => 
@@ -251,6 +261,8 @@ const CreateStockAdjustment = () =>
         {
             setProducts(result.data);
         }
+
+        setLoadingData(false);
     }
     
     const fetchStockToAdjust = async (e) => 
@@ -313,7 +325,6 @@ const CreateStockAdjustment = () =>
 
     }
 
-
     const request = async () => 
     {
         switch (reason) {
@@ -375,6 +386,21 @@ const CreateStockAdjustment = () =>
 
 
     useEffect(() => {
+
+
+
+        setStockAdjustmentDetails(
+            stockAdjustmentDetails.map(stock => ({
+                ...stock,
+                stock_after: 0,
+                added_stock: 0,
+                removed_stock: 0,
+                counted_stock: 0
+            }))
+        )
+    }, [reason])
+
+    useEffect(() => {
         fetchProducts();
 
         return () => {
@@ -391,105 +417,124 @@ const CreateStockAdjustment = () =>
                 globalMessage={alertMessage}
                 severity={alertSeverity} 
             />
-            <Card className={classes.selectPOContainer}>
-                <CardContent>
-                    <Grid container spacing={3} alignItems='center' justify='space-between'>
-                        <Grid item xs={12} sm={12} md={5} lg={5}>
-                            <FormControl className={classes.formControl}>
-                                <InputLabel id="demo-simple-select-label">
-                                    Reason
-                                </InputLabel>
-                                <Select
-                                    displayEmpty
-                                    className={classes.selectEmpty}
-                                    inputProps={{ 'aria-label': 'Without label' }}
-                                    fullWidth
-                                    value={reason}
-                                    onChange={handleOnChangeReason}
-                                >
-                                    <MenuItem value='Received items'>Received items</MenuItem>
-                                    <MenuItem value='Inventory count'>Inventory count</MenuItem>
-                                    <MenuItem value='Loss'>Loss</MenuItem>
-                                    <MenuItem value='Damage'>Damage</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={12} lg={12}>
-                            <Grid container justify='center' alignItems='center'>
-                                <Grid item xs={12} sm={12} md={5} lg={5}>
-                                    <FormControl 
-                                        className={classes.formControl}
-                                        error={Boolean(errorMessage)}
-                                        >
-                                        <InputLabel id="demo-simple-select-label">Add product</InputLabel>
-                                        <Select
-                                            name='product'
-                                            labelId="demo-simple-select-label"
-                                            id="demo-simple-select"
-                                            className={classes.selectEmpty}
-                                            fullWidth
-                                            margin='dense'
-                                            value={productId}
-                                            onChange={fetchStockToAdjust}
-                                        >
-                                            {
-                                                products.map((product) => (
-                                                    <MenuItem key={product.id} value={product.id}>
-                                                        {product.name}
-                                                    </MenuItem>
-                                                ))
-                                            }
-                                            
-                                        </Select>
-                                        <FormHelperText>{errorMessage && errorMessage}</FormHelperText>
-                                    </FormControl>  
+            {
+                products.length <= 0 && !loadingData
+                    ? <Card>
+                        <CardContent>
+                            <Typography
+                                variant="h5" 
+                                color="initial"
+                                className={classes.emptyPurchaseOrdersMessage}
+                            >
+                                Product list is empty.
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                    : (
+                        <>
+                            <Card className={classes.selectPOContainer}>
+                                <CardContent>
+                                    <Grid container spacing={3} alignItems='center' justify='space-between'>
+                                        <Grid item xs={12} sm={12} md={5} lg={5}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel id="demo-simple-select-label">
+                                                    Reason
+                                                </InputLabel>
+                                                <Select
+                                                    displayEmpty
+                                                    className={classes.selectEmpty}
+                                                    inputProps={{ 'aria-label': 'Without label' }}
+                                                    fullWidth
+                                                    value={reason}
+                                                    onChange={handleOnChangeReason}
+                                                >
+                                                    <MenuItem value='Received items'>Received items</MenuItem>
+                                                    <MenuItem value='Inventory count'>Inventory count</MenuItem>
+                                                    <MenuItem value='Loss'>Loss</MenuItem>
+                                                    <MenuItem value='Damage'>Damage</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                                            <Grid container justify='center' alignItems='center'>
+                                                <Grid item xs={12} sm={12} md={5} lg={5}>
+                                                    <FormControl 
+                                                        className={classes.formControl}
+                                                        error={Boolean(errorMessage)}
+                                                        >
+                                                        <InputLabel id="demo-simple-select-label">Add product</InputLabel>
+                                                        <Select
+                                                            name='product'
+                                                            labelId="demo-simple-select-label"
+                                                            id="demo-simple-select"
+                                                            className={classes.selectEmpty}
+                                                            fullWidth
+                                                            margin='dense'
+                                                            value={productId}
+                                                            onChange={fetchStockToAdjust}
+                                                        >
+                                                            {
+                                                                products.map((product) => (
+                                                                    <MenuItem key={product.id} value={product.id}>
+                                                                        {product.name}
+                                                                    </MenuItem>
+                                                                ))
+                                                            }
+                                                            
+                                                        </Select>
+                                                        <FormHelperText>{errorMessage && errorMessage}</FormHelperText>
+                                                    </FormControl>  
+                                                </Grid>
+                                            </Grid>
+                                
+                                        </Grid>
+                                    </Grid>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardContent>
+                                    <div style={{ width: '100%' }}>
+                                        <DataGrid 
+                                            autoHeight
+                                            showToolbar
+                                            components={{
+                                                Toolbar: GridToolbar,
+                                            }}
+                                            rows={stockAdjustmentDetails} 
+                                            columns={columns} 
+                                            pageSize={5} 
+                                        />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            <Grid container justify='flex-end'>
+                                <Grid item>
+                                    <Button 
+                                        variant='contained' 
+                                        color="default" 
+                                        className={classes.cancelBtn}
+                                        onClick={() => history.push('/inventory-mngmt/stock-adjustments')}
+                                        disabled={loading}
+                                    >
+                                        Cancel
+                                    </Button>
                                 </Grid>
-                            </Grid>
-                
-                        </Grid>
-                    </Grid>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardContent>
-                    <div style={{ width: '100%' }}>
-                        <DataGrid 
-                            autoHeight
-                            showToolbar
-                            components={{
-                                Toolbar: GridToolbar,
-                            }}
-                            rows={stockAdjustmentDetails} 
-                            columns={columns} 
-                            pageSize={5} 
-                        />
-                    </div>
-                </CardContent>
-            </Card>
-            <Grid container justify='flex-end'>
-                <Grid item>
-                    <Button 
-                        variant='contained' 
-                        color="default" 
-                        className={classes.cancelBtn}
-                        onClick={() => history.push('/inventory-mngmt/stock-adjustments')}
-                        disabled={loading}
-                    >
-                        Cancel
-                    </Button>
-                </Grid>
-                <Grid item>
-                    <Button 
-                        variant='contained' 
-                        color="default" 
-                        className={classes.addBtn}
-                        onClick={createStockAdjustment}
-                        disabled={loading}
-                    >
-                        Create
-                    </Button>
-                </Grid>
-            </Grid>
+                                <Grid item>
+                                    <Button 
+                                        variant='contained' 
+                                        color="default" 
+                                        className={classes.addBtn}
+                                        onClick={createStockAdjustment}
+                                        disabled={loading}
+                                    >
+                                        Create
+                                    </Button>
+                                </Grid>
+                            </Grid>       
+                        </>
+                    )
+
+            }
         </>
     );
 }
