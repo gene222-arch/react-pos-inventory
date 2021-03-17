@@ -45,7 +45,7 @@ const paymentUseStyles = makeStyles((theme) => ({
 }))
 
 
-const Charge = ({change, customer, paymentProcessState, dispatchPaymentProcessState, validatedData}) => 
+const Charge = ({change, customer, paymentProcessState, dispatchPaymentProcessState, validatedData, handleOnProcessPayment, fetchCustomerCart}) => 
 {
     const classes = paymentUseStyles();
     const history = useHistory();
@@ -109,7 +109,12 @@ const Charge = ({change, customer, paymentProcessState, dispatchPaymentProcessSt
         {
             setAlertSeverity('success');
             setAlertMessage(result.message);
-            setTimeout(() =>  history.go(0), 2000);
+            
+            fetchCustomerCart();
+
+            setTimeout(() =>  {
+                handleOnProcessPayment();
+            }, 2000);
         }
     
         setOpenAlert(true);

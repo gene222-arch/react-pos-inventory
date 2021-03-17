@@ -156,6 +156,14 @@ const Pos = () =>
 
     const handleOnDeleteProduct = async (posDetailIds) => 
     {
+        let _orderDetails = [...orderDetails];
+
+        posDetailIds.forEach((id) => {
+            _orderDetails = _orderDetails.filter((order) => id != order.pos_details_id)
+        });
+
+        setOrderDetails(_orderDetails);
+
         const result = await POS_.removeItemsAsync({
             customer_id: customerId,
             product_ids: rowIds
@@ -163,14 +171,7 @@ const Pos = () =>
 
         if (result.status === 'Success')
         {
-            let _orderDetails = [...orderDetails];
-
-            posDetailIds.forEach((id) => {
-                _orderDetails = _orderDetails.filter((order) => id != order.pos_details_id)
-            });
-
             setRowIds([]);
-            setOrderDetails(_orderDetails);
         }
     }
 
@@ -201,7 +202,6 @@ const Pos = () =>
     }, [customerId]);
 
 
-
     return loading 
         ? <Loading />   
         : (processPayment && orderDetails.length > 0) 
@@ -210,6 +210,7 @@ const Pos = () =>
                     customerId={customerId}
                     orderDetails={orderDetails}
                     paymentAmountDetails={paymentAmountDetails}
+                    fetchCustomerCart={fetchCustomerCart}
                 />
             : (
                 <>

@@ -59,7 +59,7 @@ const CUSTOMER_DEFAULT_PROPS = {
 }
 
 
-const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, paymentAmountDetails}) => 
+const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, paymentAmountDetails, fetchCustomerCart}) => 
 {
     const classes = processPaymentUseStyles();
 
@@ -109,7 +109,7 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
             })
         }
 
-};
+    };
 
     const handleOnChargeAmount = (e, amount) => 
     {
@@ -364,21 +364,25 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
                                     change={
                                         (paymentProcessState.cash - TO_PAY).toFixed(2)
                                     }
+                                    handleOnProcessPayment={handleOnProcessPayment}
                                     customer={customer}
                                     paymentProcessState={paymentProcessState}
                                     dispatchPaymentProcessState={dispatchPaymentProcessState}
                                     validatedData={validatedData}
+                                    fetchCustomerCart={fetchCustomerCart}
                                 />
                             )
                         }
                         {    paymentProcessState.payment_method.length > 0 && 
                             (paymentProcessState.payment_method === 'credit') && (
                                 <CardPayment 
+                                    handleOnProcessPayment={handleOnProcessPayment}
                                     customer={customer}
                                     total={paymentAmountDetails.total}
                                     paymentProcessState={paymentProcessState}
                                     dispatchPaymentProcessState={dispatchPaymentProcessState}
                                     validatedData={validatedData}
+                                    fetchCustomerCart={fetchCustomerCart}
                                 />
                             )
                         }
@@ -386,11 +390,13 @@ const ProcessPayment = ({customerId, handleOnProcessPayment, orderDetails, payme
                             paymentProcessState.payment_method.length > 0 &&
                             (paymentProcessState.payment_method === 'invoice') && (
                                 <Invoice 
+                                    handleOnProcessPayment={handleOnProcessPayment}
                                     customer={customer}
                                     total={paymentAmountDetails.total}
                                     paymentProcessState={paymentProcessState}
                                     dispatchPaymentProcessState={dispatchPaymentProcessState}
                                     validatedData={validatedData}
+                                    fetchCustomerCart={fetchCustomerCart}
                                 />
                             )
                         }

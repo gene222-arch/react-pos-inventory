@@ -53,7 +53,7 @@ const paymentUseStyles = makeStyles((theme) => ({
 }))
 
 
-const Invoice = ({customer, total, paymentProcessState, dispatchPaymentProcessState, validatedData}) => 
+const Invoice = ({customer, total, paymentProcessState, dispatchPaymentProcessState, validatedData, handleOnProcessPayment, fetchCustomerCart}) => 
 {
     const classes = paymentUseStyles();
     const history = useHistory();
@@ -123,7 +123,12 @@ const Invoice = ({customer, total, paymentProcessState, dispatchPaymentProcessSt
         {
             setAlertSeverity('success');
             setAlertMessage(result.message);
-            setTimeout(() =>  history.go(0), 2000);
+            
+            fetchCustomerCart();
+
+            setTimeout(() =>  {
+                handleOnProcessPayment()
+            }, 2000);
         }
 
         setOpenAlert(true);
@@ -193,7 +198,7 @@ const Invoice = ({customer, total, paymentProcessState, dispatchPaymentProcessSt
                                         inputProps={{ 'aria-label': 'Without label' }}
                                         fullWidth
                                         value={paymentProcessState.number_of_days}
-                                        onChange={dispatchPaymentProcessState}
+                                        onChange={handleOnChange}
                                     >
                                         {
                                             [30, 45, 60, 90].map((day, index) => (
